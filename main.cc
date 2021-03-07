@@ -1,16 +1,16 @@
-#include <iostream>
-#include <cstdint>
-#include <vector>
 #include "matrix.hh"
+#include <cstdint>
+#include <iostream>
+#include <vector>
 
-using std::cout;
 using std::cin;
+using std::cout;
 using std::endl;
 
 using std::vector;
 using namespace MX;
 
-int main ( )
+int main()
 {
   uint size = 0;
   cin >> size;

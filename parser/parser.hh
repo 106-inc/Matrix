@@ -11,7 +11,8 @@
 
 enum RES_OF_PARSE
 {
-    SUCESS_PARSE, ERROR_IN_PARSE
+  SUCESS_PARSE,
+  ERROR_IN_PARSE
 };
 
 class OurFlexLexer : public yyFlexLexer

@@ -1,6 +1,5 @@
 #include "driver.hh"
 
-
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
 yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file)
@@ -71,8 +70,8 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 
 void yy::Driver::insert(int jnction1, int jnction2, float resistor, float voltage)
 {
-    std::cout << "Hello, I'm insertion\n";
-    return;
+  std::cout << "Hello, I'm insertion\n";
+  return;
 }
 
 //!  Function for processing syntax error during parsing
