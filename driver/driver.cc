@@ -70,7 +70,12 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 
 void yy::Driver::insert(int jnction1, int jnction2, float resistor, float voltage)
 {
+#if 0
   std::cout << "Hello, I'm insertion\n";
+#endif
+
+
+
   return;
 }
 

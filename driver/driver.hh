@@ -16,6 +16,8 @@
 //#include "../FB_BLD/lex.yy.cc"
 #endif /* yyFlexLexer */
 
+#include "../matrix.hh"
+
 enum
 {
   NUM_OF_TOKENS = 30
@@ -31,6 +33,8 @@ private:
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
+
+
 
 public:
   Driver(const char *name_of_file);
