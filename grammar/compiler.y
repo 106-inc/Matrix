@@ -32,7 +32,6 @@ EDGE           "--"
 VOLT           "V"
 COMMA          ","
 NEW_LINE       "\\n"
-END_OF_FILE    0
 ;
 
 %token <int>   INT

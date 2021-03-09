@@ -18,9 +18,10 @@
 WS                  [ \t\v]+
 COMM                "//".*"\n"
 
-DIGIT               [1-9]
+DIGIT                [0-9]
+DIGIT1               [1-9]
 
-INT                 {DIGIT}{DIGIT}*
+INT                 {DIGIT1}{DIGIT1}*
 DOUBLE              {DIGIT}+\.{DIGIT}+
 
 NEW_LINE            [\n]+
