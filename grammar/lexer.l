@@ -15,13 +15,13 @@
 
 %}
 
-WS                  [ \t\v]+
+WS                  [\t\v]+
 COMM                "//".*"\n"
 
 DIGIT                [0-9]
 DIGIT1               [1-9]
 
-INT                 {DIGIT1}{DIGIT1}*
+INT                 {DIGIT1}{DIGIT}*
 DOUBLE              {DIGIT}+\.{DIGIT}+
 
 NEW_LINE            [\n]+

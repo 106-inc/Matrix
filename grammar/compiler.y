@@ -43,15 +43,15 @@ NEW_LINE       "\\n"
 
 %%
 
-program:    line                             { /* program starting */};
+program:      line                            { /* program starting */};
+	    |
 
 line:         expr                            {};
             | expr NEW_LINE                   {};
-            | expr END_OF_FILE                {};
             | NEW_LINE                        {};
 
-expr:        junction EDGE junction COMMA
-             resistor SEMICOLON voltage       { driver->insert($1, $3, $5, $7); };
+expr:        junc EDGE junction COMMA
+             resistr SEMICOLON voltage       { driver->insert($1, $3, $5, $7); };
 
 junction:    INT                              { $$ = $1; };
 
