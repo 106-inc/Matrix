@@ -1,173 +1,8 @@
-#include <cassert>
-#include <cmath>
-#include <initializer_list>
-#include <iostream>
-#include <stdexcept>
-#include <type_traits>
-#include <utility>
+#include "mem.hh"
 
-namespace Buf
-{
-template <typename T> void copy_construct(T *ptr, const T &val)
-{
-  new (ptr) T{val};
-}
-
-template <class T> void destr(T *ptr)
-{
-  ptr->~T();
-}
-
-template <typename It> void destr(It beg, It end)
-{
-  while (beg != end)
-    destr(&*beg++);
-}
-
-/*
- *
- * VBuf class
- *
- */
-
-template <typename DataT> struct VBuf
-{
-  VBuf(const VBuf &) = delete;
-
-  VBuf &operator=(const VBuf &) = delete;
-
-protected:
-  DataT *arr_;
-  size_t size_, used_;
-
-  explicit VBuf(size_t size = 0);
-
-  ~VBuf();
-
-  void swap(VBuf &rhs) noexcept;
-};
-
-/*
- *
- * VBuf class methods realistaions
- *
- */
-
-template <typename DataT>
-VBuf<DataT>::VBuf(size_t size)
-    : arr_(size == 0 ? nullptr : static_cast<DataT *>(::operator new(sizeof(DataT) * size))), size_(size), used_(0)
-{
-}
-
-template <typename DataT> VBuf<DataT>::~VBuf()
-{
-  destr(arr_, arr_ + used_);
-  ::operator delete(arr_);
-}
-
-template <typename DataT> void VBuf<DataT>::swap(VBuf &rhs) noexcept
-{
-  std::swap(arr_, rhs.arr_);
-  std::swap(size_, rhs.size_);
-  std::swap(used_, rhs.used_);
-}
-} // namespace Buf
 
 namespace MX
 {
-using namespace Buf;
-
-template <typename DataT> class Matrix;
-
-/*
- *
- * Row class
- *
- */
-
-template <typename DataT> struct Row : private VBuf<DataT>
-{
-  using VBuf<DataT>::arr_;
-  using VBuf<DataT>::size_;
-  using VBuf<DataT>::used_;
-
-  friend class Matrix<DataT>;
-
-  explicit Row(size_t size);
-  Row(const Row &rhs);
-  template <typename It> Row(size_t size, It beg, It end);
-
-  Row &operator=(const Row &rhs);
-
-public:
-  const DataT &get(size_t idx) const;
-  void set(size_t idx, DataT new_val);
-  const DataT &operator[](size_t idx) const;
-};
-
-/*
- *
- * Row class method realisations
- *
- */
-
-template <typename DataT> Row<DataT>::Row(size_t size) : VBuf<DataT>(size)
-{
-  DataT tmp{};
-  for (; used_ < size_; ++used_)
-    copy_construct(arr_ + used_, tmp);
-}
-
-template <typename DataT> Row<DataT>::Row(const Row &rhs) : VBuf<DataT>(rhs.size_)
-{
-  for (; used_ < rhs.used_; ++used_)
-    copy_construct(arr_ + used_, *(rhs.arr_ + used_));
-
-  DataT tmp{};
-  for (; used_ < size_; ++used_)
-    copy_construct(arr_ + used_, tmp);
-}
-
-template <typename DataT> template <typename It> Row<DataT>::Row(size_t size, It beg, It end) : VBuf<DataT>(size)
-{
-  It cur = beg;
-
-  for (; used_ < size_ && cur != end; ++used_, ++cur)
-    copy_construct(arr_ + used_, *cur);
-
-  DataT tmp{};
-  for (; used_ < size_; ++used_)
-    copy_construct(arr_ + used_, tmp);
-}
-
-template <typename DataT> Row<DataT> &Row<DataT>::operator=(const Row &rhs)
-{
-  Row tmp{rhs};
-  //------------ Kalb line
-  this->swap(tmp);
-  return *this;
-}
-
-template <typename DataT> const DataT &Row<DataT>::get(size_t idx) const
-{
-  if (idx >= size_)
-    throw std::out_of_range("Get index too big.");
-
-  return arr_[idx];
-}
-
-template <typename DataT> void Row<DataT>::set(size_t idx, DataT new_val)
-{
-  if (idx >= size_)
-    throw std::out_of_range("Set index too big.");
-
-  arr_[idx] = new_val;
-}
-
-template <typename DataT> const DataT &Row<DataT>::operator[](size_t idx) const
-{
-  return get(idx);
-}
 
 /*
  *
@@ -205,7 +40,7 @@ public:
   void set(size_t row, size_t col, DataT val);
   const Row<DataT> &operator[](size_t row) const;
 
-  long double det() const;
+  DataT det() const;
 
   Matrix &transpose() &;
 
@@ -340,7 +175,7 @@ template <typename DataT> size_t Matrix<DataT>::rows() const noexcept
   return rows_;
 }
 
-template <typename DataT> long double Matrix<DataT>::det() const
+template <typename DataT> DataT Matrix<DataT>::det() const
 {
   if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
@@ -542,7 +377,7 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
   if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
 
-  for (size_t i = 0; i < cols_; ++i)
+  for (size_t i = 0; i < rows_; ++i)
   {
     bool zero_col = true;
 
@@ -557,8 +392,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
           break;
         }
 
-    if (zero_col)
-      throw std::runtime_error("idk");
+    if (zero_col) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
+      throw std::runtime_error("Here we need to swap cols");
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
@@ -571,6 +406,41 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
   }
 
   return *this;
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
+{
+    if (!std::is_floating_point<DataT>::value)
+        throw std::bad_typeid();
+
+    for (size_t i = 1; i < rows_; ++i)
+    {
+        /*bool zero_col = true;
+
+        if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
+            zero_col = false;
+        else
+            for (size_t j = i + 1; j < rows_; ++j)
+                if (std::abs(arr_[j][i]) > 1e-12)
+                {
+                    swap_lines(j, i);
+                    zero_col = false;
+                    break;
+                }
+
+        if (zero_col)
+            throw std::runtime_error("Here we need to swap cols");*/
+
+        for (size_t k = 0; k < i; ++k)
+        {
+            if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
+                continue;
+
+            DataT mul = arr_[k][i] / arr_[i][i];
+            add_line(k, i, -mul);
+        }
+    }
+    return *this;
 }
 
 template <typename DataT> bool Matrix<DataT>::sum_suitable(const Matrix<DataT> &matr) const
@@ -623,6 +493,28 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
   }
 
   return ost;
+}
+
+template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr)
+{
+    for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
+    {
+        ost << "| ";
+
+        for (size_t j = 0; j < cols; ++j)
+        {
+            auto tmp = matr[i][j];
+
+            if (std::abs(tmp) < 1e-12) // TODO: EPSILON, IS_ZERO
+                ost << "0 ";
+            else
+                ost << tmp << " ";
+        }
+
+        ost << "|" << std::endl;
+    }
+
+    return ost;
 }
 
 } // namespace MX
