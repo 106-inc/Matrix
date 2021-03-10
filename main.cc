@@ -1,4 +1,4 @@
-#include "matrix.hh"
+#include "lin_alg/matrix.hh"
 #include <cstdint>
 #include <iostream>
 #include <vector>

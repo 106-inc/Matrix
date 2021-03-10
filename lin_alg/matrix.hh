@@ -221,9 +221,12 @@ public:
   bool operator==(const Matrix &matr) const;
   bool operator!=(const Matrix &matr) const;
 
-  bool swap_lines(size_t l1, size_t l2);
-  bool add_line(size_t to, size_t from, DataT mul);
-  bool mul_line(size_t l, DataT mul);
+  Matrix &swap_lines(size_t l1, size_t l2);
+  Matrix &add_line(size_t to, size_t from, DataT mul);
+  Matrix &mul_line(size_t l, DataT mul);
+
+  Matrix &GaussFWD();
+  Matrix &GaussBWD();
 
   bool sum_suitable(const Matrix<DataT> &matr) const;
 };
@@ -234,6 +237,7 @@ template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &lhs, cons
 template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &matr, DataT mul);
 template <typename DataT> Matrix<DataT> operator*(DataT mul, const Matrix<DataT> &matr);
 template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr);
+template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr);
 
 /*
  *
@@ -338,7 +342,7 @@ template <typename DataT> size_t Matrix<DataT>::rows() const noexcept
 
 template <typename DataT> long double Matrix<DataT>::det() const
 {
-  if (!std::is_fundamental<DataT>::value)
+  if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
 
   if ((cols_ != rows_))
@@ -346,22 +350,19 @@ template <typename DataT> long double Matrix<DataT>::det() const
 
   long double sign = 1;
 
-  Matrix<long double> tmp_dbl{rows_, cols_};
-  for (size_t i = 0; i < rows_; ++i)
-    for (size_t j = 0; j < cols_; ++j)
-      tmp_dbl.set(i, j, static_cast<long double>(arr_[i][j]));
+  Matrix<DataT> tmp{*this};
 
   for (size_t i = 0; i < cols_; ++i)
   {
     bool zero_col = true;
 
-    if (tmp_dbl[i][i] != 0) // TODO: EPSILON
+    if (std::abs(tmp[i][i]) > 1e-12) // TODO: EPSILON
       zero_col = false;
     else
       for (size_t j = i + 1; j < rows_; ++j)
-        if (tmp_dbl[j][i] != 0)
+        if (std::abs(tmp[j][i]) > 1e-12)
         {
-          tmp_dbl.swap_lines(j, i);
+          tmp.swap_lines(j, i);
           zero_col = false;
           sign = -sign;
           break;
@@ -372,17 +373,17 @@ template <typename DataT> long double Matrix<DataT>::det() const
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
-      if (tmp_dbl[k][i] == 0) // TODO: EPSILON
+      if (std::abs(tmp[k][i]) < 1e-12) // TODO: EPSILON
         continue;
 
-      long double mul = tmp_dbl[k][i] / tmp_dbl[i][i];
-      tmp_dbl.add_line(k, i, -mul);
+      long double mul = tmp[k][i] / tmp[i][i];
+      tmp.add_line(k, i, -mul);
     }
   }
 
   long double res = sign;
   for (size_t i = 0; i < cols_; ++i)
-    res *= tmp_dbl[i][i];
+    res *= tmp[i][i];
 
   return res;
 }
@@ -497,17 +498,17 @@ template <typename DataT> bool Matrix<DataT>::operator!=(const Matrix &matr) con
   return !operator==(matr);
 }
 
-template <typename DataT> bool Matrix<DataT>::swap_lines(size_t l1, size_t l2)
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, size_t l2)
 {
   if (l1 >= cols_ || l2 >= cols_)
     throw std::range_error("Lines' numbers wrong.");
 
   std::swap(arr_[l1], arr_[l2]);
 
-  return true;
+  return *this;
 }
 
-template <typename DataT> bool Matrix<DataT>::add_line(size_t to, size_t from, DataT mul)
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::add_line(size_t to, size_t from, DataT mul)
 {
   if (to >= cols_ || from >= cols_)
     throw std::range_error("Lines' numbers wrong.");
@@ -518,10 +519,10 @@ template <typename DataT> bool Matrix<DataT>::add_line(size_t to, size_t from, D
     tmp.set(to, i, tmp[to][i] + mul * arr_[from][i]);
 
   swap(tmp);
-  return true;
+  return *this;
 }
 
-template <typename DataT> bool Matrix<DataT>::mul_line(size_t l, DataT mul)
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::mul_line(size_t l, DataT mul)
 {
   if (l >= cols_)
     throw std::range_error("Line number wrong.");
@@ -533,7 +534,43 @@ template <typename DataT> bool Matrix<DataT>::mul_line(size_t l, DataT mul)
 
   swap(tmp);
 
-  return true;
+  return *this;
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
+{
+  if (!std::is_floating_point<DataT>::value)
+    throw std::bad_typeid();
+
+  for (size_t i = 0; i < cols_; ++i)
+  {
+    bool zero_col = true;
+
+    if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
+      zero_col = false;
+    else
+      for (size_t j = i + 1; j < rows_; ++j)
+        if (std::abs(arr_[j][i]) > 1e-12)
+        {
+          swap_lines(j, i);
+          zero_col = false;
+          break;
+        }
+
+    if (zero_col)
+      throw std::runtime_error("idk");
+
+    for (size_t k = i + 1; k < rows_; ++k)
+    {
+      if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
+        continue;
+
+      DataT mul = arr_[k][i] / arr_[i][i];
+      add_line(k, i, -mul);
+    }
+  }
+
+  return *this;
 }
 
 template <typename DataT> bool Matrix<DataT>::sum_suitable(const Matrix<DataT> &matr) const
@@ -572,4 +609,20 @@ template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr)
   tmp.transpose();
   return tmp;
 }
+
+template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr)
+{
+  for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
+  {
+    ost << "| ";
+
+    for (size_t j = 0; j < cols; ++j)
+      ost << matr[i][j] << " ";
+
+    ost << "|" << std::endl;
+  }
+
+  return ost;
+}
+
 } // namespace MX
