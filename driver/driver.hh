@@ -34,8 +34,6 @@ private:
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
 
-
-
 public:
   Driver(const char *name_of_file);
 

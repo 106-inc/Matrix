@@ -74,8 +74,6 @@ void yy::Driver::insert(int jnction1, int jnction2, float resistor, float voltag
   std::cout << "Hello, I'm insertion\n";
 #endif
 
-
-
   return;
 }
 
