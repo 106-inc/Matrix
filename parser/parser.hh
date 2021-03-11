@@ -7,7 +7,6 @@
 #include <FlexLexer.h>
 #endif /* yyFlexLexer */
 
-
 #include "../FB_BLD/compiler.tab.hh"
 
 enum RES_OF_PARSE

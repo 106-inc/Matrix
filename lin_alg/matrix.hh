@@ -18,7 +18,7 @@ static long double EPS = 1e-12;
 
 /**
  * @brief Compares floating point numbers with zero
- * @param num Number you need to compare 
+ * @param num Number you need to compare
  */
 bool is_zero(long double num)
 {
@@ -32,7 +32,6 @@ template <typename DataT> class Matrix : public VBuf<Row<DataT>>
 {
 
 protected:
-
   using VBuf<Row<DataT>>::arr_;
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
@@ -41,7 +40,6 @@ protected:
   size_t cols_{};
 
 public:
-
   /**
    * @brief Empty matrix ctor
    */
@@ -77,7 +75,6 @@ public:
    */
   void swap(Matrix &rhs) noexcept;
 
-
   size_t cols() const noexcept;
   size_t rows() const noexcept;
 
@@ -104,7 +101,7 @@ public:
 
   /**
    * @brief Calculate and return determinant
-   * @throw std::bad_typeid if DataT is not floating point type, 
+   * @throw std::bad_typeid if DataT is not floating point type,
    *        std::range_error if matrix is not square
    * @return Determinant
    */
@@ -148,14 +145,14 @@ public:
    * @param matr Matrix to concatenate with
    * @return Self reference
    */
-  Matrix &glue_dn(const Matrix & matr);
+  Matrix &glue_dn(const Matrix &matr);
 
   /**
    * @brief Concatenate this matrix with matr by right side
    * @param matr Matrix to concatenate with
    * @return Self reference
    */
-  Matrix &glue_rt(const Matrix & matr);
+  Matrix &glue_rt(const Matrix &matr);
 
   /**
    * @brief Swap line indexed as 'l1' and line indexed as 'l2'
@@ -190,7 +187,6 @@ public:
   bool sum_suitable(const Matrix<DataT> &matr) const;
 
 protected:
-
   /**
    * @brief Forward part of Gauss method
    * @return Self reference
@@ -475,37 +471,37 @@ template <typename DataT> bool Matrix<DataT>::operator!=(const Matrix &matr) con
   return !operator==(matr);
 }
 
-template <typename DataT> Matrix<DataT> & Matrix<DataT>::glue_dn(const Matrix & matr)
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_dn(const Matrix &matr)
 {
-    if (cols_ != matr.cols_)
-        throw std::runtime_error("Cols num doesn't match");
+  if (cols_ != matr.cols_)
+    throw std::runtime_error("Cols num doesn't match");
 
-    Matrix<DataT> tmp {rows_ + matr.rows_, cols_};
+  Matrix<DataT> tmp{rows_ + matr.rows_, cols_};
 
-    for (size_t i = rows_; i < tmp.rows_; ++i)
-        tmp.arr_[i] = matr.arr_[i - rows_];
+  for (size_t i = rows_; i < tmp.rows_; ++i)
+    tmp.arr_[i] = matr.arr_[i - rows_];
 
-    swap(tmp);
+  swap(tmp);
 
-    for (size_t i = 0; i < tmp.rows_; ++i)
-        std::swap(arr_[i], tmp.arr_[i]);
+  for (size_t i = 0; i < tmp.rows_; ++i)
+    std::swap(arr_[i], tmp.arr_[i]);
 
-    return *this;
+  return *this;
 }
 
-template <typename DataT> Matrix<DataT> & Matrix<DataT>::glue_rt(const Matrix & matr)
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_rt(const Matrix &matr)
 {
-    if (rows_ != matr.rows_)
-        throw std::runtime_error("Rows num doesn't match");
+  if (rows_ != matr.rows_)
+    throw std::runtime_error("Rows num doesn't match");
 
-    Matrix<DataT> this_tr {MX::transpose(*this)};
-    Matrix<DataT> matr_tr {MX::transpose(matr)};
+  Matrix<DataT> this_tr{MX::transpose(*this)};
+  Matrix<DataT> matr_tr{MX::transpose(matr)};
 
-    this_tr.glue_dn(matr_tr);
+  this_tr.glue_dn(matr_tr);
 
-    swap(this_tr.transpose());
+  swap(this_tr.transpose());
 
-    return *this;
+  return *this;
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, size_t l2)
@@ -657,12 +653,12 @@ template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr)
 
 template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
 {
-    return Matrix<DataT> {matr1}.glue_rt(matr2);
+  return Matrix<DataT>{matr1}.glue_rt(matr2);
 }
 
 template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
 {
-    return Matrix<DataT> {matr1}.glue_dn(matr2);
+  return Matrix<DataT>{matr1}.glue_dn(matr2);
 }
 
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr)

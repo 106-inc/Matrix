@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
-#include "matrix.hh"
 #include "la.hh"
+#include "matrix.hh"
 
 using std::cin;
 using std::cout;
@@ -27,66 +27,57 @@ TEST(matr, cout)
 
 TEST(la, solve)
 {
-    Sys s{2, 3, {0, 1, 7,
-                 1, 0, 4}};
+  Sys s{2, 3, {0, 1, 7, 1, 0, 4}};
 
-    auto res = s.solve();
+  auto res = s.solve();
 
-    EXPECT_DOUBLE_EQ(res[0], 4);
-    EXPECT_DOUBLE_EQ(res[1], 7);
+  EXPECT_DOUBLE_EQ(res[0], 4);
+  EXPECT_DOUBLE_EQ(res[1], 7);
 }
 
 TEST(lamda, eye)
 {
-  auto func = [](int i, int j)
-          { return (i == j); };
+  auto func = [](int i, int j) { return (i == j); };
 
   Matrix<double> m1{4, 4, func};
 
-  Matrix<double> m2{4, 4, {1, 0, 0, 0,
-                           0, 1, 0, 0,
-                           0, 0, 1, 0,
-                           0, 0, 0, 1}};
+  Matrix<double> m2{4, 4, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}};
 
   EXPECT_EQ(m1, m2);
 }
 
 TEST(glue, down)
 {
-    Matrix<double> m1{1, 2, {1, 1}};
-    Matrix<double> m2{2, 2, {2, 2,
-                             3, 3}};
+  Matrix<double> m1{1, 2, {1, 1}};
+  Matrix<double> m2{2, 2, {2, 2, 3, 3}};
 
-    std::cout << m1.glue_dn(m2) << std::endl;
+  std::cout << m1.glue_dn(m2) << std::endl;
 }
 
 TEST(glue, right)
 {
-    Matrix<double> m1{2, 1, {1, 1}};
-    Matrix<double> m2{2, 2, {2, 3,
-                             2, 3}};
+  Matrix<double> m1{2, 1, {1, 1}};
+  Matrix<double> m2{2, 2, {2, 3, 2, 3}};
 
-    std::cout << m1.glue_rt(m2) << std::endl;
+  std::cout << m1.glue_rt(m2) << std::endl;
 }
 
 TEST(glue, bott)
 {
-    Matrix<double> m1{1, 2, {1, 1}};
-    Matrix<double> m2{2, 2, {2, 2,
-                             3, 3}};
+  Matrix<double> m1{1, 2, {1, 1}};
+  Matrix<double> m2{2, 2, {2, 2, 3, 3}};
 
-    std::cout << glue_bott(m1, m2) << std::endl;
-    std::cout << glue_bott(m2, m1) << std::endl;
+  std::cout << glue_bott(m1, m2) << std::endl;
+  std::cout << glue_bott(m2, m1) << std::endl;
 }
 
 TEST(glue, side)
 {
-    Matrix<double> m1{2, 1, {1, 1}};
-    Matrix<double> m2{2, 2, {2, 3,
-                             2, 3}};
+  Matrix<double> m1{2, 1, {1, 1}};
+  Matrix<double> m2{2, 2, {2, 3, 2, 3}};
 
-    std::cout << glue_side(m1, m2) << std::endl;
-    std::cout << glue_side(m2, m1) << std::endl;
+  std::cout << glue_side(m1, m2) << std::endl;
+  std::cout << glue_side(m2, m1) << std::endl;
 }
 
 int main(int argc, char **argv)

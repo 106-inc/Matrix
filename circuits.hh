@@ -22,13 +22,9 @@ private:
   MX::Matrix<double> incidence_;
 
 public:
-  Circuit( const std::vector<Edge> &edges, size_t j_num );
-
-
-
+  Circuit(const std::vector<Edge> &edges, size_t j_num);
 
 private:
-
   MX::Matrix<double> make_eds_matr();
   MX::Matrix<double> make_res_matr();
 };

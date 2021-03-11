@@ -16,7 +16,6 @@
 //#include "../FB_BLD/lex.yy.cc"
 #endif /* yyFlexLexer */
 
-
 enum
 {
   NUM_OF_TOKENS = 30
@@ -25,12 +24,11 @@ enum
 namespace yy
 {
 
-
 struct Edge
 {
-    int junc1, junc2;
-    float rtor;
-    float voltage;
+  int junc1, junc2;
+  float rtor;
+  float voltage;
 };
 
 class Driver final
@@ -62,8 +60,7 @@ public:
 
   void dump();
 
-
-    ~Driver();
+  ~Driver();
 };
 
 } // namespace yy

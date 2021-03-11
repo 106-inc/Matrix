@@ -2,8 +2,7 @@
 
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
-yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file),
-                                               max_junc_(0)
+yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_junc_(0)
 {
   std::string tmp_str;
 
@@ -56,20 +55,20 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
   }
 
   case yy::parser::token_type::DOUBLE: {
-      yylval->emplace<float>(std::stof(plex_->YYText()));
+    yylval->emplace<float>(std::stof(plex_->YYText()));
   }
 
-  /*
-  case yy::parser::token_type::NAME: {
-    yylval->emplace<std::string>(std::string{plex_->YYText()});
-    break;
-  }
-   */
-  /*
-  case yy::parser::token_type::ERR: {
-    std::cerr << "UNKNOWN TOKEN" << std::endl;
-  }
-   */
+    /*
+    case yy::parser::token_type::NAME: {
+      yylval->emplace<std::string>(std::string{plex_->YYText()});
+      break;
+    }
+     */
+    /*
+    case yy::parser::token_type::ERR: {
+      std::cerr << "UNKNOWN TOKEN" << std::endl;
+    }
+     */
 
   default:
     break;
@@ -78,7 +77,6 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
   return tkn_type;
 }
 
-
 //!
 //! \param junc1
 //! \param junc2
@@ -86,16 +84,16 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 //! \param voltage
 void yy::Driver::insert(int junc1, int junc2, float rtor, float voltage)
 {
-    //! Insertion new edge to structure
-    int tmp_junc = std::max(junc1, junc2);
+  //! Insertion new edge to structure
+  int tmp_junc = std::max(junc1, junc2);
 
-    if (tmp_junc > max_junc_)
-        max_junc_ = tmp_junc;
+  if (tmp_junc > max_junc_)
+    max_junc_ = tmp_junc;
 
-    edges_.push_back({junc1, junc2, rtor, voltage});
-    edges_.resize(edges_.size() + 1);
+  edges_.push_back({junc1, junc2, rtor, voltage});
+  edges_.resize(edges_.size() + 1);
 
-    return;
+  return;
 }
 
 //!  Function for processing syntax error during parsing
@@ -146,8 +144,8 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
 
 void yy::Driver::dump()
 {
-    for (auto&& edge : edges_)
-        std::cout << edge.junc1 << "--" << edge.junc2 << "," << edge.rtor << ";" << edge.voltage << "V";
+  for (auto &&edge : edges_)
+    std::cout << edge.junc1 << "--" << edge.junc2 << "," << edge.rtor << ";" << edge.voltage << "V";
 }
 
 //! Destructor for class Driver
