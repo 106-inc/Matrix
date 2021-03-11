@@ -74,7 +74,7 @@ public:
 
   bool sum_suitable(const Matrix<DataT> &matr) const;
 
-  // private:
+protected:
 
   Matrix &GaussFWD();
   Matrix &GaussBWD();
