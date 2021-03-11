@@ -1,12 +1,12 @@
 %language "c++"
 %skeleton "lalr1.cc"
 
+%define api.value.type variant
+%define parse.error custom
 
 %param {Driver* driver}
 %locations
 
-%define api.value.type variant
-%define parse.error custom
 
 %code requires
 {
@@ -31,7 +31,9 @@ SEMICOLON      ";"
 EDGE           "--"
 VOLT           "V"
 COMMA          ","
-NEW_LINE       "\\n"
+NEW_LINE       "\n"
+
+ERR
 ;
 
 %token <int>   INT
@@ -48,24 +50,28 @@ lines:	  line
 
 %%
 
-program:      program line                    { /* program starting */};
-	    |
+program:     lines                           { /* program starting */};
 
-line:         expr                            {};
-            | expr NEW_LINE                   {};
-            | NEW_LINE                        {};
+
+lines:       line			     {};
+           | lines line                      {};
+
+line:        expr NEW_LINE                   {};
+           | NEW_LINE                        {};
 
 expr:        junc EDGE junc COMMA
-             rtor SEMICOLON voltage           { driver->insert($1, $3, $5, $7); };
+             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7); };
+           | junc EDGE junc COMMA
+             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0); };
 
-junc:        INT                              { $$ = $1; };
+junc:        INT                             { $$ = $1; };
 
-rtor:        INT                              { $$ = $1; };
-           | DOUBLE                           { $$ = $1; };
+rtor:        INT                             { $$ = $1; };
+           | DOUBLE                          { $$ = $1; };
 
-voltage:     INT VOLT                         { $$ = $1; };
-           | DOUBLE VOLT                      { $$ = $1; };
-           |                                  { $$ = 0.0; };
+voltage:     INT VOLT                        { $$ = $1; };
+           | DOUBLE VOLT                     { $$ = $1; };
+         /*|                                 { $$ = 0.0;};*/
 
 %%
 
