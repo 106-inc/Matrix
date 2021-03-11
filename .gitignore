@@ -1,4 +1,4 @@
-./.vscode/
-./build/
-./BUILD/
-./cmake-build-debug/
+.vscode/
+build/
+BUILD/
+cmake-build-debug/
