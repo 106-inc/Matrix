@@ -10,7 +10,12 @@
 
 namespace CTS
 {
-struct Edge; // rtor, junc1, junc2, voltage
+struct Edge final // rtor, junc1, junc2, voltage
+{
+  size_t junc1_, junc_2;
+
+  double rtor_, eds_, cur_ /** May be deleted in future */;
+};
 
 /**
  * @brief Circuit class. Solves a circut
@@ -22,9 +27,10 @@ private:
   MX::Matrix<double> incidence_;
 
 public:
+
   Circuit( const std::vector<Edge> &edges, size_t j_num );
 
-
+  
 
 
 private:
