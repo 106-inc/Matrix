@@ -7,6 +7,7 @@
 #include <FlexLexer.h>
 #endif /* yyFlexLexer */
 
+
 #include "../FB_BLD/compiler.tab.hh"
 
 enum RES_OF_PARSE
@@ -14,12 +15,10 @@ enum RES_OF_PARSE
   SUCESS_PARSE,
   ERROR_IN_PARSE
 };
-
 class OurFlexLexer : public yyFlexLexer
 {
 private:
   yy::location cur_location_{};
-
   int last_num_of_line;
 
 public:

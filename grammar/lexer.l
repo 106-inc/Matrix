@@ -37,7 +37,7 @@ NEW_LINE            [\n]+
 ","                 return yy::parser::token_type::COMMA;
 
 {INT}               return yy::parser::token_type::INT;
-{DOUBLE_DIGIT}      return yy::parser::token_type::DOUBLE;
+{DOUBLE}            return yy::parser::token_type::DOUBLE;
 
 {NEW_LINE}          return yy::parser::token_type::NEW_LINE;
 
