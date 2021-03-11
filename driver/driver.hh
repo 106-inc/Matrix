@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "../parser/parser.hh"
+#include "../circuits.hh"
+
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
@@ -26,20 +28,12 @@ namespace yy
 {
 
 
-struct Edge
-{
-    int junc1, junc2;
-    float rtor;
-    float voltage;
-};
-
 class Driver final
 {
 private:
   std::string name_of_file_;
   std::ifstream in_file;
 
-  std::vector<Edge> edges_;
   int max_junc_;
 
   OurFlexLexer *plex_; // maybe this is good name
@@ -54,7 +48,7 @@ public:
 
   bool parse();
 
-  void insert(int jnction1, int jnction2, float resistor, float voltage);
+  void insert(size_t junc1, size_t junc2, float rtor, float voltage);
 
   parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc);
 
