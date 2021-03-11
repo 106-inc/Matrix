@@ -45,22 +45,43 @@ MX::Matrix<int> Circuit::make_circ_matr()
 
   // go from all 
   for (size_t i = 0; i < inc_rows; ++i)
-    cycles.push_back(dfs_start(i));
+  {
+    auto tmp_vec = dfs_start(i);
+    if (!tmp_vec.empty())
+      cycles.push_back(tmp_vec);
+  }
 
-  MX::Matrix<int> circ{edges_.size(), cycles.size(), [&cycles](int i, int j)
+  MX::Matrix<double> circ{edges_.size(), cycles.size(), [&cycles](int i, int j)
                                                       {
                                                         int res{};
                                                         for (auto & edge : cycles[i])
                                                         {
                                                           if (edge == j)
-                                                            return 1;
+                                                            return 1.0;
                                                           if (edge == -j)
-                                                            return -1;
-                                                          return 0;
+                                                            return -1.0;
+                                                          return 0.0;
                                                         }
                                                       }
   };
   
+  // TODO: weak place здесь явно не все -- разобраться!!
+
+  MX::Matrix<double> diag = circ.diag();
+
+  size_t i = 0;
+  for (size_t size = diag.rows(); i < size && !MX::is_zero(diag[i][i]); ++i);
+
+  if (i < diag.rows())
+  {
+    MX::Matrix<double> res = {i, circ.cols(), [&circ](int i, int j)
+    {
+
+    }};
+    return res;
+  }
+
+  return circ;
 }
 
 std::vector<int> Circuit::dfs_start( size_t from )
@@ -103,12 +124,11 @@ void Circuit::dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, st
       std::vector<int> rout_cpy{cyc_rout};
       std::vector<Color> col_cpy{colors};
 
-      if (edges_[i].junc1 == nactual)
-        rout_cpy.push_back(i);
-      else
-        rout_cpy.push_back(-i);
+      rout_cpy.push_back(-i * incidence_[nactual][i]);
+      
+      size_t nnext = edges_[i].junc1 == nactual ? edges_[i].junc2 : edges_[i].junc1;
 
-      dfs(nstart, i, rout_cpy, col_cpy);
+      dfs(nstart, nnext, rout_cpy, col_cpy);
 
       if (!rout_cpy.empty())
       {

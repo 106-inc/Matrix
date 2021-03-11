@@ -186,13 +186,20 @@ public:
    */
   bool sum_suitable(const Matrix<DataT> &matr) const;
 
-protected:
   /**
    * @brief Forward part of Gauss method
    * @return Self reference
    */
-  Matrix &GaussFWD();
+  Matrix GaussFWD() const;
 
+  /**
+   * @brief Diagonalise matrix function
+   * @param mat reference to matrix
+   * @return Created matrix.
+   */
+  Matrix diag() const;
+
+protected:
   /**
    * @brief Backward part of Gauss method
    * @return Self reference
@@ -543,22 +550,24 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::mul_line(size_t l, DataT
   return *this;
 }
 
-template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
+template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 {
+  Matrix<DataT> mat_cpy{*this};
+
   if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
 
-  for (size_t i = 0; i < rows_; ++i)
+  for (size_t i = 0; i < mat_cpy.rows_; ++i)
   {
     bool zero_col = true;
 
-    if (!is_zero(arr_[i][i]))
+    if (!is_zero(mat_cpy[i][i]))
       zero_col = false;
     else
       for (size_t j = i + 1; j < rows_; ++j)
-        if (!is_zero(arr_[j][i]))
+        if (!is_zero(mat_cpy[j][i]))
         {
-          swap_lines(j, i);
+          mat_cpy.swap_lines(j, i);
           zero_col = false;
           break;
         }
@@ -568,15 +577,20 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
-      if (is_zero(arr_[k][i]))
+      if (is_zero(mat_cpy[k][i]))
         continue;
 
-      DataT mul = arr_[k][i] / arr_[i][i];
-      add_line(k, i, -mul);
+      DataT mul = mat_cpy[k][i] / mat_cpy[i][i];
+      mat_cpy.add_line(k, i, -mul);
     }
   }
 
-  return *this;
+  return mat_cpy;
+}
+
+template <typename DataT> Matrix<DataT> Matrix<DataT>::diag() const
+{
+  return GaussFWD(*this).GaussBWD();
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
