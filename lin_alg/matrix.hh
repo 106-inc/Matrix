@@ -1,3 +1,6 @@
+#ifndef MATRIX_HH
+#define MATRIX_HH
+
 #include "mem.hh"
 
 namespace MX
@@ -11,8 +14,17 @@ namespace MX
 
 using std::initializer_list;
 
-template <typename DataT> class Matrix : VBuf<Row<DataT>>
+static long double EPS = 1e-18;
+
+bool is_zero(long double num)
 {
+  return std::abs(num) < EPS;
+}
+
+template <typename DataT> class Matrix : public VBuf<Row<DataT>>
+{
+
+protected:
   using VBuf<Row<DataT>>::arr_;
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
@@ -59,10 +71,12 @@ public:
   Matrix &add_line(size_t to, size_t from, DataT mul);
   Matrix &mul_line(size_t l, DataT mul);
 
+  bool sum_suitable(const Matrix<DataT> &matr) const;
+
+  // private:
+
   Matrix &GaussFWD();
   Matrix &GaussBWD();
-
-  bool sum_suitable(const Matrix<DataT> &matr) const;
 };
 
 template <typename DataT> Matrix<DataT> operator+(const Matrix<DataT> &lhs, const Matrix<DataT> &rhs);
@@ -190,11 +204,11 @@ template <typename DataT> DataT Matrix<DataT>::det() const
   {
     bool zero_col = true;
 
-    if (std::abs(tmp[i][i]) > 1e-12) // TODO: EPSILON
+    if (!is_zero(tmp[i][i]))
       zero_col = false;
     else
       for (size_t j = i + 1; j < rows_; ++j)
-        if (std::abs(tmp[j][i]) > 1e-12)
+        if (!is_zero(tmp[j][i]))
         {
           tmp.swap_lines(j, i);
           zero_col = false;
@@ -207,7 +221,7 @@ template <typename DataT> DataT Matrix<DataT>::det() const
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
-      if (std::abs(tmp[k][i]) < 1e-12) // TODO: EPSILON
+      if (is_zero(tmp[i][i]))
         continue;
 
       long double mul = tmp[k][i] / tmp[i][i];
@@ -380,11 +394,11 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
   {
     bool zero_col = true;
 
-    if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
+    if (!is_zero(arr_[i][i]))
       zero_col = false;
     else
       for (size_t j = i + 1; j < rows_; ++j)
-        if (std::abs(arr_[j][i]) > 1e-12)
+        if (!is_zero(arr_[j][i]))
         {
           swap_lines(j, i);
           zero_col = false;
@@ -396,7 +410,7 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
-      if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
+      if (is_zero(arr_[k][i]))
         continue;
 
       DataT mul = arr_[k][i] / arr_[i][i];
@@ -432,7 +446,7 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
 
     for (size_t k = 0; k < i; ++k)
     {
-      if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
+      if (is_zero(arr_[k][i]))
         continue;
 
       DataT mul = arr_[k][i] / arr_[i][i];
@@ -504,7 +518,7 @@ template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &ma
     {
       auto tmp = matr[i][j];
 
-      if (std::abs(tmp) < 1e-12) // TODO: EPSILON, IS_ZERO
+      if (is_zero(tmp))
         ost << "0 ";
       else
         ost << tmp << " ";
@@ -517,3 +531,5 @@ template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &ma
 }
 
 } // namespace MX
+
+#endif // MATRIX_HH
