@@ -52,6 +52,21 @@ TEST(Gauss, all)
   std::cout << m1.GaussBWD() << std::endl;
 }
 
+TEST(lamda, eye)
+{
+  auto func = [](int i, int j)
+          { return (i == j); };
+
+  Matrix<double> m1{4, 4, func};
+
+  Matrix<double> m2{4, 4, {1, 0, 0, 0,
+                           0, 1, 0, 0,
+                           0, 0, 1, 0,
+                           0, 0, 0, 1}};
+
+  EXPECT_EQ(m1, m2);
+}
+
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);

@@ -29,18 +29,16 @@ protected:
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
 
-  using func = DataT (*)(size_t, size_t);
-
   size_t &rows_ = size_;
   size_t cols_{};
 
 public:
   Matrix(size_t rows, size_t cols);
-  Matrix(size_t rows, size_t cols, func action);
   Matrix(size_t rows, size_t cols, const initializer_list<DataT> &dat);
   Matrix(const Matrix &orig);
 
   template <typename It> Matrix(size_t rows, size_t cols, It beg, It end);
+  template <typename Func> Matrix(size_t rows, size_t cols, Func action);
 
   void swap(Matrix &rhs) noexcept;
 
@@ -100,7 +98,9 @@ template <typename DataT> Matrix<DataT>::Matrix(size_t rows, size_t cols) : VBuf
     copy_construct(arr_ + used_, tmp);
 }
 
-template <typename DataT> Matrix<DataT>::Matrix(size_t rows, size_t cols, func action) : Matrix(rows, cols)
+template <typename DataT>
+template <typename Func>
+Matrix<DataT>::Matrix(size_t rows, size_t cols, Func action) : Matrix(rows, cols)
 {
   Matrix<DataT> tmp{rows_, cols_};
 
@@ -335,7 +335,7 @@ template <typename DataT> bool Matrix<DataT>::operator==(const Matrix &matr) con
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      if (arr_[i][j] != matr.data_[i][j])
+      if (arr_[i][j] != matr.arr_[i][j])
         return false;
 
   return true;
