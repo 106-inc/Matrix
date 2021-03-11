@@ -4,6 +4,21 @@
 #include "matrix.hh"
 #include <vector>
 
+/**
+ * dfs(vert)
+ * {
+ *  color[vert] = grey; & put to matrix
+ *
+ *  for sbvert in vert.sub
+ *  {
+ *    if (color[sbvert] == white)
+ *      dfs(sbvert)
+ *    if (color[sbvert] == grey)
+ *
+ *  }
+ * }
+ *
+ */
 namespace LA
 {
 using namespace MX;
