@@ -14,13 +14,20 @@ namespace MX
 
 using std::initializer_list;
 
-static long double EPS = 1e-18;
+static long double EPS = 1e-12;
 
+/**
+ * @brief Compares floating point numbers with zero
+ * @param num Number you need to compare
+ */
 bool is_zero(long double num)
 {
   return std::abs(num) < EPS;
 }
 
+/**
+ * @class Template matrix
+ */
 template <typename DataT> class Matrix : public VBuf<Row<DataT>>
 {
 
@@ -29,53 +36,167 @@ protected:
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
 
-  using func = DataT (*)(size_t, size_t);
-
   size_t &rows_ = size_;
   size_t cols_{};
 
 public:
+  /**
+   * @brief Empty matrix ctor
+   */
   Matrix(size_t rows, size_t cols);
-  Matrix(size_t rows, size_t cols, func action);
+
+  /**
+   * @brief Matrix ctor with data
+   * @param dat List of starting data
+   */
   Matrix(size_t rows, size_t cols, const initializer_list<DataT> &dat);
+
+  /**
+   * @brief Copy ctor
+   */
   Matrix(const Matrix &orig);
 
+  /**
+   * @brief Iterator filling ctor
+   * @param beg Start iterator
+   * @param end Start iterator
+   */
   template <typename It> Matrix(size_t rows, size_t cols, It beg, It end);
 
+  /**
+   * @brief Function filling ctor
+   * @param action Filling function/functor/lamda
+   */
+  template <typename Func> Matrix(size_t rows, size_t cols, Func action);
+
+  /**
+   * @brief Swap this matrix with rhs
+   * @param rhs Other matrix
+   */
   void swap(Matrix &rhs) noexcept;
 
   size_t cols() const noexcept;
   size_t rows() const noexcept;
 
+  /**
+   * @brief Get elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @return Matrix elem copy
+   */
   const DataT &get(size_t row, size_t col) const;
+
+  /**
+   * @brief Set elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @param val New elem value
+   */
   void set(size_t row, size_t col, DataT val);
+
+  /**
+   * @brief Get row by number
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @return Matrix elem copy
+   */
   const Row<DataT> &operator[](size_t row) const;
 
+  /**
+   * @brief Calculate and return determinant
+   * @throw std::bad_typeid if DataT is not floating point type,
+   *        std::range_error if matrix is not square
+   * @return Determinant
+   */
   DataT det() const;
 
+  /**
+   * @brief Self transpose method
+   * @return Self reference
+   */
   Matrix &transpose() &;
 
   Matrix operator-() const;
 
   Matrix &operator=(const Matrix &orig);
 
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not add suitable
+   * @return Self reference
+   */
   Matrix &operator+=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not sub suitable
+   * @return Self reference
+   */
   Matrix &operator-=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not mul suitable
+   * @return Self reference
+   */
   Matrix &operator*=(const Matrix &matr);
+
   Matrix &operator*=(DataT mul);
 
   bool operator==(const Matrix &matr) const;
   bool operator!=(const Matrix &matr) const;
 
+  /**
+   * @brief Concatenate this matrix with matr by down side
+   * @param matr Matrix to concatenate with
+   * @return Self reference
+   */
+  Matrix &glue_dn(const Matrix &matr);
+
+  /**
+   * @brief Concatenate this matrix with matr by right side
+   * @param matr Matrix to concatenate with
+   * @return Self reference
+   */
+  Matrix &glue_rt(const Matrix &matr);
+
+  /**
+   * @brief Swap line indexed as 'l1' and line indexed as 'l2'
+   * @param l1 First row
+   * @param l2 Second row
+   * @throw std::runtime_error if l1 or l2 is greater (or equal) then rows_
+   * @return Self reference
+   */
   Matrix &swap_lines(size_t l1, size_t l2);
+
+  /**
+   * @brief Add line indexed as 'from' multiplied by 'mul' to line indexed as 'to'
+   * @param to Line which will be changed
+   * @param from Line which will not be changed
+   * @throw std::runtime_error if 'to' or 'from' is greater (or equal) then 'rows_'
+   * @return Self reference
+   */
   Matrix &add_line(size_t to, size_t from, DataT mul);
+
+  /**
+   * @brief Multiply line indexed as 'l' by mul
+   * @param l Line index
+   * @throw std::runtime_error if 'l' is greater (or equal) then 'rows_'
+   * @return Self reference
+   */
   Matrix &mul_line(size_t l, DataT mul);
 
+  /**
+   * @brief Check if this and matr is suitable for addition
+   * @return True if suitable, False otherwise
+   */
   bool sum_suitable(const Matrix<DataT> &matr) const;
 
-  // private:
-
+protected:
+  /**
+   * @brief Forward part of Gauss method
+   * @return Self reference
+   */
   Matrix &GaussFWD();
+
+  /**
+   * @brief Backward part of Gauss method
+   * @return Self reference
+   */
   Matrix &GaussBWD();
 };
 
@@ -85,6 +206,8 @@ template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &lhs, cons
 template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &matr, DataT mul);
 template <typename DataT> Matrix<DataT> operator*(DataT mul, const Matrix<DataT> &matr);
 template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr);
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr);
 
 /*
@@ -100,7 +223,9 @@ template <typename DataT> Matrix<DataT>::Matrix(size_t rows, size_t cols) : VBuf
     copy_construct(arr_ + used_, tmp);
 }
 
-template <typename DataT> Matrix<DataT>::Matrix(size_t rows, size_t cols, func action) : Matrix(rows, cols)
+template <typename DataT>
+template <typename Func>
+Matrix<DataT>::Matrix(size_t rows, size_t cols, Func action) : Matrix(rows, cols)
 {
   Matrix<DataT> tmp{rows_, cols_};
 
@@ -335,7 +460,7 @@ template <typename DataT> bool Matrix<DataT>::operator==(const Matrix &matr) con
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      if (arr_[i][j] != matr.data_[i][j])
+      if (arr_[i][j] != matr.arr_[i][j])
         return false;
 
   return true;
@@ -344,6 +469,39 @@ template <typename DataT> bool Matrix<DataT>::operator==(const Matrix &matr) con
 template <typename DataT> bool Matrix<DataT>::operator!=(const Matrix &matr) const
 {
   return !operator==(matr);
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_dn(const Matrix &matr)
+{
+  if (cols_ != matr.cols_)
+    throw std::runtime_error("Cols num doesn't match");
+
+  Matrix<DataT> tmp{rows_ + matr.rows_, cols_};
+
+  for (size_t i = rows_; i < tmp.rows_; ++i)
+    tmp.arr_[i] = matr.arr_[i - rows_];
+
+  swap(tmp);
+
+  for (size_t i = 0; i < tmp.rows_; ++i)
+    std::swap(arr_[i], tmp.arr_[i]);
+
+  return *this;
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_rt(const Matrix &matr)
+{
+  if (rows_ != matr.rows_)
+    throw std::runtime_error("Rows num doesn't match");
+
+  Matrix<DataT> this_tr{MX::transpose(*this)};
+  Matrix<DataT> matr_tr{MX::transpose(matr)};
+
+  this_tr.glue_dn(matr_tr);
+
+  swap(this_tr.transpose());
+
+  return *this;
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, size_t l2)
@@ -491,6 +649,16 @@ template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr)
   Matrix<DataT> tmp{matr};
   tmp.transpose();
   return tmp;
+}
+
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+  return Matrix<DataT>{matr1}.glue_rt(matr2);
+}
+
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+  return Matrix<DataT>{matr1}.glue_dn(matr2);
 }
 
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr)

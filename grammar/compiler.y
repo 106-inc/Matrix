@@ -37,25 +37,30 @@ NEW_LINE       "\\n"
 %token <int>   INT
 %token <float> DOUBLE
 
-%nterm <int>   junction
-%nterm <float> resistor
+%nterm <int>   junc
+%nterm <float> rtor
 %nterm <float> voltage
+
+/*
+lines:	  line
+        | lines line
+*/
 
 %%
 
-program:      line                            { /* program starting */};
+program:      program line                    { /* program starting */};
 	    |
 
 line:         expr                            {};
             | expr NEW_LINE                   {};
             | NEW_LINE                        {};
 
-expr:        junc EDGE junction COMMA
-             resistr SEMICOLON voltage       { driver->insert($1, $3, $5, $7); };
+expr:        junc EDGE junc COMMA
+             rtor SEMICOLON voltage           { driver->insert($1, $3, $5, $7); };
 
-junction:    INT                              { $$ = $1; };
+junc:        INT                              { $$ = $1; };
 
-resistor:    INT                              { $$ = $1; };
+rtor:        INT                              { $$ = $1; };
            | DOUBLE                           { $$ = $1; };
 
 voltage:     INT VOLT                         { $$ = $1; };

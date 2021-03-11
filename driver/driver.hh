@@ -16,8 +16,6 @@
 //#include "../FB_BLD/lex.yy.cc"
 #endif /* yyFlexLexer */
 
-#include "../matrix.hh"
-
 enum
 {
   NUM_OF_TOKENS = 30
@@ -25,11 +23,22 @@ enum
 
 namespace yy
 {
+
+struct Edge
+{
+  int junc1, junc2;
+  float rtor;
+  float voltage;
+};
+
 class Driver final
 {
 private:
   std::string name_of_file_;
   std::ifstream in_file;
+
+  std::vector<Edge> edges_;
+  int max_junc_;
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
@@ -48,6 +57,8 @@ public:
   parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc);
 
   void report_syntax_error(const parser::context &ctx);
+
+  void dump();
 
   ~Driver();
 };

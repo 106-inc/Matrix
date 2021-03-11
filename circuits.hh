@@ -26,7 +26,6 @@ private:
   MX::Matrix<int> incidence_;
 
 public:
-
   Circuit( const std::vector<Edge> &edges, size_t j_num );
 
   /*

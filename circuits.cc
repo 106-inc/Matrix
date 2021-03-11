@@ -2,9 +2,8 @@
 
 namespace CTS
 {
-    
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges),
-                                                                 incidence_(j_num, edges_.size())
+
+Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), incidence_(j_num, edges_.size())
 {
   size_t e_num = edges_.size();
 
