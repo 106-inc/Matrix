@@ -5,6 +5,7 @@
 %define parse.error custom
 
 %param {Driver* driver}
+
 %locations
 
 
@@ -45,10 +46,6 @@ ERR
 %nterm <float> rtor
 %nterm <float> voltage
 
-/*
-lines:	  line
-        | lines line
-*/
 
 %%
 

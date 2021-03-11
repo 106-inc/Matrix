@@ -151,7 +151,7 @@ void yy::Driver::dump()
 {
     for (auto&& edge : Edges_)
     {
-        std::cout << edge.junc1_ << "--" << edge.junc2_ << ", " << edge.rtor_ << "; " << edge.eds_ << "V";
+        std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
         std::cout << std::endl;
     }
 }
