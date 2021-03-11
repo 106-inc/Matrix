@@ -34,10 +34,13 @@ public:
   Sys(size_t rows, size_t cols) : Matrix(rows, cols)
   {
   }
-  Sys(size_t rows, size_t cols, func action) : Matrix(rows, cols, action)
+  Sys(size_t rows, size_t cols, const initializer_list<double> &dat) : Matrix(rows, cols, dat)
   {
   }
-  Sys(size_t rows, size_t cols, const initializer_list<double> &dat) : Matrix(rows, cols, dat)
+  template <typename It> Sys(size_t rows, size_t cols, It beg, It end) : Matrix(rows, cols, beg, end)
+  {
+  }
+  template <typename Func> Sys(size_t rows, size_t cols, Func action) : Matrix(rows, cols, action)
   {
   }
 
