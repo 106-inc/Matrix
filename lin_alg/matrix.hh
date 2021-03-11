@@ -86,6 +86,8 @@ template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &lhs, cons
 template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &matr, DataT mul);
 template <typename DataT> Matrix<DataT> operator*(DataT mul, const Matrix<DataT> &matr);
 template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr);
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr);
 
 /*
@@ -527,6 +529,16 @@ template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr)
   Matrix<DataT> tmp{matr};
   tmp.transpose();
   return tmp;
+}
+
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+    return Matrix<DataT> {matr1}.glue_rt(matr2);
+}
+
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+    return Matrix<DataT> {matr1}.glue_dn(matr2);
 }
 
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr)

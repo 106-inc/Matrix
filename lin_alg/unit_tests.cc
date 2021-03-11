@@ -69,6 +69,26 @@ TEST(glue, right)
     std::cout << m1.glue_rt(m2) << std::endl;
 }
 
+TEST(glue, bott)
+{
+    Matrix<double> m1{1, 2, {1, 1}};
+    Matrix<double> m2{2, 2, {2, 2,
+                             3, 3}};
+
+    std::cout << glue_bott(m1, m2) << std::endl;
+    std::cout << glue_bott(m2, m1) << std::endl;
+}
+
+TEST(glue, side)
+{
+    Matrix<double> m1{2, 1, {1, 1}};
+    Matrix<double> m2{2, 2, {2, 3,
+                             2, 3}};
+
+    std::cout << glue_side(m1, m2) << std::endl;
+    std::cout << glue_side(m2, m1) << std::endl;
+}
+
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
