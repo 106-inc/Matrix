@@ -10,11 +10,28 @@
 
 namespace CTS
 {
-    struct Edge; // rtor, junc1, junc2, voltage
+struct Edge; // rtor, junc1, junc2, voltage
 
-    MX::Matrix<double> make_inc_matr (const std::vector<Edge> & edges, size_t jnum);
-    MX::Matrix<double> make_res_matr (const std::vector<Edge> & edges);
-    MX::Matrix<double> make_eds_matr (const std::vector<Edge> & edges);
-}
+/**
+ * @brief Circuit class. Solves a circut
+ */
+class Circuit final
+{
+private:
+  std::vector<Edge> edges_;
+  MX::Matrix<double> incidence_;
 
-#endif //MATRIX_CIRCUITS_HH
+public:
+  Circuit( const std::vector<Edge> &edges, size_t j_num );
+
+
+
+
+private:
+
+  MX::Matrix<double> make_eds_matr();
+  MX::Matrix<double> make_res_matr();
+};
+} // namespace CTS
+
+#endif // MATRIX_CIRCUITS_HH
