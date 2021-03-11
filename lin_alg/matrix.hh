@@ -1,6 +1,5 @@
 #include "mem.hh"
 
-
 namespace MX
 {
 
@@ -410,37 +409,37 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
 {
-    if (!std::is_floating_point<DataT>::value)
-        throw std::bad_typeid();
+  if (!std::is_floating_point<DataT>::value)
+    throw std::bad_typeid();
 
-    for (size_t i = 1; i < rows_; ++i)
+  for (size_t i = 1; i < rows_; ++i)
+  {
+    /*bool zero_col = true;
+
+    if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
+        zero_col = false;
+    else
+        for (size_t j = i + 1; j < rows_; ++j)
+            if (std::abs(arr_[j][i]) > 1e-12)
+            {
+                swap_lines(j, i);
+                zero_col = false;
+                break;
+            }
+
+    if (zero_col)
+        throw std::runtime_error("Here we need to swap cols");*/
+
+    for (size_t k = 0; k < i; ++k)
     {
-        /*bool zero_col = true;
+      if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
+        continue;
 
-        if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
-            zero_col = false;
-        else
-            for (size_t j = i + 1; j < rows_; ++j)
-                if (std::abs(arr_[j][i]) > 1e-12)
-                {
-                    swap_lines(j, i);
-                    zero_col = false;
-                    break;
-                }
-
-        if (zero_col)
-            throw std::runtime_error("Here we need to swap cols");*/
-
-        for (size_t k = 0; k < i; ++k)
-        {
-            if (std::abs(arr_[k][i]) < 1e-12) // TODO: EPSILON
-                continue;
-
-            DataT mul = arr_[k][i] / arr_[i][i];
-            add_line(k, i, -mul);
-        }
+      DataT mul = arr_[k][i] / arr_[i][i];
+      add_line(k, i, -mul);
     }
-    return *this;
+  }
+  return *this;
 }
 
 template <typename DataT> bool Matrix<DataT>::sum_suitable(const Matrix<DataT> &matr) const
@@ -497,24 +496,24 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
 
 template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr)
 {
-    for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
+  for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
+  {
+    ost << "| ";
+
+    for (size_t j = 0; j < cols; ++j)
     {
-        ost << "| ";
+      auto tmp = matr[i][j];
 
-        for (size_t j = 0; j < cols; ++j)
-        {
-            auto tmp = matr[i][j];
-
-            if (std::abs(tmp) < 1e-12) // TODO: EPSILON, IS_ZERO
-                ost << "0 ";
-            else
-                ost << tmp << " ";
-        }
-
-        ost << "|" << std::endl;
+      if (std::abs(tmp) < 1e-12) // TODO: EPSILON, IS_ZERO
+        ost << "0 ";
+      else
+        ost << tmp << " ";
     }
 
-    return ost;
+    ost << "|" << std::endl;
+  }
+
+  return ost;
 }
 
 } // namespace MX

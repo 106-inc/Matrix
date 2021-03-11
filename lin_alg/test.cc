@@ -19,27 +19,29 @@ TEST(la, det)
 
 TEST(matr, cout)
 {
-  Matrix<double> m1{3, 4, {1.5, 2, 3.2, 6.7,
-                           0, 6.3, 3.5, 0,
-                           1, 5.6, 7.1, 7}};
+  Matrix<double> m1{3, 4, {1.5, 2, 3.2, 6.7, 0, 6.3, 3.5, 0, 1, 5.6, 7.1, 7}};
   std::cout << m1 << std::endl;
 }
 
 TEST(Gauss, FWD)
 {
-    Matrix<double> m1{3, 4, {1.5, 2, 3.2, 6.7,
-                             0, 6.3, 3.5, 0,
-                             1, 5.6, 7.1, 7}};
+  Matrix<double> m1{3, 4, {1.5, 2, 3.2, 6.7, 0, 6.3, 3.5, 0, 1, 5.6, 7.1, 7}};
 
-    std::cout << m1.GaussFWD() << std::endl;
+  std::cout << m1.GaussFWD() << std::endl;
 }
 
 TEST(Gauss, BWD)
 {
-    Matrix<double> m1{2, 2, {1.5, 2,
-                                    0, 6.3,}};
+  Matrix<double> m1{2,
+                    2,
+                    {
+                        1.5,
+                        2,
+                        0,
+                        6.3,
+                    }};
 
-    std::cout << m1.GaussBWD() << std::endl;
+  std::cout << m1.GaussBWD() << std::endl;
 }
 
 int main(int argc, char **argv)
