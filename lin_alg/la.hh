@@ -28,6 +28,7 @@ class Sys : public Matrix<double>
   using Matrix<double>::rows_;
 
 public:
+
   Sys(const Matrix &orig) : Matrix(orig)
   {
   }
@@ -44,6 +45,10 @@ public:
   {
   }
 
+  /**
+   * @brief Solving system as augmented system's matrix. Solves only solvable systems
+   * @return Vector of solutions
+   */
   std::vector<double> solve() const;
 };
 
