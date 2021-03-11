@@ -42,38 +42,53 @@ MX::Matrix<int> Circuit::make_circ_matr()
 {
   size_t inc_rows = incidence_.rows();
 
-  std::vector<std::vector<Edge>> cycles;
+  std::vector<std::vector<int>> cycles;
 
   // go from all 
   for (size_t i = 0; i < inc_rows; ++i)
     cycles.push_back(dfs_start(i));
 
-
+  MX::Matrix<int> circ{edges_.size(), cycles.size(), [&cycles](int i, int j)
+                                                      {
+                                                        int res{};
+                                                        for (auto & edge : cycles[i])
+                                                        {
+                                                          if (edge == j)
+                                                            return 1;
+                                                          if (edge == -j)
+                                                            return -1;
+                                                          return 0;
+                                                        }
+                                                      }
+  };
   
 }
 
-std::vector<CTS::Edge> Circuit::dfs_start( size_t from )
+std::vector<int> Circuit::dfs_start( size_t from )
 {
-  std::vector<Edge> tmp{};
+  std::vector<int> tmp{};
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, tmp, cols);
   return tmp;
 }
 
-void Circuit::dfs( size_t nstart, size_t nactual, std::vector<Edge> &cyc_rout, std::vector<Color> &colors )
+void Circuit::dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, std::vector<Color> &colors )
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
 
-  Edge eprev = cyc_rout.back();
-  size_t nprev = eprev.junc1 == nactual ? eprev.junc2 : eprev.junc1;
+  size_t nprev = cyc_rout.back();
 
 
   for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
   {
     /* Check if we came from this vert */
     if (i == nprev)
+      continue;
+
+    /* Check if we have a route between verts */
+    if (incidence_[nactual][i] == 0)
       continue;
     
     /* Check if we have already visited this vert */
@@ -86,8 +101,14 @@ void Circuit::dfs( size_t nstart, size_t nactual, std::vector<Edge> &cyc_rout, s
 
     if (colors[i] == Color::WHITE)
     {
-      std::vector<Edge> rout_cpy{cyc_rout};
+      std::vector<int> rout_cpy{cyc_rout};
       std::vector<Color> col_cpy{colors};
+
+      if (edges_[i].junc1 == nactual)
+        rout_cpy.push_back(i);
+      else
+        rout_cpy.push_back(-i);
+
       dfs(nstart, i, rout_cpy, col_cpy);
 
       if (!rout_cpy.empty())

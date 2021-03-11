@@ -50,8 +50,8 @@ private:
 
   MX::Matrix<int> make_circ_matr();
 
-  void dfs( size_t nstart, size_t nactual, std::vector<Edge> &cyc_rout, std::vector<Color> &colors );
-  std::vector<Edge> dfs_start( size_t from );
+  void dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, std::vector<Color> &colors );
+  std::vector<int> dfs_start( size_t from );
 };
 } // namespace CTS
 
