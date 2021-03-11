@@ -67,6 +67,24 @@ TEST(lamda, eye)
   EXPECT_EQ(m1, m2);
 }
 
+TEST(glue, down)
+{
+    Matrix<double> m1{1, 2, {1, 1}};
+    Matrix<double> m2{2, 2, {2, 2,
+                             3, 3}};
+
+    std::cout << m1.glue_dn(m2) << std::endl;
+}
+
+TEST(glue, right)
+{
+    Matrix<double> m1{2, 1, {1, 1}};
+    Matrix<double> m2{2, 2, {2, 3,
+                             2, 3}};
+
+    std::cout << m1.glue_rt(m2) << std::endl;
+}
+
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);

@@ -14,7 +14,7 @@ namespace MX
 
 using std::initializer_list;
 
-static long double EPS = 1e-18;
+static long double EPS = 1e-12;
 
 bool is_zero(long double num)
 {
@@ -64,6 +64,9 @@ public:
 
   bool operator==(const Matrix &matr) const;
   bool operator!=(const Matrix &matr) const;
+
+  Matrix &glue_dn(const Matrix & matr);
+  Matrix &glue_rt(const Matrix & matr);
 
   Matrix &swap_lines(size_t l1, size_t l2);
   Matrix &add_line(size_t to, size_t from, DataT mul);
@@ -344,6 +347,39 @@ template <typename DataT> bool Matrix<DataT>::operator==(const Matrix &matr) con
 template <typename DataT> bool Matrix<DataT>::operator!=(const Matrix &matr) const
 {
   return !operator==(matr);
+}
+
+template <typename DataT> Matrix<DataT> & Matrix<DataT>::glue_dn(const Matrix & matr)
+{
+    if (cols_ != matr.cols_)
+        throw std::runtime_error("Cols num doesn't match");
+
+    Matrix<DataT> tmp {rows_ + matr.rows_, cols_};
+
+    for (size_t i = rows_; i < tmp.rows_; ++i)
+        tmp.arr_[i] = matr.arr_[i - rows_];
+
+    swap(tmp);
+
+    for (size_t i = 0; i < tmp.rows_; ++i)
+        std::swap(arr_[i], tmp.arr_[i]);
+
+    return *this;
+}
+
+template <typename DataT> Matrix<DataT> & Matrix<DataT>::glue_rt(const Matrix & matr)
+{
+    if (rows_ != matr.rows_)
+        throw std::runtime_error("Rows num doesn't match");
+
+    Matrix<DataT> this_tr {MX::transpose(*this)};
+    Matrix<DataT> matr_tr {MX::transpose(matr)};
+
+    this_tr.glue_dn(matr_tr);
+
+    swap(this_tr.transpose());
+
+    return *this;
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, size_t l2)
