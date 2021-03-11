@@ -83,24 +83,29 @@ public:
 
   /**
    * @brief Get elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
    * @return Matrix elem copy
    */
   const DataT &get(size_t row, size_t col) const;
 
   /**
    * @brief Set elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @param val New elem value
    */
   void set(size_t row, size_t col, DataT val);
 
   /**
    * @brief Get row by number
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
    * @return Matrix elem copy
    */
   const Row<DataT> &operator[](size_t row) const;
 
   /**
    * @brief Calculate and return determinant
-   * @throw std::runtime_error if DataT is not floating point type
+   * @throw std::bad_typeid if DataT is not floating point type, 
+   *        std::range_error if matrix is not square
    * @return Determinant
    */
   DataT det() const;
@@ -115,9 +120,24 @@ public:
 
   Matrix &operator=(const Matrix &orig);
 
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not add suitable
+   * @return Self reference
+   */
   Matrix &operator+=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not sub suitable
+   * @return Self reference
+   */
   Matrix &operator-=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not mul suitable
+   * @return Self reference
+   */
   Matrix &operator*=(const Matrix &matr);
+
   Matrix &operator*=(DataT mul);
 
   bool operator==(const Matrix &matr) const;
