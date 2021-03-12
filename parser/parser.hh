@@ -1,5 +1,5 @@
-#ifndef PARACL_PARSER_HH
-#define PARACL_PARSER_HH
+#ifndef CIRC_PARSER_HH
+#define CIRC_PARSER_HH
 
 #include <iostream>
 
@@ -8,6 +8,7 @@
 #endif /* yyFlexLexer */
 
 #include "../FB_BLD/compiler.tab.hh"
+#include "../circuits.hh"
 
 enum RES_OF_PARSE
 {
@@ -38,4 +39,4 @@ public:
   ~OurFlexLexer() = default;
 };
 
-#endif // PARACL_PARSER_HH
+#endif // CIRC_PARSER_HH

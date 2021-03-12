@@ -1,21 +1,15 @@
 
-#ifndef PARACL_DRIVER_HH
-#define PARACL_DRIVER_HH
+#ifndef CIRC_DRIVER_HH
+#define CIRC_DRIVER_HH
 
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 #include "../parser/parser.hh"
-#include "../circuits.hh"
-
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
-#endif /* yyFlexLexer */
-
-#ifndef yyFlexLexer
-//#include "../FB_BLD/lex.yy.cc"
 #endif /* yyFlexLexer */
 
 enum
@@ -25,7 +19,6 @@ enum
 
 namespace yy
 {
-
 
 class Driver final
 {
@@ -54,6 +47,8 @@ public:
   void report_syntax_error(const parser::context &ctx);
 
   void dump();
+  
+  int get_juncs() { return max_junc_; }
 
   ~Driver();
 };
@@ -62,4 +57,4 @@ public:
 
 // namespace yy
 
-#endif // PARACL_DRIVER_HH
+#endif // CIRC_DRIVER_HH
