@@ -2,7 +2,7 @@
 #define MATRIX_HH
 
 #include "mem.hh"
-
+#include <vector>
 namespace MX
 {
 
@@ -20,10 +20,7 @@ static long double EPS = 1e-12;
  * @brief Compares floating point numbers with zero
  * @param num Number you need to compare
  */
-bool is_zero(long double num)
-{
-  return std::abs(num) < EPS;
-}
+bool is_zero(long double num);
 
 /**
  * @class Template matrix
@@ -31,7 +28,7 @@ bool is_zero(long double num)
 template <typename DataT> class Matrix : public VBuf<Row<DataT>>
 {
 
-protected:
+private:
   using VBuf<Row<DataT>>::arr_;
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
@@ -199,7 +196,20 @@ public:
    */
   Matrix diag() const;
 
-protected:
+  static std::vector<double> solve(const Matrix &mat)
+  {
+    Matrix tmp{mat.diag()};
+
+    std::vector<double> res;
+    res.reserve(tmp.rows_);
+
+    for (size_t i = 0, col_idx = tmp.cols_ - 1; i < tmp.rows_; ++i)
+      res.push_back(tmp[i][col_idx] / tmp[i][i]);
+
+    return res;
+  }
+
+private:
   /**
    * @brief Backward part of Gauss method
    * @return Self reference
@@ -690,27 +700,7 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
   return ost;
 }
 
-template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr)
-{
-  for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
-  {
-    ost << "| ";
-
-    for (size_t j = 0; j < cols; ++j)
-    {
-      auto tmp = matr[i][j];
-
-      if (is_zero(tmp))
-        ost << "0 ";
-      else
-        ost << tmp << " ";
-    }
-
-    ost << "|" << std::endl;
-  }
-
-  return ost;
-}
+template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr);
 
 } // namespace MX
 
