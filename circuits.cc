@@ -36,7 +36,7 @@ MX::Matrix<double> Circuit::make_eds_matr()
   return E;
 }
 
-bool Circuit::is_cyc_unique( const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec )
+bool Circuit::is_cyc_unique(const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec)
 {
   for (auto &&cyc : cyc_vec)
   {
@@ -45,7 +45,7 @@ bool Circuit::is_cyc_unique( const std::vector<int> &vec, const std::vector<std:
       if (std::abs(cyc[i]) != std::abs(vec[i]))
         break;
     if (i == cyc.size())
-     return false;
+      return false;
   }
 
   return true;
@@ -58,7 +58,7 @@ MX::Matrix<double> Circuit::make_circ_matr()
 
   std::vector<std::vector<int>> cycles;
 
-  // go from all 
+  // go from all
   for (size_t i = 0; i < inc_rows && cycles.size() != cycles_needed; ++i)
   {
     auto tmp_vec = dfs_start(i);
@@ -70,16 +70,13 @@ MX::Matrix<double> Circuit::make_circ_matr()
       cycles.push_back(tmp_vec);
   }
 
-  MX::Matrix<double> circ{cycles.size(), edges_.size(), [&cycles](int circ_num, int edge_num)
-                                                      {
-                                                        return cycles[circ_num][edge_num];
-                                                      }
-  };
+  MX::Matrix<double> circ{cycles.size(), edges_.size(),
+                          [&cycles](int circ_num, int edge_num) { return cycles[circ_num][edge_num]; }};
 
   return circ;
 }
 
-std::vector<int> Circuit::dfs_start( size_t from )
+std::vector<int> Circuit::dfs_start(size_t from)
 {
   std::vector<int> tmp{};
   tmp.reserve(edges_.size());
@@ -89,7 +86,7 @@ std::vector<int> Circuit::dfs_start( size_t from )
   return tmp;
 }
 
-bool Circuit::dfs( size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors )
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors)
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
@@ -105,7 +102,7 @@ bool Circuit::dfs( size_t nstart, size_t nactual, size_t nprev, std::vector<int>
     /* Check if we have a route between verts */
     if (incidence_[nactual][i] == 0)
       continue;
-    
+
     /* Check if we have already visited this vert */
     if (colors[dest_vert] == Color::GREY)
     {
@@ -137,7 +134,6 @@ bool Circuit::dfs( size_t nstart, size_t nactual, size_t nprev, std::vector<int>
 
   return false;
 }
-
 
 void Circuit::curs_calc()
 {
