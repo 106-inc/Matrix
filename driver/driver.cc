@@ -96,7 +96,6 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
         max_junc_ = tmp_junc;
 
     Edges_.push_back({junc1, junc2, rtor, voltage});
-    Edges_.resize(Edges_.size() + 1);
 
     return;
 }
@@ -149,6 +148,8 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
 
 void yy::Driver::dump()
 {
+    //std::cout <<
+
     for (auto&& edge : Edges_)
     {
         std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
