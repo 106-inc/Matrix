@@ -47,10 +47,12 @@ private:
   MX::Matrix<double> make_eds_matr();
   MX::Matrix<double> make_res_matr();
 
-  MX::Matrix<int> make_circ_matr();
+  MX::Matrix<double> make_circ_matr();
 
-  void dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, std::vector<Color> &colors );
+  bool dfs( size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors );
   std::vector<int> dfs_start( size_t from );
+
+  static bool is_cyc_unique( const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec );
 };
 } // namespace CTS
 

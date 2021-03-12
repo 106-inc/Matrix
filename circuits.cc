@@ -36,50 +36,45 @@ MX::Matrix<double> Circuit::make_eds_matr()
   return E;
 }
 
+bool Circuit::is_cyc_unique( const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec )
+{
+  for (auto &&cyc : cyc_vec)
+  {
+    size_t i = 0;
+    for (size_t endi = cyc.size(); i < endi; ++i)
+      if (std::abs(cyc[i]) != std::abs(vec[i]))
+        break;
+    if (i == cyc.size())
+     return false;
+  }
 
-MX::Matrix<int> Circuit::make_circ_matr()
+  return true;
+}
+
+MX::Matrix<double> Circuit::make_circ_matr()
 {
   size_t inc_rows = incidence_.rows();
+  size_t cycles_needed = incidence_.cols() - inc_rows + 1;
 
   std::vector<std::vector<int>> cycles;
 
   // go from all 
-  for (size_t i = 0; i < inc_rows; ++i)
+  for (size_t i = 0; i < inc_rows && cycles.size() != cycles_needed; ++i)
   {
     auto tmp_vec = dfs_start(i);
+
+    if (!is_cyc_unique(tmp_vec, cycles))
+      continue;
+
     if (!tmp_vec.empty())
       cycles.push_back(tmp_vec);
   }
 
-  MX::Matrix<double> circ{edges_.size(), cycles.size(), [&cycles](int i, int j)
+  MX::Matrix<double> circ{cycles.size(), edges_.size(), [&cycles](int circ_num, int edge_num)
                                                       {
-                                                        int res{};
-                                                        for (auto & edge : cycles[i])
-                                                        {
-                                                          if (edge == j)
-                                                            return 1.0;
-                                                          if (edge == -j)
-                                                            return -1.0;
-                                                          return 0.0;
-                                                        }
+                                                        return cycles[circ_num][edge_num];
                                                       }
   };
-  
-  // TODO: weak place здесь явно не все -- разобраться!!
-
-  MX::Matrix<double> diag = circ.diag();
-
-  size_t i = 0;
-  for (size_t size = diag.rows(); i < size && !MX::is_zero(diag[i][i]); ++i);
-
-  if (i < diag.rows())
-  {
-    MX::Matrix<double> res = {i, circ.cols(), [&circ](int i, int j)
-    {
-
-    }};
-    return res;
-  }
 
   return circ;
 }
@@ -87,24 +82,24 @@ MX::Matrix<int> Circuit::make_circ_matr()
 std::vector<int> Circuit::dfs_start( size_t from )
 {
   std::vector<int> tmp{};
+  tmp.reserve(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
-  dfs(from, from, tmp, cols);
+  dfs(from, from, from, tmp, cols);
   return tmp;
 }
 
-void Circuit::dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, std::vector<Color> &colors )
+bool Circuit::dfs( size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors )
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
 
-  size_t nprev = cyc_rout.back();
-
-
   for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
   {
+    size_t dest_vert = edges_[i].junc1 == nactual ? edges_[i].junc2 : edges_[i].junc1;
+
     /* Check if we came from this vert */
-    if (i == nprev)
+    if (dest_vert == nprev)
       continue;
 
     /* Check if we have a route between verts */
@@ -112,41 +107,42 @@ void Circuit::dfs( size_t nstart, size_t nactual, std::vector<int> &cyc_rout, st
       continue;
     
     /* Check if we have already visited this vert */
-    if (colors[i] == Color::GREY)
+    if (colors[dest_vert] == Color::GREY)
     {
-      if (i == nstart)
-        return;
+      if (dest_vert == nstart)
+        return true;
       continue;
     }
 
-    if (colors[i] == Color::WHITE)
+    if (colors[dest_vert] == Color::WHITE)
     {
       std::vector<int> rout_cpy{cyc_rout};
       std::vector<Color> col_cpy{colors};
 
-      rout_cpy.push_back(-i * incidence_[nactual][i]);
-      
-      size_t nnext = edges_[i].junc1 == nactual ? edges_[i].junc2 : edges_[i].junc1;
+      rout_cpy[i] = incidence_[nactual][i];
 
-      dfs(nstart, nnext, rout_cpy, col_cpy);
+      bool is_cycle = dfs(nstart, dest_vert, nactual, rout_cpy, col_cpy);
 
-      if (!rout_cpy.empty())
+      if (is_cycle)
       {
         /* Means that we've found a cycle in previous dfs call */
         cyc_rout = rout_cpy;
-        return;
+        return true;
       }
     }
   }
-  
-  cyc_rout.clear();
+
   /* Mark that we go away from vert. */
   colors[nactual] = Color::BLACK;
+
+  return false;
 }
 
 
 void Circuit::curs_calc()
 {
-  
+  std::cout << "CIRC_MATR: \n" << make_circ_matr();
+  std::cout << "EDS_MATR: \n" << make_eds_matr();
+  std::cout << "RES_MATR: \n" << make_res_matr();
 }
 } // namespace CTS
