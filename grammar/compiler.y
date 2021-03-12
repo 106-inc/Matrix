@@ -59,9 +59,17 @@ line:        expr NEW_LINE                   {};
            | NEW_LINE                        {};
 
 expr:        junc EDGE junc COMMA
-             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7); };
+             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7);};
+
            | junc EDGE junc COMMA
-             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0); };
+             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0);};
+
+           | junc EDGE junc COMMA
+             voltage  	                     { driver->insert($1, $3, 0.0, $5);};
+
+           | junc EDGE junc
+             SEMICOLON                       { driver->insert($1, $3, 0.0, 0.0);};
+
 
 junc:        INT                             { $$ = $1; };
 
@@ -70,7 +78,6 @@ rtor:        INT                             { $$ = $1; };
 
 voltage:     INT VOLT                        { $$ = $1; };
            | DOUBLE VOLT                     { $$ = $1; };
-         /*|                                 { $$ = 0.0;};*/
 
 %%
 
