@@ -2,7 +2,6 @@
 
 std::vector<CTS::Edge> Edges_{};
 
-
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
 yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_junc_(0)
@@ -93,8 +92,7 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
   if (tmp_junc > max_junc_)
     max_junc_ = tmp_junc;
 
-    Edges_.push_back({junc1, junc2, rtor, voltage});
-
+  Edges_.push_back({junc1, junc2, rtor, voltage});
 
   return;
 }
@@ -147,11 +145,11 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
 
 void yy::Driver::dump()
 {
-    for (auto&& edge : Edges_)
-    {
-        std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
-        std::cout << std::endl;
-    }
+  for (auto &&edge : Edges_)
+  {
+    std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
+    std::cout << std::endl;
+  }
 }
 
 //! Destructor for class Driver
