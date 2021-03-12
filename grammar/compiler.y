@@ -56,7 +56,6 @@ lines:       line			     {};
            | lines line                      {};
 
 line:        expr NEW_LINE                   {};
-           | NEW_LINE                        {};
 
 expr:        junc EDGE junc COMMA
              rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7);};
