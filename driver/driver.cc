@@ -1,5 +1,8 @@
 #include "driver.hh"
 
+std::vector<CTS::Edge> Edges_{};
+
+
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
 yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_junc_(0)
@@ -26,7 +29,7 @@ yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_
   plex_ = new OurFlexLexer;
   plex_->switch_streams(in_file, std::cout);
 
-  edges_.reserve(1);
+  Edges_.reserve(1);
 }
 
 //! Functuion for calling bison yy::parser:parse()
@@ -82,7 +85,7 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 //! \param junc2
 //! \param rtor
 //! \param voltage
-void yy::Driver::insert(int junc1, int junc2, float rtor, float voltage)
+void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
   //! Insertion new edge to structure
   int tmp_junc = std::max(junc1, junc2);
@@ -90,8 +93,8 @@ void yy::Driver::insert(int junc1, int junc2, float rtor, float voltage)
   if (tmp_junc > max_junc_)
     max_junc_ = tmp_junc;
 
-  edges_.push_back({junc1, junc2, rtor, voltage});
-  edges_.resize(edges_.size() + 1);
+    Edges_.push_back({junc1, junc2, rtor, voltage});
+
 
   return;
 }
@@ -144,8 +147,11 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
 
 void yy::Driver::dump()
 {
-  for (auto &&edge : edges_)
-    std::cout << edge.junc1 << "--" << edge.junc2 << "," << edge.rtor << ";" << edge.voltage << "V";
+    for (auto&& edge : Edges_)
+    {
+        std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
+        std::cout << std::endl;
+    }
 }
 
 //! Destructor for class Driver

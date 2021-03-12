@@ -1,12 +1,13 @@
 %language "c++"
 %skeleton "lalr1.cc"
 
-
-%param {Driver* driver}
-%locations
-
 %define api.value.type variant
 %define parse.error custom
+
+%param {Driver* driver}
+
+%locations
+
 
 %code requires
 {
@@ -22,6 +23,8 @@ namespace yy { class Driver; };
 namespace yy
 {
 parser::token_type yylex(parser::semantic_type* yylval, parser::location_type* yylloc, Driver* driver);
+
+extern std::vector<CTS::Edge> Edges_;
 };
 }
 
@@ -31,7 +34,9 @@ SEMICOLON      ";"
 EDGE           "--"
 VOLT           "V"
 COMMA          ","
-NEW_LINE       "\\n"
+NEW_LINE       "\n"
+
+ERR
 ;
 
 %token <int>   INT
@@ -41,31 +46,37 @@ NEW_LINE       "\\n"
 %nterm <float> rtor
 %nterm <float> voltage
 
-/*
-lines:	  line
-        | lines line
-*/
 
 %%
 
-program:      program line                    { /* program starting */};
-	    |
+program:     lines                           { /* program starting */};
 
-line:         expr                            {};
-            | expr NEW_LINE                   {};
-            | NEW_LINE                        {};
+
+lines:       line			     {};
+           | lines line                      {};
+
+line:        expr NEW_LINE                   {};
 
 expr:        junc EDGE junc COMMA
-             rtor SEMICOLON voltage           { driver->insert($1, $3, $5, $7); };
+             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7);};
 
-junc:        INT                              { $$ = $1; };
+           | junc EDGE junc COMMA
+             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0);};
 
-rtor:        INT                              { $$ = $1; };
-           | DOUBLE                           { $$ = $1; };
+           | junc EDGE junc COMMA
+             voltage  	                     { driver->insert($1, $3, 0.0, $5);};
 
-voltage:     INT VOLT                         { $$ = $1; };
-           | DOUBLE VOLT                      { $$ = $1; };
-           |                                  { $$ = 0.0; };
+           | junc EDGE junc
+             SEMICOLON                       { driver->insert($1, $3, 0.0, 0.0);};
+
+
+junc:        INT                             { $$ = $1; };
+
+rtor:        INT                             { $$ = $1; };
+           | DOUBLE                          { $$ = $1; };
+
+voltage:     INT VOLT                        { $$ = $1; };
+           | DOUBLE VOLT                     { $$ = $1; };
 
 %%
 

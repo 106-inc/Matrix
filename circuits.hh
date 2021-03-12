@@ -13,7 +13,13 @@ struct Edge final // rtor, junc1, junc2, voltage
 {
   size_t junc1, junc2;
 
-  double rtor, eds, cur /** May be deleted in future */;
+  double rtor, eds, cur{} /** May be deleted in future */;
+
+  Edge(size_t j1, size_t j2, double rtr, double ed) : junc1(j1),
+                                                      junc2(j2),
+                                                      rtor(rtr),
+                                                      eds(ed)
+  {}
 };
 
 /**
@@ -53,6 +59,7 @@ private:
   std::vector<int> dfs_start( size_t from );
 
   static bool is_cyc_unique( const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec );
+
 };
 } // namespace CTS
 
