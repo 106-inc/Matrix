@@ -1,8 +1,5 @@
-#ifndef MATRIX_LA_HH
-#define MATRIX_LA_HH
-
-#include "matrix.hh"
-#include <vector>
+#ifndef CIRC_LA_HH
+#define CIRC_LA_HH
 
 /**
  * dfs(vert)
@@ -28,7 +25,6 @@ class Sys : public Matrix<double>
   using Matrix<double>::rows_;
 
 public:
-
   Sys(const Matrix &orig) : Matrix(orig)
   {
   }
@@ -51,22 +47,6 @@ public:
    */
   std::vector<double> solve() const;
 };
-
-std::vector<double> Sys::solve() const
-{
-  Sys tmp{*this};
-
-  tmp.GaussFWD();
-  tmp.GaussBWD();
-
-  std::vector<double> res;
-  res.reserve(rows_);
-
-  for (size_t i = 0, col_idx = cols_ - 1; i < rows_; ++i)
-    res.push_back(tmp[i][col_idx] / tmp[i][i]);
-
-  return res;
-}
 } // namespace LA
 
-#endif // MATRIX_LA_HH
+#endif // CIRC_LA_HH
