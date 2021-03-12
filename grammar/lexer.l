@@ -1,6 +1,5 @@
 %option c++
 
-%option noyywrap
 %option noyywrap nounput noinput batch debug
 %option yylineno
 
