@@ -3,6 +3,15 @@
 namespace CTS
 {
 
+std::ostream &operator <<( std::ostream &ost, const Edge &edge )
+{
+  double real_cur = MX::is_zero(edge.cur) ? 0.0 : edge.cur;
+
+  ost << edge.junc1 + 1 << " -- " << edge.junc2 + 1 << ": " << real_cur << " A" << std::endl;
+
+  return ost;
+}
+
 Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), incidence_(j_num, edges_.size())
 {
   size_t e_num = edges_.size();
@@ -31,7 +40,7 @@ MX::Matrix<double> Circuit::make_eds_matr()
   MX::Matrix<double> E{e_num, 1};
 
   for (size_t i = 0; i < e_num; ++i)
-    E.set(i, 1, edges_[i].eds);
+    E.set(i, 0, edges_[i].eds);
 
   return E;
 }
@@ -79,7 +88,7 @@ MX::Matrix<double> Circuit::make_circ_matr()
 std::vector<int> Circuit::dfs_start(size_t from)
 {
   std::vector<int> tmp{};
-  tmp.reserve(edges_.size());
+  tmp.resize(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, from, tmp, cols);
@@ -107,7 +116,10 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
     if (colors[dest_vert] == Color::GREY)
     {
       if (dest_vert == nstart)
+      {
+        cyc_rout[i] = incidence_[nactual][i];
         return true;
+      }
       continue;
     }
 
@@ -137,8 +149,29 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
 
 void Circuit::curs_calc()
 {
-  std::cout << "CIRC_MATR: \n" << make_circ_matr();
-  std::cout << "EDS_MATR: \n" << make_eds_matr();
-  std::cout << "RES_MATR: \n" << make_res_matr();
+  MX::Matrix<double> cut_inc{incidence_.rows() - 1, incidence_.cols(), 
+  [this](int i, int j)
+  {
+    return this->incidence_[i][j];
+  }
+  };
+
+  auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
+  auto B = make_circ_matr();
+
+  auto BR = B * make_res_matr();
+  auto BE = B * make_eds_matr(); 
+
+  auto BR_BE = MX::glue_side(BR, BE);
+
+  auto system = MX::glue_bott(A_0, BR_BE);
+
+  // TODO: delete after debug
+  std::cout << system;
+
+  auto curs = MX::Matrix<double>::solve(system);
+
+  for (size_t i = 0, endi = curs.size(); i < endi; ++i)
+    edges_[i].cur = curs[i];
 }
 } // namespace CTS

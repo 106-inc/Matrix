@@ -11,12 +11,14 @@ struct Edge final // rtor, junc1, junc2, voltage
 {
   size_t junc1, junc2;
 
-  double rtor, eds, cur{} /** May be deleted in future */;
+  double rtor, eds, cur;
 
   Edge(size_t j1, size_t j2, double rtr, double ed) : junc1(j1), junc2(j2), rtor(rtr), eds(ed)
   {
   }
 };
+
+std::ostream &operator <<( std::ostream &ost, const Edge &edge );
 
 /**
  * @brief Circuit class. Solves a circut
@@ -25,7 +27,7 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
-  MX::Matrix<int> incidence_;
+  MX::Matrix<double> incidence_;
 
 public:
   Circuit(const std::vector<Edge> &edges, size_t j_num);
@@ -37,6 +39,12 @@ public:
    */
 
   void curs_calc();
+
+  void curs_out()
+  {
+    for (auto &&edge : edges_)
+      std::cout << edge;
+  }
 
 private:
   enum class Color
