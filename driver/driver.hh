@@ -4,7 +4,10 @@
 
 #include <fstream>
 #include <iostream>
+
+#include <unordered_map>
 #include <vector>
+
 
 #include "../parser/parser.hh"
 
@@ -25,6 +28,9 @@ class Driver final
 private:
   std::string name_of_file_;
   std::ifstream in_file;
+
+  std::unordered_map<size_t, size_t> juncs;
+  size_t counter{0};
 
   int max_junc_;
 

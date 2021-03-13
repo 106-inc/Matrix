@@ -52,22 +52,22 @@ ERR
 program:     lines                           { /* program starting */};
 
 
-lines:       line			     {};
+lines:       line			                       {};
            | lines line                      {};
 
 line:        expr NEW_LINE                   {};
 
 expr:        junc EDGE junc COMMA
-             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7);};
+             rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7); };
 
            | junc EDGE junc COMMA
-             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0);};
+             rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0); };
 
            | junc EDGE junc SEMICOLON
-             voltage  	                     { driver->insert($1, $3, 0.0, $5);};
+             voltage  	                     { driver->insert($1, $3, 0.0, $5); };
 
            | junc EDGE junc
-             SEMICOLON                       { driver->insert($1, $3, 0.0, 0.0);};
+             SEMICOLON                       { driver->insert($1, $3, 0.0, 0.0); };
 
 
 junc:        INT                             { $$ = $1; };

@@ -38,6 +38,18 @@ bool yy::Driver::parse()
   yy::parser parser_(this);
 
   bool res = !parser_.parse();
+
+  if (!res)
+    return res;
+
+  for (auto && e : Edges_)
+  {
+    e.junc1.norm = juncs[e.junc1.real];
+    e.junc2.norm = juncs[e.junc2.real];
+  }
+
+  max_junc_ = juncs.size();
+
   return res;
 }
 
@@ -87,12 +99,20 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
   //! Insertion new edge to structure
+  
+  /*
   int tmp_junc = std::max(junc1, junc2);
 
   if (tmp_junc > max_junc_)
     max_junc_ = tmp_junc;
+  */
 
-  Edges_.push_back({junc1 - 1, junc2 - 1, rtor, voltage});
+  if (!juncs.contains(junc1))
+    juncs[junc1] = counter++;
+  if (!juncs.contains(junc2))
+    juncs[junc2] = counter++;
+
+  Edges_.push_back({junc1, junc2, rtor, voltage});
 
   return;
 }
