@@ -12,7 +12,10 @@ std::ostream &operator <<( std::ostream &ost, const Edge &edge )
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), incidence_(j_num, edges_.size())
+Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), 
+                                                                 incidence_(j_num, edges_.size()),
+                                                                 circs_(edges_.size() - j_num + 1, edges_.size())
+
 {
   size_t e_num = edges_.size();
 
@@ -23,7 +26,7 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), 
   }
 }
 
-MX::Matrix<double> Circuit::make_res_matr()
+MX::Matrix<double> Circuit::make_res_matr() const 
 {
   size_t e_num = edges_.size();
   MX::Matrix<double> R{e_num, e_num};
@@ -34,7 +37,7 @@ MX::Matrix<double> Circuit::make_res_matr()
   return R;
 }
 
-MX::Matrix<double> Circuit::make_eds_matr()
+MX::Matrix<double> Circuit::make_eds_matr() const
 {
   size_t e_num = edges_.size();
   MX::Matrix<double> E{e_num, 1};
@@ -45,44 +48,44 @@ MX::Matrix<double> Circuit::make_eds_matr()
   return E;
 }
 
-bool Circuit::is_cyc_unique(const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec)
+void Circuit::insert_cycle( size_t num, const std::vector<int> &cyc )
 {
-  for (auto &&cyc : cyc_vec)
+  for (size_t i = 0, endi = circs_.cols(); i < endi; ++i)
+    circs_.set(num, i, cyc[i]);
+}
+
+bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
+{
+  for (size_t i = 0, endi = circs_.rows(); i < endi; ++i)
   {
-    size_t i = 0;
-    for (size_t endi = cyc.size(); i < endi; ++i)
-      if (std::abs(cyc[i]) != std::abs(vec[i]))
+    size_t j = 0;
+    for (size_t endj = circs_.cols(); j < endj; ++j)
+      if (std::abs(circs_[i][j]) != std::abs(vec[j]))
         break;
-    if (i == cyc.size())
+    if (j == circs_.cols())
       return false;
   }
 
   return true;
 }
 
-MX::Matrix<double> Circuit::make_circ_matr()
+void Circuit::fill_circ_matr()
 {
   size_t inc_rows = incidence_.rows();
-  size_t cycles_needed = incidence_.cols() - inc_rows + 1;
+  size_t cycles_found = 0;
 
-  std::vector<std::vector<int>> cycles;
 
   // go from all
-  for (size_t i = 0; cycles.size() != cycles_needed; ++i)
+  for (size_t i = 0; i < inc_rows && circs_.rows() != cycles_found; ++i)
   {
     auto tmp_vec = dfs_start(i);
 
-    if (!is_cyc_unique(tmp_vec, cycles))
+    if (!is_cyc_unique(tmp_vec))
       continue;
 
     if (!tmp_vec.empty())
-      cycles.push_back(tmp_vec);
+      insert_cycle(cycles_found++, tmp_vec);
   }
-
-  MX::Matrix<double> circ{cycles.size(), edges_.size(),
-                          [&cycles](int circ_num, int edge_num) { return cycles[circ_num][edge_num]; }};
-
-  return circ;
 }
 
 std::vector<int> Circuit::dfs_start(size_t from)
@@ -92,6 +95,7 @@ std::vector<int> Circuit::dfs_start(size_t from)
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, from, tmp, cols);
+
   return tmp;
 }
 
@@ -118,7 +122,9 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
       if (dest_vert == nstart)
       {
         cyc_rout[i] = incidence_[nactual][i];
-        return true;
+        if (is_cyc_unique(cyc_rout))
+          return true;
+        cyc_rout[i] = 0;
       }
       continue;
     }
@@ -157,19 +163,18 @@ void Circuit::curs_calc()
   };
 
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
-  auto B = make_circ_matr();
+  fill_circ_matr();
   
-  std::cout << "A:\n" << incidence_ << "\nB:\n" << B << std::endl;
+ //std::cout << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
 
-  auto BR = B * make_res_matr();
-  auto BE = B * make_eds_matr(); 
+  auto BR = circs_ * make_res_matr();
+  auto BE = circs_ * make_eds_matr(); 
 
   auto BR_BE = MX::glue_side(BR, BE);
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  // TODO: delete after debug
-  std::cout << system;
+  //std::cout << system;
 
   auto curs = MX::Matrix<double>::solve(system);
 

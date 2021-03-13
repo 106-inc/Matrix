@@ -28,6 +28,7 @@ class Circuit final
 private:
   std::vector<Edge> edges_;
   MX::Matrix<double> incidence_;
+  MX::Matrix<double> circs_;
 
 public:
   Circuit(const std::vector<Edge> &edges, size_t j_num);
@@ -54,15 +55,17 @@ private:
     BLACK
   };
 
-  MX::Matrix<double> make_eds_matr();
-  MX::Matrix<double> make_res_matr();
+  MX::Matrix<double> make_eds_matr() const;
+  MX::Matrix<double> make_res_matr() const;
 
-  MX::Matrix<double> make_circ_matr();
+  void fill_circ_matr();
 
   bool dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors);
   std::vector<int> dfs_start(size_t from);
 
-  static bool is_cyc_unique(const std::vector<int> &vec, const std::vector<std::vector<int>> &cyc_vec);
+  void insert_cycle( size_t num, const std::vector<int> &cyc );
+
+  bool is_cyc_unique(const std::vector<int> &vec) const;
 };
 } // namespace CTS
 

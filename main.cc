@@ -5,13 +5,13 @@ extern std::vector<CTS::Edge> Edges_;
 
 int main(int argc, char **argv)
 {
-  if (0 && argc < 2)
+  if (argc < 2)
   {
     std::cout << "USAGE: " << argv[0] << " FILENAME" << std::endl;
     return 0;
   }
 
-  yy::Driver driver("../tst/in/vl_test.dat");
+  yy::Driver driver(argv[1]);
 
   if (!driver.parse())
     return 1;
