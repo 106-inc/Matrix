@@ -14,7 +14,7 @@ namespace MX
 
 using std::initializer_list;
 
-static long double EPS = 1e-12;
+const long double EPS = 1e-12;
 
 /**
  * @brief Compares floating point numbers with zero
