@@ -600,7 +600,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 
 template <typename DataT> Matrix<DataT> Matrix<DataT>::diag() const
 {
-  return GaussFWD(*this).GaussBWD();
+  return GaussFWD().GaussBWD();
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
