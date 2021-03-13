@@ -4,18 +4,30 @@ namespace MX
 {
 template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr)
 {
+  ost << "   | ";
+  for (size_t i = 0, cols = matr.cols(); i < cols; ++i)
+    ost << std::setw(4) << i;
+
+  ost << std::endl;
+
+  ost << "   +-";
+  for (size_t i = 0, cols = matr.cols(); i < cols; ++i)
+    ost << "----";
+
+  ost << std::endl;
+
   for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
   {
-    ost << "| ";
+    ost << std::setw(3) << i << "| ";
 
     for (size_t j = 0; j < cols; ++j)
     {
       auto tmp = matr[i][j];
 
       if (is_zero(tmp))
-        ost << "0 ";
+        ost << std::setw(3) << 0 << ";";
       else
-        ost << tmp << " ";
+        ost << std::setw(3) << tmp << ";";
     }
 
     ost << "|" << std::endl;
