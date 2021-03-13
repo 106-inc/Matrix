@@ -16,21 +16,9 @@ int main(int argc, char **argv)
   if (!driver.parse())
     return 1;
 
-  try 
-  {
-    CTS::Circuit crc{Edges_, driver.get_juncs()};
-  }
-  catch (const std::runtime_error &err)
-  {
-    std::cerr << err.what() << std::endl;
-  }
-  catch (const std::out_of_range &err)
-  {
-    std::cerr << err.what() << std::endl;
-  }
-
-
-  driver.dump();
+  CTS::Circuit crc{Edges_, driver.get_juncs()};
+  crc.curs_calc();
+  crc.curs_out();
 
   return 0;
 }
