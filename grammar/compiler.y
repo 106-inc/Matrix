@@ -63,7 +63,7 @@ expr:        junc EDGE junc COMMA
            | junc EDGE junc COMMA
              rtor SEMICOLON                  { driver->insert($1, $3, $5, 0.0);};
 
-           | junc EDGE junc COMMA
+           | junc EDGE junc SEMICOLON
              voltage  	                     { driver->insert($1, $3, 0.0, $5);};
 
            | junc EDGE junc
