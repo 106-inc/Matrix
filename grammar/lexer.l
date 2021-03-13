@@ -21,7 +21,7 @@ DIGIT1               [1-9]
 
 UN_OPER              [\+\-]
 
-INT                 {DIGIT1}{DIGIT}*
+INT                 {DIGIT}{DIGIT}*
 DOUBLE              {DIGIT}+\.{DIGIT}+
 
 NEW_LINE            [\n]+

@@ -165,7 +165,7 @@ void Circuit::curs_calc()
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
   fill_circ_matr();
   
- //std::cout << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
+  std::cout << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
 
   auto BR = circs_ * make_res_matr();
   auto BE = circs_ * make_eds_matr(); 
@@ -174,7 +174,7 @@ void Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  //std::cout << system;
+  std::cout << system;
 
   auto curs = MX::Matrix<double>::solve(system);
 
