@@ -7,7 +7,7 @@ std::ostream &operator <<( std::ostream &ost, const Edge &edge )
 {
   double real_cur = MX::is_zero(edge.cur) ? 0.0 : edge.cur;
 
-  ost << edge.junc1 + 1 << " -- " << edge.junc2 + 1 << ": " << real_cur << " A" << std::endl;
+  ost << edge.junc1.real << " -- " << edge.junc2.real << ": " << real_cur << " A" << std::endl;
 
   return ost;
 }
@@ -21,8 +21,8 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges),
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    incidence_.set(edges[i].junc1, i, 1);
-    incidence_.set(edges[i].junc2, i, -1);
+    incidence_.set(edges[i].junc1.norm, i, 1);
+    incidence_.set(edges[i].junc2.norm, i, -1);
   }
 }
 
@@ -106,7 +106,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
 
   for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
   {
-    size_t dest_vert = edges_[i].junc1 == nactual ? edges_[i].junc2 : edges_[i].junc1;
+    size_t dest_vert = edges_[i].junc1.norm == nactual ? edges_[i].junc2.norm : edges_[i].junc1.norm;
 
     /* Check if we came from this vert */
     if (dest_vert == nprev)

@@ -7,9 +7,17 @@
 
 namespace CTS
 {
+struct Junc final
+{
+  size_t real, norm;
+
+  Junc(size_t r, size_t n = 0) : real(r), norm(n)
+  {}
+};
+
 struct Edge final // rtor, junc1, junc2, voltage
 {
-  size_t junc1, junc2;
+  Junc junc1, junc2;
 
   double rtor, eds, cur;
 
@@ -39,8 +47,8 @@ public:
    * 2) calculating currents
    */
 
-  void curs_calc();
 
+  void curs_calc();
   void curs_out()
   {
     for (auto &&edge : edges_)

@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   if (!driver.parse())
     return 1;
 
-  CTS::Circuit crc{Edges_, driver.get_juncs()};
+  CTS::Circuit crc{Edges_, static_cast<size_t>(driver.get_juncs())};
   crc.curs_calc();
   crc.curs_out();
 
