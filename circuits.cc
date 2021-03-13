@@ -174,11 +174,21 @@ void Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  std::cout << system;
+  std::cerr << system << std::endl;
+  std::cerr << "cols: " << system.cols() << ", rows: " << system.rows() << std::endl;
+
+  dump();
 
   auto curs = MX::Matrix<double>::solve(system);
 
   for (size_t i = 0, endi = curs.size(); i < endi; ++i)
     edges_[i].cur = curs[i];
 }
+
+void Circuit::dump()
+{
+  for (auto && e : edges_)
+    std::cerr << e.junc1.norm << " -> " << e.junc2.norm << std::endl;
+}
+
 } // namespace CTS

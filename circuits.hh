@@ -74,6 +74,8 @@ private:
   void insert_cycle( size_t num, const std::vector<int> &cyc );
 
   bool is_cyc_unique(const std::vector<int> &vec) const;
+
+  void dump();
 };
 } // namespace CTS
 
