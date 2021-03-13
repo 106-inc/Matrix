@@ -68,7 +68,7 @@ MX::Matrix<double> Circuit::make_circ_matr()
   std::vector<std::vector<int>> cycles;
 
   // go from all
-  for (size_t i = 0; i < inc_rows && cycles.size() != cycles_needed; ++i)
+  for (size_t i = 0; cycles.size() != cycles_needed; ++i)
   {
     auto tmp_vec = dfs_start(i);
 
@@ -158,6 +158,8 @@ void Circuit::curs_calc()
 
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
   auto B = make_circ_matr();
+  
+  std::cout << "A:\n" << incidence_ << "\nB:\n" << B << std::endl;
 
   auto BR = B * make_res_matr();
   auto BE = B * make_eds_matr(); 

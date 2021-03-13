@@ -1,8 +1,7 @@
 .PHONY: all clean
 
-RELEASE_OPTIONS = -O2
 WRNNG_OPTNS = -Wall -Wextra -Wno-old-style-cast -Waggressive-loop-optimizations -Wnon-virtual-dtor -Wunused -Wuseless-cast
-CXX = g++ --std=c++2a
+CXX = g++ --std=c++2a -O2
 
 FB_BLD = FB_BLD
 BLD = BLD_DIR
@@ -16,11 +15,8 @@ LA = lin_alg
 all: start
 
 start: bld_dir fb_bld matrix.o circuits.o compiler.o lexer.o parser.o driver.o main.o
-	$(CXX) -o $(BLD)/curc $(BLD)/matrix.o $(BLD)/circuits.o $(BLD)/parser.o $(BLD)/lexer.o $(BLD)/compiler.o $(BLD)/driver.o $(BLD)/main.o
+	$(CXX) -o $(BLD)/circ $(BLD)/matrix.o $(BLD)/circuits.o $(BLD)/parser.o $(BLD)/lexer.o $(BLD)/compiler.o $(BLD)/driver.o $(BLD)/main.o
 	
-link:
-	$(CXX) -o $(BLD)/curc $(BLD)/circuits.o $(BLD)/parser.o $(BLD)/lexer.o $(BLD)/compiler.o $(BLD)/driver.o $(BLD)/main.o
-
 clean:
 	rm -rf $(BLD) $(FB_BLD)
 
