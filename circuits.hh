@@ -13,7 +13,8 @@ struct Junc final
   size_t real, norm;
 
   Junc(size_t r, size_t n = 0) : real(r), norm(n)
-  {}
+  {
+  }
 };
 
 struct Edge final // rtor, junc1, junc2, voltage
@@ -28,11 +29,11 @@ struct Edge final // rtor, junc1, junc2, voltage
 
   double get_cur() const
   {
-      return MX::is_zero(cur) ? 0.0 : cur;
+    return MX::is_zero(cur) ? 0.0 : cur;
   }
 };
 
-std::ostream &operator <<( std::ostream &ost, const Edge &edge );
+std::ostream &operator<<(std::ostream &ost, const Edge &edge);
 
 /**
  * @brief Circuit class. Solves a circut
@@ -53,7 +54,6 @@ public:
    * 2) calculating currents
    */
 
-
   void curs_calc();
   void curs_out()
   {
@@ -61,8 +61,8 @@ public:
       std::cout << edge;
   }
 
-  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" ) const;
-  
+  void dump(const std::string &png_file, const std::string &dot_file = "dump.dot") const;
+
 private:
   enum class Color
   {
@@ -79,7 +79,7 @@ private:
   bool dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors);
   std::vector<int> dfs_start(size_t from);
 
-  void insert_cycle( size_t num, const std::vector<int> &cyc );
+  void insert_cycle(size_t num, const std::vector<int> &cyc);
 
   bool is_cyc_unique(const std::vector<int> &vec) const;
 };

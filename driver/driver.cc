@@ -42,7 +42,7 @@ bool yy::Driver::parse()
   if (!res)
     return res;
 
-  for (auto && e : Edges_)
+  for (auto &&e : Edges_)
   {
     e.junc1.norm = juncs[e.junc1.real];
     e.junc2.norm = juncs[e.junc2.real];
@@ -99,7 +99,7 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
   //! Insertion new edge to structure
-  
+
   /*
   int tmp_junc = std::max(junc1, junc2);
 
