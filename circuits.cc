@@ -55,17 +55,18 @@ void Circuit::insert_cycle(size_t num, const std::vector<int> &cyc)
 
 bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
 {
-  for (size_t i = 0, endi = circs_.rows(); i < endi; ++i)
+  auto tcircs = transpose(circs_);
+
+  for (size_t i = 0, endi = tcircs.rows(); i < endi; ++i)
   {
     size_t j = 0;
-    for (size_t endj = circs_.cols(); j < endj; ++j)
-      if (std::abs(circs_[i][j]) != std::abs(vec[j]))
-        break;
-    if (j == circs_.cols())
-      return false;
-  }
+    for (size_t endj = tcircs.cols(); j < endj && !tcircs[i][j];++j);
 
-  return true;
+    if (j == tcircs.cols() && vec[i])
+      return true;
+   }
+
+  return false;
 }
 
 void Circuit::fill_circ_matr()
@@ -96,12 +97,13 @@ std::vector<int> Circuit::dfs_start(size_t from) const
   tmp.resize(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
-  dfs(from, from, from, tmp, cols);
+  if (!dfs(from, from, edges_.size(), tmp, cols))
+    tmp.clear();
 
   return tmp;
 }
 
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors) const
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors) const
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
@@ -111,7 +113,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
     size_t dest_vert = edges_[i].junc1.norm == nactual ? edges_[i].junc2.norm : edges_[i].junc1.norm;
 
     /* Check if we came from this vert */
-    if (dest_vert == nprev)
+    if (i == ecurr)
       continue;
 
     /* Check if we have a route between verts */
@@ -138,7 +140,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
 
       rout_cpy[i] = incidence_[nactual][i];
 
-      bool is_cycle = dfs(nstart, dest_vert, nactual, rout_cpy, col_cpy);
+      bool is_cycle = dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
 
       if (is_cycle)
       {
