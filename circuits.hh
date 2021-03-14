@@ -2,6 +2,7 @@
 #define CIRC_CIRCUITS_HH
 
 #include "lin_alg/matrix.hh"
+#include <fstream>
 
 // TODO: найти где будут Edge
 
@@ -25,10 +26,9 @@ struct Edge final // rtor, junc1, junc2, voltage
   {
   }
 
-  double get_cur()
+  double get_cur() const
   {
-      double real_cur = MX::is_zero(cur) ? 0.0 : cur;
-      return real_cur;
+      return MX::is_zero(cur) ? 0.0 : cur;
   }
 };
 
@@ -61,7 +61,7 @@ public:
       std::cout << edge;
   }
 
-  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" );
+  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" ) const;
   
 private:
   enum class Color

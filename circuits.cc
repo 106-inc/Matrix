@@ -185,7 +185,7 @@ void Circuit::curs_calc()
     edges_[i].cur = curs[i];
 }
 
-void Circuit::dump( const std::string &png_file, const std::string& dot_file)
+void Circuit::dump( const std::string &png_file, const std::string& dot_file) const
 {
   std::ofstream fout;
 
@@ -206,8 +206,9 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file)
 
   fout.close();
 
-    std::string promt = "dot " + dot_file + " -Tpng > " + png_file;
-    system(promt.c_str());
+  std::string prompt = "dot " + dot_file + " -Tpng > " + png_file;
+  if (!system(prompt.c_str()))
+    std::cerr << "An error occurred in system command" << std::endl;
 }
 
 } // namespace CTS

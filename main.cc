@@ -17,8 +17,10 @@ int main(int argc, char **argv)
     return 1;
 
   CTS::Circuit crc{Edges_, static_cast<size_t>(driver.get_juncs())};
-  crc.curs_calc();
-  crc.curs_out();
+  crc.dump("hello.png");
+
+  //crc.curs_calc();
+  //crc.curs_out();
 
   return 0;
 }
