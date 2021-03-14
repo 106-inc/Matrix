@@ -75,7 +75,7 @@ private:
 
   bool is_cyc_unique(const std::vector<int> &vec) const;
 
-  void dump();
+  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" ) const;
 };
 } // namespace CTS
 
