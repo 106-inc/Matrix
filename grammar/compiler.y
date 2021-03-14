@@ -49,17 +49,14 @@ ERR
 
 %%
 
-program:     lines fin_line                  { /* program starting */};
+program:     lines                           { /* program starting */};
 
 
 lines:       line			                       {};
            | lines line                      {};
 
-fin_line:    line                            {};
+line:        line NEW_LINE                   {};
            | expr                            {};
-
-line:        expr NEW_LINE                   {};
-           | NEW_LINE                        {};
 
 expr:        junc EDGE junc COMMA
              rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7); };
