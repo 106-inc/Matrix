@@ -188,7 +188,7 @@ void Circuit::curs_calc()
 void Circuit::dump( const std::string &png_file, const std::string& dot_file) const
 {
   char name_of_edge = 'A';
-  size_t num_of_edge = 1;
+  size_t num_of_edge = 0;
   std::ofstream fout;
 
   fout.open(dot_file, std::ios::out);
@@ -199,12 +199,12 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
       return;
   }
 
-  fout << "digraph D {\n";
+  fout << "digraph D {\n" << "rankdir=\"LR\";\n";
 
   for (auto&& e: edges_)
   {
       fout << name_of_edge << " [label=\n\" "
-                                       "# " << num_of_edge << "\n"
+                                       "Edge # " << num_of_edge << "\n"
                                        "I = "         << e.get_cur() << " A\n "
                                        "R = "        << e.rtor      << " Om\n "
                                        "E = "         << e.eds       << " V\n\", "
