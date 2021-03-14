@@ -211,7 +211,7 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
 
                                        "shape = box, color = black]" << std::endl;
 
-      fout << e.junc1.real << " -> " << name_of_edge << " -> " << e.junc2.real << std::endl;
+      fout << e.junc1.norm << " -> " << name_of_edge << " -> " << e.junc2.norm << std::endl;
 
       fout << std::endl;
 
