@@ -53,7 +53,10 @@ program:     lines                           { /* program starting */};
 
 
 lines:       line			                       {};
-           | lines line                      {};
+           | lines fin_line                  {};
+
+fin_line:    line                            {};
+           | expr                            {};
 
 line:        expr NEW_LINE                   {};
 
