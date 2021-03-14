@@ -61,6 +61,8 @@ public:
       std::cout << edge;
   }
 
+  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" );
+  
 private:
   enum class Color
   {
@@ -80,8 +82,6 @@ private:
   void insert_cycle( size_t num, const std::vector<int> &cyc );
 
   bool is_cyc_unique(const std::vector<int> &vec) const;
-
-  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" );
 };
 } // namespace CTS
 
