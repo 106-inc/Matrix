@@ -204,12 +204,12 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
   for (auto&& e: edges_)
   {
       fout << name_of_edge << " [label=\n\" "
-                                       "num_of_edge = " << num_of_edge << "\n"
-                                       "cur = "         << e.get_cur() << " A\n "
-                                       "rtor = "        << e.rtor      << " R\n "
-                                       "eds = "         << e.eds       << "V\n\", "
+                                       "# " << num_of_edge << "\n"
+                                       "I = "         << e.get_cur() << " A\n "
+                                       "R = "        << e.rtor      << " Om\n "
+                                       "E = "         << e.eds       << " V\n\", "
 
-                                       "shape = diamond, color = lightgrey, style=filled]" << std::endl;
+                                       "shape = box, color = black]" << std::endl;
 
       fout << e.junc1.real << " -> " << name_of_edge << " -> " << e.junc2.real << std::endl;
 
