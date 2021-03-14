@@ -53,12 +53,13 @@ program:     lines fin_line                  { /* program starting */};
 
 
 lines:       line			                       {};
-           | lines                           {};
+           | lines line                      {};
 
 fin_line:    line                            {};
            | expr                            {};
 
 line:        expr NEW_LINE                   {};
+           | NEW_LINE                        {};
 
 expr:        junc EDGE junc COMMA
              rtor SEMICOLON voltage          { driver->insert($1, $3, $5, $7); };
