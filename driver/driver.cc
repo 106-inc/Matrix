@@ -45,7 +45,7 @@ bool yy::Driver::parse()
   for (auto &&e : Edges_)
   {
     e.junc1.norm = /*juncs[e.junc1.real]*/ e.junc1.real;
-    e.junc2.norm = /*juncs[e.junc2.real]*/ e.junc1.real;
+    e.junc2.norm = /*juncs[e.junc2.real]*/ e.junc2.real;
   }
 
   max_junc_ = juncs.size();
