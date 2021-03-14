@@ -76,7 +76,7 @@ private:
 
   void fill_circ_matr();
 
-  bool dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors) const;
+  bool dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors) const;
   std::vector<int> dfs_start(size_t from) const;
 
   void insert_cycle(size_t num, const std::vector<int> &cyc);

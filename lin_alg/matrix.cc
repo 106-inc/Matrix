@@ -33,6 +33,19 @@ template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &ma
     ost << "|" << std::endl;
   }
 
+  std::cerr << "[";
+  for (size_t i = 0; i < matr.rows(); ++i)
+  {
+    std::cerr << "[";
+    for (size_t j = 0; j < matr.cols(); ++j)
+      std::cerr << matr[i][j] << ((j == matr.cols() - 1) ? "" : ",");
+
+    std::cerr << "]" << ((i == matr.rows() - 1) ? "" : ",") << std::endl;
+  }
+
+
+  std::cerr << "]";
+
   return ost;
 }
 
