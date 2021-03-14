@@ -175,5 +175,6 @@ void yy::Driver::dump()
 //! Destructor for class Driver
 yy::Driver::~Driver()
 {
+  in_file.close();
   delete plex_;
 }
