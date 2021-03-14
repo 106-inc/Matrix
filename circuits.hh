@@ -55,7 +55,7 @@ public:
    */
 
   void curs_calc();
-  void curs_out()
+  void curs_out() const
   {
     for (auto &&edge : edges_)
       std::cout << edge;
@@ -76,8 +76,8 @@ private:
 
   void fill_circ_matr();
 
-  bool dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors);
-  std::vector<int> dfs_start(size_t from);
+  bool dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors) const;
+  std::vector<int> dfs_start(size_t from) const;
 
   void insert_cycle(size_t num, const std::vector<int> &cyc);
 

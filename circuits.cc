@@ -78,15 +78,19 @@ void Circuit::fill_circ_matr()
   {
     auto tmp_vec = dfs_start(i);
 
-    if (!is_cyc_unique(tmp_vec))
-      continue;
-
     if (!tmp_vec.empty())
+    {
+      std::cout << "Independent cycle #" << cycles_found << ":\n";
+      for (size_t i = 0; i < tmp_vec.size(); ++i)
+        if (tmp_vec[i] != 0)
+          std::cout << i << " ";
+      std::cout << std::endl;
       insert_cycle(cycles_found++, tmp_vec);
+    }
   }
 }
 
-std::vector<int> Circuit::dfs_start(size_t from)
+std::vector<int> Circuit::dfs_start(size_t from) const
 {
   std::vector<int> tmp{};
   tmp.resize(edges_.size());
@@ -97,7 +101,7 @@ std::vector<int> Circuit::dfs_start(size_t from)
   return tmp;
 }
 
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors)
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> &cyc_rout, std::vector<Color> &colors) const
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
