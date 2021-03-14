@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-
 #include "../parser/parser.hh"
 
 #ifndef yyFlexLexer
@@ -53,8 +52,11 @@ public:
   void report_syntax_error(const parser::context &ctx);
 
   void dump();
-  
-  int get_juncs() { return max_junc_; }
+
+  int get_juncs()
+  {
+    return max_junc_;
+  }
 
   ~Driver();
 };

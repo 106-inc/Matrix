@@ -1,5 +1,5 @@
-#include "driver/driver.hh"
 #include "circuits.hh"
+#include "driver/driver.hh"
 
 extern std::vector<CTS::Edge> Edges_;
 
@@ -19,8 +19,8 @@ int main(int argc, char **argv)
   CTS::Circuit crc{Edges_, static_cast<size_t>(driver.get_juncs())};
   crc.dump("hello.png");
 
-  //crc.curs_calc();
-  //crc.curs_out();
+  crc.curs_calc();
+  crc.curs_out();
 
   return 0;
 }

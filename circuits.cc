@@ -3,7 +3,7 @@
 namespace CTS
 {
 
-std::ostream &operator <<( std::ostream &ost, const Edge &edge )
+std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 {
   double real_cur = MX::is_zero(edge.cur) ? 0.0 : edge.cur;
 
@@ -12,9 +12,8 @@ std::ostream &operator <<( std::ostream &ost, const Edge &edge )
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges), 
-                                                                 incidence_(j_num, edges_.size()),
-                                                                 circs_(edges_.size() - j_num + 1, edges_.size())
+Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num)
+    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size() - j_num + 1, edges_.size())
 
 {
   size_t e_num = edges_.size();
@@ -26,7 +25,7 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num) : edges_(edges),
   }
 }
 
-MX::Matrix<double> Circuit::make_res_matr() const 
+MX::Matrix<double> Circuit::make_res_matr() const
 {
   size_t e_num = edges_.size();
   MX::Matrix<double> R{e_num, e_num};
@@ -48,7 +47,7 @@ MX::Matrix<double> Circuit::make_eds_matr() const
   return E;
 }
 
-void Circuit::insert_cycle( size_t num, const std::vector<int> &cyc )
+void Circuit::insert_cycle(size_t num, const std::vector<int> &cyc)
 {
   for (size_t i = 0, endi = circs_.cols(); i < endi; ++i)
     circs_.set(num, i, cyc[i]);
@@ -73,7 +72,6 @@ void Circuit::fill_circ_matr()
 {
   size_t inc_rows = incidence_.rows();
   size_t cycles_found = 0;
-
 
   // go from all
   for (size_t i = 0; i < inc_rows && circs_.rows() != cycles_found; ++i)
@@ -155,20 +153,16 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t nprev, std::vector<int> 
 
 void Circuit::curs_calc()
 {
-  MX::Matrix<double> cut_inc{incidence_.rows() - 1, incidence_.cols(), 
-  [this](int i, int j)
-  {
-    return this->incidence_[i][j];
-  }
-  };
+  MX::Matrix<double> cut_inc{incidence_.rows() - 1, incidence_.cols(),
+                             [this](int i, int j) { return this->incidence_[i][j]; }};
 
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
   fill_circ_matr();
-  
+
   std::cout << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
 
   auto BR = circs_ * make_res_matr();
-  auto BE = circs_ * make_eds_matr(); 
+  auto BE = circs_ * make_eds_matr();
 
   auto BR_BE = MX::glue_side(BR, BE);
 
@@ -185,7 +179,7 @@ void Circuit::curs_calc()
     edges_[i].cur = curs[i];
 }
 
-void Circuit::dump( const std::string &png_file, const std::string& dot_file) const
+void Circuit::dump(const std::string &png_file, const std::string &dot_file) const
 {
   char name_of_edge = 'A';
   size_t num_of_edge = 0;
@@ -195,28 +189,39 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
 
   if (!fout.is_open())
   {
-      std::cerr << "Can't open dump file" << dot_file << "\n";
-      return;
+    std::cerr << "Can't open dump file" << dot_file << "\n";
+    return;
   }
 
-  fout << "digraph D {\n" << "rankdir=\"LR\";\n";
+  fout << "digraph D {\n"
+       << "rankdir=\"LR\";\n";
 
-  for (auto&& e: edges_)
+  for (auto &&e : edges_)
   {
-      fout << name_of_edge << " [label=\n\" "
-                                       "Edge # " << num_of_edge << "\n"
-                                       "I = "         << e.get_cur() << " A\n "
-                                       "R = "        << e.rtor      << " Om\n "
-                                       "E = "         << e.eds       << " V\n\", "
+    fout << name_of_edge
+         << " [label=\n\" "
+            "Edge # "
+         << num_of_edge
+         << "\n"
+            "I = "
+         << e.get_cur()
+         << " A\n "
+            "R = "
+         << e.rtor
+         << " Om\n "
+            "E = "
+         << e.eds
+         << " V\n\", "
 
-                                       "shape = box, color = black]" << std::endl;
+            "shape = box, color = black]"
+         << std::endl;
 
-      fout << e.junc1.norm << " -> " << name_of_edge << " -> " << e.junc2.norm << std::endl;
+    fout << e.junc1.norm << " -> " << name_of_edge << " -> " << e.junc2.norm << std::endl;
 
-      fout << std::endl;
+    fout << std::endl;
 
-      ++name_of_edge;
-      ++num_of_edge;
+    ++name_of_edge;
+    ++num_of_edge;
   }
 
   fout << "}\n";
@@ -228,7 +233,5 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
   if (system(prompt.c_str()) == -1)
     std::cerr << "An error occurred in system command" << std::endl;
 }
-
-
 
 } // namespace CTS

@@ -2,8 +2,8 @@
 #define MATRIX_HH
 
 #include "mem.hh"
-#include <vector>
 #include <iomanip>
+#include <vector>
 
 namespace MX
 {
@@ -647,8 +647,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
   }
 
   std::cerr << "------FWD------" << std::endl;
-  std::cerr << mat_cpy << "---------------" << std::endl; 
-
+  std::cerr << mat_cpy << "---------------" << std::endl;
 
   return mat_cpy;
 }
@@ -665,10 +664,10 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
 
   for (size_t i = 0, end = std::min(rows_, cols_); i < end; ++i)
   {
-    //bool zero_col = true;
+    // bool zero_col = true;
 
     if (is_zero(arr_[i][i]))
-        continue;
+      continue;
 
     /*if (zero_col)
         throw std::runtime_error("Here we need to swap cols (BWD)");*/
@@ -684,7 +683,7 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
   }
 
   std::cerr << "------BWD------" << std::endl;
-  std::cerr << *this << "---------------" << std::endl; 
+  std::cerr << *this << "---------------" << std::endl;
 
   return *this;
 }
