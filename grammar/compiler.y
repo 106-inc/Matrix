@@ -49,11 +49,11 @@ ERR
 
 %%
 
-program:     lines                           { /* program starting */};
+program:     lines fin_line                  { /* program starting */};
 
 
 lines:       line			                       {};
-           | lines fin_line                  {};
+           | lines                           {};
 
 fin_line:    line                            {};
            | expr                            {};
