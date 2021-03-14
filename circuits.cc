@@ -188,6 +188,7 @@ void Circuit::curs_calc()
 void Circuit::dump( const std::string &png_file, const std::string& dot_file) const
 {
   char name_of_edge = 'A';
+  size_t num_of_edge = 1;
   std::ofstream fout;
 
   fout.open(dot_file, std::ios::out);
@@ -202,14 +203,20 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
 
   for (auto&& e: edges_)
   {
-      fout << name_of_edge << " [label=\n\"cur = "  << e.get_cur() << " A\n "
-                                       "rtor = " << e.rtor      << " R\n "
-                                       "eds = "  << e.eds       << "V\n\", shape = diamond, color = lightgrey, style=filled]" << std::endl;
+      fout << name_of_edge << " [label=\n\" "
+                                       "num_of_edge = " << num_of_edge << "\n"
+                                       "cur = "         << e.get_cur() << " A\n "
+                                       "rtor = "        << e.rtor      << " R\n "
+                                       "eds = "         << e.eds       << "V\n\", "
+
+                                       "shape = diamond, color = lightgrey, style=filled]" << std::endl;
+
       fout << e.junc1.real << " -> " << name_of_edge << " -> " << e.junc2.real << std::endl;
 
       fout << std::endl;
 
       ++name_of_edge;
+      ++num_of_edge;
   }
 
   fout << "}\n";
@@ -222,21 +229,6 @@ void Circuit::dump( const std::string &png_file, const std::string& dot_file) co
     std::cerr << "An error occurred in system command" << std::endl;
 }
 
-/*
- *  dot.node('A', 'King Arthur')
- *  dot.node('B', 'Sir Bedevere the Wise')
- *  dot.node('L', 'Sir Lancelot the Brave')dot.edges(['AB', 'AL'])
- *  dot.edge('B', 'L', constraint='false')
- *
 
-digraph {
-    A [label="King Arthur"]
-    B [label="Sir Bedevere the Wise"]
-    L [label="Sir Lancelot the Brave"]
-    A -> B
-    A -> L
-    B -> L [constraint=false]
-}
- */
 
 } // namespace CTS
