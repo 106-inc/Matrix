@@ -177,7 +177,7 @@ void Circuit::curs_calc()
   std::cerr << system << std::endl;
   std::cerr << "cols: " << system.cols() << ", rows: " << system.rows() << std::endl;
 
-  dump();
+  dump("picture.png");
 
   auto curs = MX::Matrix<double>::solve(system);
 
@@ -185,10 +185,29 @@ void Circuit::curs_calc()
     edges_[i].cur = curs[i];
 }
 
-void Circuit::dump()
+void Circuit::dump( const std::string &png_file, const std::string& dot_file)
 {
-  for (auto && e : edges_)
-    std::cerr << e.junc1.norm << " -> " << e.junc2.norm << std::endl;
+  std::ofstream fout;
+
+  fout.open(dot_file, std::ios::out);
+
+  if (!fout.is_open())
+  {
+      std::cerr << "Can't open dump file" << dot_file << "\n";
+      return;
+  }
+
+  fout << "digraph D {\n";
+
+  for (auto && e: edges_)
+      fout << e.junc1.real << " -> " << e.junc2.real << ", " << e.rtor << "R; " << e.eds << "V, " << e.get_cur() << "A\n";
+
+  fout << "}\n";
+
+  fout.close();
+
+    std::string promt = "dot " + dot_file + " -Tpng > " + png_file;
+    system(promt.c_str());
 }
 
 } // namespace CTS

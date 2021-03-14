@@ -24,6 +24,12 @@ struct Edge final // rtor, junc1, junc2, voltage
   Edge(size_t j1, size_t j2, double rtr, double ed) : junc1(j1), junc2(j2), rtor(rtr), eds(ed)
   {
   }
+
+  double get_cur()
+  {
+      double real_cur = MX::is_zero(cur) ? 0.0 : cur;
+      return real_cur;
+  }
 };
 
 std::ostream &operator <<( std::ostream &ost, const Edge &edge );
@@ -75,7 +81,7 @@ private:
 
   bool is_cyc_unique(const std::vector<int> &vec) const;
 
-  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" ) const;
+  void dump( const std::string &png_file, const std::string &dot_file = "dump.dot" );
 };
 } // namespace CTS
 
