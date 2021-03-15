@@ -3,7 +3,7 @@
 
 extern std::vector<CTS::Edge> Edges_;
 
-int main(int argc, char **argv)
+int main()
 {
   yy::Driver driver;
 
