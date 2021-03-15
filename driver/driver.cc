@@ -4,7 +4,7 @@ std::vector<CTS::Edge> Edges_{};
 
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
-yy::Driver::Driver() : plex_(new OurFlexLexer) 
+yy::Driver::Driver() : plex_(new OurFlexLexer)
 {
   plex_->switch_streams(std::cin, std::cout);
 
@@ -51,9 +51,9 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
   case yy::parser::token_type::DOUBLE: {
     yylval->emplace<float>(std::stof(plex_->YYText()));
   }
-    case yy::parser::token_type::ERR: {
-      std::cerr << "UNKNOWN TOKEN:" << plex_->YYText() << std::endl;
-    }
+  case yy::parser::token_type::ERR: {
+    std::cerr << "UNKNOWN TOKEN:" << plex_->YYText() << std::endl;
+  }
 
   default:
     break;

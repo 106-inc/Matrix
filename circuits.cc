@@ -13,8 +13,8 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 }
 
 Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num, size_t j_loops)
-    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size(), edges_.size()), 
-    inc_cut_{j_num - j_loops, edges_.size()}
+    : edges_(edges), incidence_(j_num, edges_.size()),
+      circs_(edges_.size(), edges_.size()), inc_cut_{j_num - j_loops, edges_.size()}
 {
   size_t e_num = edges_.size();
   size_t cut_cnt = 0;
