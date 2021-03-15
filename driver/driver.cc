@@ -4,37 +4,12 @@ std::vector<CTS::Edge> Edges_{};
 
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
-yy::Driver::Driver() : name_of_file_(), max_junc_(0)
+yy::Driver::Driver() : plex_(new OurFlexLexer) 
 {
-  /*std::string tmp_str;
-
-  in_file.open(name_of_file);
-  std::ifstream tmp(name_of_file);
-
-  if (tmp.is_open())
-  {
-    while (tmp)
-    {
-      std::getline(tmp, tmp_str);
-      lines_of_prog.push_back(tmp_str);
-    }
-  }
-  else
-  {
-    std::string what = "File '" + name_of_file_ + "' does not exist";
-    throw std::runtime_error{what};
-  }*/
-
-  plex_ = new OurFlexLexer;
   plex_->switch_streams(std::cin, std::cout);
 
   Edges_.reserve(1);
 }
-
- bool yy::Driver::get_from_file(const std::string &fname)
- {
-
- }
 
 //! Functuion for calling bison yy::parser:parse()
 //! \return bool in
@@ -76,18 +51,9 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
   case yy::parser::token_type::DOUBLE: {
     yylval->emplace<float>(std::stof(plex_->YYText()));
   }
-
-    /*
-    case yy::parser::token_type::NAME: {
-      yylval->emplace<std::string>(std::string{plex_->YYText()});
-      break;
-    }
-     */
-    /*
     case yy::parser::token_type::ERR: {
-      std::cerr << "UNKNOWN TOKEN" << std::endl;
+      std::cerr << "UNKNOWN TOKEN:" << plex_->YYText() << std::endl;
     }
-     */
 
   default:
     break;

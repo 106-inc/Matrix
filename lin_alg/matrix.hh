@@ -632,11 +632,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 
     if (is_zero(mat_cpy[i][i])) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
     {
-      // std::cerr << mat_cpy;
-      // throw std::runtime_error("Here we need to swap cols (FWD)");
       Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
-
-      std::cerr << "After FWD:" << std::endl << tmp;
 
       return Matrix<DataT>{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
     }
@@ -650,9 +646,6 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
       mat_cpy.add_line(k, i, -mul);
     }
   }
-
-  // std::cerr << "------FWD------" << std::endl;
-  // std::cerr << mat_cpy << "---------------" << std::endl;
 
   return mat_cpy;
 }
@@ -669,13 +662,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
 
   for (size_t i = 0, end = std::min(rows_, cols_); i < end; ++i)
   {
-    // bool zero_col = true;
-
     if (is_zero(arr_[i][i]))
       continue;
-
-    /*if (zero_col)
-        throw std::runtime_error("Here we need to swap cols (BWD)");*/
 
     for (size_t k = 0; k < i; ++k)
     {
@@ -686,9 +674,6 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
       add_line(k, i, -mul);
     }
   }
-
-  // std::cerr << "------BWD------" << std::endl;
-  // std::cerr << *this << "---------------" << std::endl;
 
   return *this;
 }

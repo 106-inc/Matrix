@@ -26,13 +26,10 @@ namespace yy
 class Driver final
 {
 private:
-  std::string name_of_file_;
-  std::ifstream in_file;
-
   size_t loop_counter{0};
   std::unordered_map<size_t, size_t> juncs;
 
-  size_t max_junc_;
+  size_t max_junc_{};
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
@@ -43,8 +40,6 @@ public:
   Driver(const Driver &drvr) = delete;
 
   Driver &operator=(const Driver &) = delete;
-
-  bool get_from_file(const std::string &fname);
 
   bool parse();
 
