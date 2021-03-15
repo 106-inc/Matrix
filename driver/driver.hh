@@ -1,9 +1,11 @@
 
-#ifndef PARACL_DRIVER_HH
-#define PARACL_DRIVER_HH
+#ifndef CIRC_DRIVER_HH
+#define CIRC_DRIVER_HH
 
 #include <fstream>
 #include <iostream>
+
+#include <unordered_map>
 #include <vector>
 
 #include "../parser/parser.hh"
@@ -12,12 +14,6 @@
 #include <FlexLexer.h>
 #endif /* yyFlexLexer */
 
-#ifndef yyFlexLexer
-//#include "../FB_BLD/lex.yy.cc"
-#endif /* yyFlexLexer */
-
-#include "../matrix.hh"
-
 enum
 {
   NUM_OF_TOKENS = 30
@@ -25,11 +21,17 @@ enum
 
 namespace yy
 {
+
 class Driver final
 {
 private:
   std::string name_of_file_;
   std::ifstream in_file;
+
+  std::unordered_map<size_t, size_t> juncs;
+  size_t counter{0};
+
+  int max_junc_;
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
@@ -43,11 +45,18 @@ public:
 
   bool parse();
 
-  void insert(int jnction1, int jnction2, float resistor, float voltage);
+  void insert(size_t junc1, size_t junc2, float rtor, float voltage);
 
   parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc);
 
   void report_syntax_error(const parser::context &ctx);
+
+  void dump();
+
+  int get_juncs()
+  {
+    return max_junc_;
+  }
 
   ~Driver();
 };
@@ -56,4 +65,4 @@ public:
 
 // namespace yy
 
-#endif // PARACL_DRIVER_HH
+#endif // CIRC_DRIVER_HH

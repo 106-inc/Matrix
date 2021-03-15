@@ -2,6 +2,8 @@
 #define MATRIX_HH
 
 #include "mem.hh"
+#include <iomanip>
+#include <vector>
 
 namespace MX
 {
@@ -14,17 +16,21 @@ namespace MX
 
 using std::initializer_list;
 
-static long double EPS = 1e-18;
+const long double EPS = 1e-12;
 
-bool is_zero(long double num)
-{
-  return std::abs(num) < EPS;
-}
+/**
+ * @brief Compares floating point numbers with zero
+ * @param num Number you need to compare
+ */
+bool is_zero(long double num);
 
+/**
+ * @class Template matrix
+ */
 template <typename DataT> class Matrix : public VBuf<Row<DataT>>
 {
 
-protected:
+private:
   using VBuf<Row<DataT>>::arr_;
   using VBuf<Row<DataT>>::size_;
   using VBuf<Row<DataT>>::used_;
@@ -33,47 +39,201 @@ protected:
   size_t cols_{};
 
 public:
+  /**
+   * @brief Empty matrix ctor
+   */
   Matrix(size_t rows, size_t cols);
+
+  /**
+   * @brief Matrix ctor with data
+   * @param dat List of starting data
+   */
   Matrix(size_t rows, size_t cols, const initializer_list<DataT> &dat);
+
+  /**
+   * @brief Copy ctor
+   */
   Matrix(const Matrix &orig);
 
+  /**
+   * @brief Iterator filling ctor
+   * @param beg Start iterator
+   * @param end Start iterator
+   */
   template <typename It> Matrix(size_t rows, size_t cols, It beg, It end);
+
+  /**
+   * @brief Function filling ctor
+   * @param action Filling function/functor/lamda
+   */
   template <typename Func> Matrix(size_t rows, size_t cols, Func action);
 
+  /**
+   * @brief Swap this matrix with rhs
+   * @param rhs Other matrix
+   */
   void swap(Matrix &rhs) noexcept;
 
   size_t cols() const noexcept;
   size_t rows() const noexcept;
 
+  /**
+   * @brief Get elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @return Matrix elem copy
+   */
   const DataT &get(size_t row, size_t col) const;
+
+  /**
+   * @brief Set elem by coordinates
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @param val New elem value
+   */
   void set(size_t row, size_t col, DataT val);
+
+  /**
+   * @brief Get row by number
+   * @throw std::out_of_range if 'row' or 'col' bigger than matrix size
+   * @return Matrix elem copy
+   */
   const Row<DataT> &operator[](size_t row) const;
 
+  /**
+   * @brief Calculate and return determinant
+   * @throw std::bad_typeid if DataT is not floating point type,
+   *        std::range_error if matrix is not square
+   * @return Determinant
+   */
   DataT det() const;
 
+  /**
+   * @brief Self transpose method
+   * @return Self reference
+   */
   Matrix &transpose() &;
 
   Matrix operator-() const;
 
   Matrix &operator=(const Matrix &orig);
 
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not add suitable
+   * @return Self reference
+   */
   Matrix &operator+=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not sub suitable
+   * @return Self reference
+   */
   Matrix &operator-=(const Matrix &matr);
+
+  /**
+   * @throw std::range_error if 'this' and 'matr' is not mul suitable
+   * @return Self reference
+   */
   Matrix &operator*=(const Matrix &matr);
+
   Matrix &operator*=(DataT mul);
 
   bool operator==(const Matrix &matr) const;
   bool operator!=(const Matrix &matr) const;
 
+  /**
+   * @brief Concatenate this matrix with matr by down side
+   * @param matr Matrix to concatenate with
+   * @return Self reference
+   */
+  Matrix &glue_dn(const Matrix &matr);
+
+  /**
+   * @brief Concatenate this matrix with matr by right side
+   * @param matr Matrix to concatenate with
+   * @return Self reference
+   */
+  Matrix &glue_rt(const Matrix &matr);
+
+  /**
+   * @brief Swap line indexed as 'l1' and line indexed as 'l2'
+   * @param l1 First row
+   * @param l2 Second row
+   * @throw std::runtime_error if l1 or l2 is greater (or equal) then rows_
+   * @return Self reference
+   */
   Matrix &swap_lines(size_t l1, size_t l2);
+
+  /**
+   * @brief Swap line indexed as 'l1' and line indexed as 'l2'
+   * @param l1 First row
+   * @param l2 Second row
+   * @throw std::runtime_error if l1 or l2 is greater (or equal) then rows_
+   * @return Self reference
+   */
+  Matrix &swap_columns(size_t l1, size_t l2);
+
+  /**
+   * @brief Add line indexed as 'from' multiplied by 'mul' to line indexed as 'to'
+   * @param to Line which will be changed
+   * @param from Line which will not be changed
+   * @throw std::runtime_error if 'to' or 'from' is greater (or equal) then 'rows_'
+   * @return Self reference
+   */
   Matrix &add_line(size_t to, size_t from, DataT mul);
+
+  /**
+   * @brief Add column indexed as 'from' multiplied by 'mul' to column indexed as 'to'
+   * @param to column which will be changed
+   * @param from column which will not be changed
+   * @throw std::runtime_error if 'to' or 'from' is greater (or equal) then 'rows_'
+   * @return Self reference
+   */
+  Matrix &add_column(size_t to, size_t from, DataT mul);
+
+  /**
+   * @brief Multiply line indexed as 'l' by mul
+   * @param l Line index
+   * @throw std::runtime_error if 'l' is greater (or equal) then 'rows_'
+   * @return Self reference
+   */
   Matrix &mul_line(size_t l, DataT mul);
 
+  /**
+   * @brief Check if this and matr is suitable for addition
+   * @return True if suitable, False otherwise
+   */
   bool sum_suitable(const Matrix<DataT> &matr) const;
 
-  // private:
+  /**
+   * @brief Forward part of Gauss method
+   * @return Self reference
+   */
+  Matrix GaussFWD() const;
 
-  Matrix &GaussFWD();
+  /**
+   * @brief Diagonalise matrix function
+   * @param mat reference to matrix
+   * @return Created matrix.
+   */
+  Matrix diag() const;
+
+  static std::vector<double> solve(const Matrix &mat)
+  {
+    Matrix tmp{mat.diag()};
+
+    std::vector<double> res;
+    res.reserve(tmp.rows_);
+
+    for (size_t i = 0, col_idx = tmp.cols_ - 1; i < tmp.rows_; ++i)
+      res.push_back(tmp[i][col_idx] / tmp[i][i]);
+
+    return res;
+  }
+
+private:
+  /**
+   * @brief Backward part of Gauss method
+   * @return Self reference
+   */
   Matrix &GaussBWD();
 };
 
@@ -83,6 +243,8 @@ template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &lhs, cons
 template <typename DataT> Matrix<DataT> operator*(const Matrix<DataT> &matr, DataT mul);
 template <typename DataT> Matrix<DataT> operator*(DataT mul, const Matrix<DataT> &matr);
 template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr);
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2);
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr);
 
 /*
@@ -346,6 +508,39 @@ template <typename DataT> bool Matrix<DataT>::operator!=(const Matrix &matr) con
   return !operator==(matr);
 }
 
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_dn(const Matrix &matr)
+{
+  if (cols_ != matr.cols_)
+    throw std::runtime_error("Cols num doesn't match");
+
+  Matrix<DataT> tmp{rows_ + matr.rows_, cols_};
+
+  for (size_t i = rows_; i < tmp.rows_; ++i)
+    tmp.arr_[i] = matr.arr_[i - rows_];
+
+  swap(tmp);
+
+  for (size_t i = 0; i < tmp.rows_; ++i)
+    std::swap(arr_[i], tmp.arr_[i]);
+
+  return *this;
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::glue_rt(const Matrix &matr)
+{
+  if (rows_ != matr.rows_)
+    throw std::runtime_error("Rows num doesn't match");
+
+  Matrix<DataT> this_tr{MX::transpose(*this)};
+  Matrix<DataT> matr_tr{MX::transpose(matr)};
+
+  this_tr.glue_dn(matr_tr);
+
+  swap(this_tr.transpose());
+
+  return *this;
+}
+
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, size_t l2)
 {
   if (l1 >= cols_ || l2 >= cols_)
@@ -356,9 +551,21 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_lines(size_t l1, si
   return *this;
 }
 
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::swap_columns(size_t c1, size_t c2)
+{
+  if (c1 >= rows_ || c2 >= rows_)
+    throw std::range_error("Columns' numbers wrong.");
+
+  transpose();
+  std::swap(arr_[c1], arr_[c2]);
+  transpose();
+
+  return *this;
+}
+
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::add_line(size_t to, size_t from, DataT mul)
 {
-  if (to >= cols_ || from >= cols_)
+  if (to >= rows_ || from >= rows_)
     throw std::range_error("Lines' numbers wrong.");
 
   Matrix<DataT> tmp{*this};
@@ -367,6 +574,18 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::add_line(size_t to, size
     tmp.set(to, i, tmp[to][i] + mul * arr_[from][i]);
 
   swap(tmp);
+  return *this;
+}
+
+template <typename DataT> Matrix<DataT> &Matrix<DataT>::add_column(size_t to, size_t from, DataT mul)
+{
+  if (to >= cols_ || from >= cols_)
+    throw std::range_error("Cols' numbers wrong.");
+
+  transpose();
+  add_line(to, from, mul);
+  transpose();
+
   return *this;
 }
 
@@ -385,40 +604,57 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::mul_line(size_t l, DataT
   return *this;
 }
 
-template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussFWD()
+template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 {
+  Matrix<DataT> mat_cpy{*this};
+
   if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
 
-  for (size_t i = 0; i < rows_; ++i)
-  {
-    bool zero_col = true;
-
-    if (!is_zero(arr_[i][i]))
-      zero_col = false;
-    else
-      for (size_t j = i + 1; j < rows_; ++j)
-        if (!is_zero(arr_[j][i]))
+  for (size_t i = 0, end = std::min(mat_cpy.rows_, mat_cpy.cols_); i < end; ++i)
+    if (is_zero(mat_cpy[i][i]))
+      for (size_t j = 0; j < rows_; ++j)
+        if (!is_zero(mat_cpy[j][i]))
         {
-          swap_lines(j, i);
-          zero_col = false;
+          mat_cpy.add_line(i, j, 1);
           break;
         }
 
-    if (zero_col) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
-      throw std::runtime_error("Here we need to swap cols");
+  for (size_t i = 0; i < mat_cpy.rows_; ++i)
+  {
+    if (is_zero(mat_cpy[i][i]))
+      for (size_t k = i + 1; k < rows_; ++k)
+        if (!is_zero(mat_cpy[k][i]))
+        {
+          mat_cpy.add_line(i, k, 1);
+          break;
+        }
+
+    if (is_zero(mat_cpy[i][i])) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
+    {
+      //std::cerr << mat_cpy;
+      throw std::runtime_error("Here we need to swap cols (FWD)");
+    }
 
     for (size_t k = i + 1; k < rows_; ++k)
     {
-      if (is_zero(arr_[k][i]))
+      if (is_zero(mat_cpy[k][i]))
         continue;
 
-      DataT mul = arr_[k][i] / arr_[i][i];
-      add_line(k, i, -mul);
+      DataT mul = mat_cpy[k][i] / mat_cpy[i][i];
+      mat_cpy.add_line(k, i, -mul);
     }
   }
 
-  return *this;
+  //std::cerr << "------FWD------" << std::endl;
+  //std::cerr << mat_cpy << "---------------" << std::endl;
+
+  return mat_cpy;
+}
+
+template <typename DataT> Matrix<DataT> Matrix<DataT>::diag() const
+{
+  return GaussFWD().GaussBWD();
 }
 
 template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
@@ -426,23 +662,15 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
   if (!std::is_floating_point<DataT>::value)
     throw std::bad_typeid();
 
-  for (size_t i = 1; i < rows_; ++i)
+  for (size_t i = 0, end = std::min(rows_, cols_); i < end; ++i)
   {
-    /*bool zero_col = true;
+    // bool zero_col = true;
 
-    if (std::abs(arr_[i][i]) > 1e-12) // TODO: EPSILON
-        zero_col = false;
-    else
-        for (size_t j = i + 1; j < rows_; ++j)
-            if (std::abs(arr_[j][i]) > 1e-12)
-            {
-                swap_lines(j, i);
-                zero_col = false;
-                break;
-            }
+    if (is_zero(arr_[i][i]))
+      continue;
 
-    if (zero_col)
-        throw std::runtime_error("Here we need to swap cols");*/
+    /*if (zero_col)
+        throw std::runtime_error("Here we need to swap cols (BWD)");*/
 
     for (size_t k = 0; k < i; ++k)
     {
@@ -453,6 +681,10 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
       add_line(k, i, -mul);
     }
   }
+
+  //std::cerr << "------BWD------" << std::endl;
+  //std::cerr << *this << "---------------" << std::endl;
+
   return *this;
 }
 
@@ -493,14 +725,36 @@ template <typename DataT> Matrix<DataT> transpose(const Matrix<DataT> &matr)
   return tmp;
 }
 
+template <typename DataT> Matrix<DataT> glue_side(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+  return Matrix<DataT>{matr1}.glue_rt(matr2);
+}
+
+template <typename DataT> Matrix<DataT> glue_bott(const Matrix<DataT> &matr1, const Matrix<DataT> &matr2)
+{
+  return Matrix<DataT>{matr1}.glue_dn(matr2);
+}
+
 template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matrix<DataT> &matr)
 {
+  ost << "   | ";
+  for (size_t i = 0, cols = matr.cols(); i < cols; ++i)
+    ost << std::setw(4) << i;
+
+  ost << std::endl;
+
+  ost << "   +-";
+  for (size_t i = 0, cols = matr.cols(); i < cols; ++i)
+    ost << "----";
+
+  ost << std::endl;
+
   for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
   {
-    ost << "| ";
+    ost << std::setw(3) << i << "| ";
 
     for (size_t j = 0; j < cols; ++j)
-      ost << matr[i][j] << " ";
+      ost << std::setw(4) << matr[i][j] << ";";
 
     ost << "|" << std::endl;
   }
@@ -508,27 +762,7 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
   return ost;
 }
 
-template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr)
-{
-  for (size_t i = 0, cols = matr.cols(), rows = matr.rows(); i < rows; ++i)
-  {
-    ost << "| ";
-
-    for (size_t j = 0; j < cols; ++j)
-    {
-      auto tmp = matr[i][j];
-
-      if (is_zero(tmp))
-        ost << "0 ";
-      else
-        ost << tmp << " ";
-    }
-
-    ost << "|" << std::endl;
-  }
-
-  return ost;
-}
+template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &matr);
 
 } // namespace MX
 

@@ -1,8 +1,10 @@
 #include "driver.hh"
 
+std::vector<CTS::Edge> Edges_{};
+
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
-yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file)
+yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_junc_(0)
 {
   std::string tmp_str;
 
@@ -25,6 +27,8 @@ yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file)
 
   plex_ = new OurFlexLexer;
   plex_->switch_streams(in_file, std::cout);
+
+  Edges_.reserve(1);
 }
 
 //! Functuion for calling bison yy::parser:parse()
@@ -34,6 +38,18 @@ bool yy::Driver::parse()
   yy::parser parser_(this);
 
   bool res = !parser_.parse();
+
+  if (!res)
+    return res;
+
+  for (auto &&e : Edges_)
+  {
+    e.junc1.norm = juncs[e.junc1.real] /*e.junc1.real*/;
+    e.junc2.norm = juncs[e.junc2.real] /*e.junc2.real*/;
+  }
+
+  max_junc_ = juncs.size();
+
   return res;
 }
 
@@ -52,14 +68,21 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
     break;
   }
 
-  case yy::parser::token_type::NAME: {
-    yylval->emplace<std::string>(std::string{plex_->YYText()});
-    break;
+  case yy::parser::token_type::DOUBLE: {
+    yylval->emplace<float>(std::stof(plex_->YYText()));
   }
 
-  case yy::parser::token_type::ERR: {
-    std::cerr << "UNKNOWN TOKEN" << std::endl;
-  }
+    /*
+    case yy::parser::token_type::NAME: {
+      yylval->emplace<std::string>(std::string{plex_->YYText()});
+      break;
+    }
+     */
+    /*
+    case yy::parser::token_type::ERR: {
+      std::cerr << "UNKNOWN TOKEN" << std::endl;
+    }
+     */
 
   default:
     break;
@@ -68,11 +91,28 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
   return tkn_type;
 }
 
-void yy::Driver::insert(int jnction1, int jnction2, float resistor, float voltage)
+//!
+//! \param junc1
+//! \param junc2
+//! \param rtor
+//! \param voltage
+void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
-#if 0
-  std::cout << "Hello, I'm insertion\n";
-#endif
+  //! Insertion new edge to structure
+
+  /*
+  int tmp_junc = std::max(junc1, junc2);
+
+  if (tmp_junc > max_junc_)
+    max_junc_ = tmp_junc;
+  */
+
+  if (!juncs.contains(junc1))
+    juncs[junc1] = counter++;
+  if (!juncs.contains(junc2))
+    juncs[junc2] = counter++;
+
+  Edges_.push_back({junc1, junc2, rtor, voltage});
 
   return;
 }
@@ -123,8 +163,18 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
   std::cerr << std::endl;
 }
 
+void yy::Driver::dump()
+{
+  for (auto &&edge : Edges_)
+  {
+    std::cout << edge.junc1.real << "--" << edge.junc2.real << ", " << edge.rtor << "; " << edge.eds << "V";
+    std::cout << std::endl;
+  }
+}
+
 //! Destructor for class Driver
 yy::Driver::~Driver()
 {
+  in_file.close();
   delete plex_;
 }
