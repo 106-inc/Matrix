@@ -48,7 +48,7 @@ private:
   MX::Matrix<double> inc_cut_;
 
 public:
-  Circuit(const std::vector<Edge> &edges, size_t j_num);
+  Circuit(const std::vector<Edge> &edges, size_t j_num, size_t j_loops);
 
   /*
    * What here should locate:

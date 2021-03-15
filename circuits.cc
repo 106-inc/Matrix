@@ -12,36 +12,25 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num)
-    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size(), edges_.size()), inc_cut_{0, 0}
-
+Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num, size_t j_loops)
+    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size(), edges_.size()), 
+    inc_cut_{j_num - j_loops, edges_.size()}
 {
-
-  // TODO: fix dat sheet
-  std::vector<size_t> str_to_del;
-
   size_t e_num = edges_.size();
+  size_t cut_cnt = 0;
 
   for (size_t i = 0; i < e_num; ++i)
   {
     size_t norm1 = edges[i].junc1.norm, norm2 = edges[i].junc2.norm;
 
-    if (norm1 == norm2)
-      str_to_del.push_back(norm1);
+    if (norm1 != norm2)
+    {
+      inc_cut_.set(norm1, cut_cnt, 1);
+      inc_cut_.set(norm2, cut_cnt++, -1);
+    }
 
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
-  }
-  inc_cut_ = MX::Matrix<double>{incidence_.rows() - str_to_del.size(), e_num};
-
-  size_t cnt = 0;
-  for (size_t i = 0; i < incidence_.rows(); ++i)
-  {
-    if (std::find(str_to_del.begin(), str_to_del.end(), i) != str_to_del.end())
-      continue;
-    for (size_t j = 0; j < incidence_.cols(); ++j)
-      inc_cut_.set(cnt, j, incidence_[i][j]);
-    ++cnt;
   }
 }
 
