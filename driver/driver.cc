@@ -101,7 +101,6 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
   //! Insertion new edge to structure
 
   static size_t counter = 0;
-  static std::unordered_map<size_t, size_t> juncs;
 
   if (!juncs.contains(junc1))
     juncs[junc1] = counter++;

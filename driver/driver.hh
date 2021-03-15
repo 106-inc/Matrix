@@ -29,6 +29,7 @@ private:
   std::ifstream in_file;
 
   size_t loop_counter{0};
+  std::unordered_map<size_t, size_t> juncs;
 
   size_t max_junc_;
 
