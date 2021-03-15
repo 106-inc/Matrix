@@ -31,7 +31,7 @@ lexer.o: $(FNB)/lexer.l
 	$(CXX) -c -o $(BLD)/lexer.o $(FB_BLD)/lex.yy.cc
 
 compiler.o: $(FNB)/compiler.y
-	bison -d -Wcounterexamples -o $(FB_BLD)/compiler.tab.cc $(FNB)/compiler.y
+	bison -d -o $(FB_BLD)/compiler.tab.cc $(FNB)/compiler.y
 	$(CXX) -c -o $(BLD)/compiler.o $(FB_BLD)/compiler.tab.cc
 
 driver.o: $(DRVR)/driver.cc

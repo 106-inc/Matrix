@@ -80,12 +80,12 @@ void Circuit::fill_circ_matr()
     auto tmp_vec = dfs_start(i);
 
     if (!tmp_vec.empty())
-    {
+    {/*
       std::cout << "Independent cycle #" << cycles_found << ":\n";
       for (size_t i = 0; i < tmp_vec.size(); ++i)
         if (tmp_vec[i] != 0)
           std::cout << i << " ";
-      std::cout << std::endl;
+      std::cout << std::endl;*/
       insert_cycle(cycles_found++, tmp_vec);
     }
   }
@@ -165,9 +165,9 @@ void Circuit::curs_calc()
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
   fill_circ_matr();
   
-  std::cerr << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
+  //std::cerr << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
 
-  std::cerr << "R:\n" << make_res_matr() << "\nE:\n" << make_eds_matr() << std::endl;
+  //std::cerr << "R:\n" << make_res_matr() << "\nE:\n" << make_eds_matr() << std::endl;
 
   auto BR = circs_ * make_res_matr();
   auto BE = circs_ * make_eds_matr();
@@ -176,10 +176,10 @@ void Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  std::cerr << system << std::endl;
-  std::cerr << "cols: " << system.cols() << ", rows: " << system.rows() << std::endl;
+  //std::cerr << system << std::endl;
+  //std::cerr << "cols: " << system.cols() << ", rows: " << system.rows() << std::endl;
 
-  dump("picture.png");
+  //dump("picture.png");
 
   auto curs = MX::Matrix<double>::solve(system);
 
