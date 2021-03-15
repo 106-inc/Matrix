@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../parser/parser.hh"
@@ -25,19 +26,16 @@ namespace yy
 class Driver final
 {
 private:
-  std::string name_of_file_;
-  std::ifstream in_file;
-
+  size_t loop_counter{0};
   std::unordered_map<size_t, size_t> juncs;
-  size_t counter{0};
 
-  int max_junc_;
+  size_t max_junc_{};
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
 
 public:
-  Driver(const char *name_of_file);
+  Driver();
 
   Driver(const Driver &drvr) = delete;
 
@@ -53,9 +51,14 @@ public:
 
   void dump();
 
-  int get_juncs()
+  size_t get_juncs()
   {
     return max_junc_;
+  }
+
+  size_t get_loops()
+  {
+    return loop_counter;
   }
 
   ~Driver();

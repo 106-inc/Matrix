@@ -21,7 +21,7 @@ DIGIT1               [1-9]
 
 UN_OPER              [\+\-]
 
-INT                 {DIGIT}{DIGIT}*
+INT                 {DIGIT}+
 DOUBLE              {DIGIT}+\.{DIGIT}+
 
 NEW_LINE            [\n]+
@@ -35,8 +35,8 @@ NEW_LINE            [\n]+
 "V"                               return yy::parser::token_type::VOLT;
 ","                               return yy::parser::token_type::COMMA;
 
-{UN_OPER}{0,1}{INT}               return yy::parser::token_type::INT;
-{UN_OPER}{0,1}{DOUBLE}            return yy::parser::token_type::DOUBLE;
+{UN_OPER}?{INT}               return yy::parser::token_type::INT;
+{UN_OPER}?{DOUBLE}            return yy::parser::token_type::DOUBLE;
 
 {NEW_LINE}                        return yy::parser::token_type::NEW_LINE;
 
