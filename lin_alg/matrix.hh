@@ -633,10 +633,15 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
     if (is_zero(mat_cpy[i][i])) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
     {
       //std::cerr << mat_cpy;
-      throw std::runtime_error("Here we need to swap cols (FWD)");
+      //throw std::runtime_error("Here we need to swap cols (FWD)");
+      Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n){return mat_cpy[m][n];}};
+
+      std::cerr << "After FWD:" << std::endl << tmp;
+
+      return Matrix<DataT> {i, cols_, [&mat_cpy](size_t m, size_t n){return mat_cpy[m][n];}};
     }
 
-    for (size_t k = i + 1; k < rows_; ++k)
+    for (size_t k = i + 1; k < mat_cpy.rows_; ++k)
     {
       if (is_zero(mat_cpy[k][i]))
         continue;

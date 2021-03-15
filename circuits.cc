@@ -152,7 +152,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
 void Circuit::curs_calc()
 {
-  MX::Matrix<double> cut_inc{incidence_.rows() - 1, incidence_.cols(),
+  MX::Matrix<double> cut_inc{incidence_.rows(), incidence_.cols(),
                              [this](int i, int j) { return this->incidence_[i][j]; }};
 
   auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
