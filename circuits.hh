@@ -2,8 +2,8 @@
 #define CIRC_CIRCUITS_HH
 
 #include "lin_alg/matrix.hh"
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 
 // TODO: найти где будут Edge
 

@@ -43,7 +43,6 @@ template <> std::ostream &operator<<(std::ostream &ost, const Matrix<double> &ma
     std::cerr << "]" << ((i == matr.rows() - 1) ? "" : ",") << std::endl;
   }
 
-
   std::cerr << "]";
 
   return ost;

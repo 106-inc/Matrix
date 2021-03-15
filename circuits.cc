@@ -19,13 +19,12 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num)
 
   // TODO: fix dat sheet
   std::vector<size_t> str_to_del;
- 
+
   size_t e_num = edges_.size();
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = edges[i].junc1.norm,
-           norm2 = edges[i].junc2.norm;
+    size_t norm1 = edges[i].junc1.norm, norm2 = edges[i].junc2.norm;
 
     if (norm1 == norm2)
       str_to_del.push_back(norm1);
@@ -81,11 +80,12 @@ bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
   for (size_t i = 0, endi = tcircs.rows(); i < endi; ++i)
   {
     size_t j = 0;
-    for (size_t endj = tcircs.cols(); j < endj && !tcircs[i][j];++j);
+    for (size_t endj = tcircs.cols(); j < endj && !tcircs[i][j]; ++j)
+      ;
 
     if (j == tcircs.cols() && vec[i])
       return true;
-   }
+  }
 
   return false;
 }
@@ -117,7 +117,8 @@ std::vector<int> Circuit::dfs_start(size_t from) const
   return tmp;
 }
 
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors) const
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout,
+                  std::vector<Color> &colors) const
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
@@ -175,7 +176,7 @@ void Circuit::curs_calc()
 {
   auto A_0 = MX::glue_side(inc_cut_, MX::Matrix<double>{inc_cut_.rows(), 1});
   fill_circ_matr();
-  
+
   std::cerr << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;
 
   std::cerr << "R:\n" << make_res_matr() << "\nE:\n" << make_eds_matr() << std::endl;
