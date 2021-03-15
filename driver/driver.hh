@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../parser/parser.hh"
@@ -29,6 +30,7 @@ private:
   std::ifstream in_file;
 
   std::unordered_map<size_t, size_t> juncs;
+  size_t loop_counter{0};
   size_t counter{0};
 
   int max_junc_;
@@ -56,6 +58,11 @@ public:
   int get_juncs()
   {
     return max_junc_;
+  }
+
+  size_t get_loops()
+  {
+    return loop_counter;
   }
 
   ~Driver();
