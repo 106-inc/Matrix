@@ -4,9 +4,9 @@ std::vector<CTS::Edge> Edges_{};
 
 //! Constructor for class Driver
 //! \param name_of_file - the name of the file from which our program is read
-yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_junc_(0)
+yy::Driver::Driver() : name_of_file_(), max_junc_(0)
 {
-  std::string tmp_str;
+  /*std::string tmp_str;
 
   in_file.open(name_of_file);
   std::ifstream tmp(name_of_file);
@@ -23,13 +23,18 @@ yy::Driver::Driver(const char *name_of_file) : name_of_file_(name_of_file), max_
   {
     std::string what = "File '" + name_of_file_ + "' does not exist";
     throw std::runtime_error{what};
-  }
+  }*/
 
   plex_ = new OurFlexLexer;
-  plex_->switch_streams(in_file, std::cout);
+  plex_->switch_streams(std::cin, std::cout);
 
   Edges_.reserve(1);
 }
+
+ bool yy::Driver::get_from_file(const std::string &fname)
+ {
+
+ }
 
 //! Functuion for calling bison yy::parser:parse()
 //! \return bool in
@@ -101,6 +106,7 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
   //! Insertion new edge to structure
 
   static size_t counter = 0;
+  static std::unordered_set<size_t> unique_juncs_with_loops{};
 
   if (!juncs.contains(junc1))
     juncs[junc1] = counter++;
@@ -108,9 +114,10 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
     juncs[junc2] = counter++;
 
   if (junc1 == junc2)
-    ++loop_counter;
+    unique_juncs_with_loops.insert(junc1);
 
   Edges_.push_back({junc1, junc2, rtor, voltage});
+  loop_counter = unique_juncs_with_loops.size();
 
   return;
 }
@@ -173,6 +180,6 @@ void yy::Driver::dump()
 //! Destructor for class Driver
 yy::Driver::~Driver()
 {
-  in_file.close();
+  /*in_file.close();*/
   delete plex_;
 }

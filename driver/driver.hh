@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../parser/parser.hh"
@@ -37,11 +38,13 @@ private:
   std::vector<std::string> lines_of_prog;
 
 public:
-  Driver(const char *name_of_file);
+  Driver();
 
   Driver(const Driver &drvr) = delete;
 
   Driver &operator=(const Driver &) = delete;
+
+  bool get_from_file(const std::string &fname);
 
   bool parse();
 
