@@ -13,15 +13,36 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 }
 
 Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num)
-    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size(), edges_.size())
+    : edges_(edges), incidence_(j_num, edges_.size()), circs_(edges_.size(), edges_.size()), inc_cut_{0, 0}
 
 {
+
+  // TODO: fix dat sheet
+  std::vector<size_t> str_to_del;
+ 
   size_t e_num = edges_.size();
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    incidence_.set(edges[i].junc1.norm, i, 1);
-    incidence_.set(edges[i].junc2.norm, i, -1);
+    size_t norm1 = edges[i].junc1.norm,
+           norm2 = edges[i].junc2.norm;
+
+    if (norm1 == norm2)
+      str_to_del.push_back(norm1);
+
+    incidence_.set(norm1, i, 1);
+    incidence_.set(norm2, i, -1);
+  }
+  inc_cut_ = MX::Matrix<double>{incidence_.rows() - str_to_del.size(), e_num};
+
+  size_t cnt = 0;
+  for (size_t i = 0; i < incidence_.rows(); ++i)
+  {
+    if (std::find(str_to_del.begin(), str_to_del.end(), i) != str_to_del.end())
+      continue;
+    for (size_t j = 0; j < incidence_.cols(); ++j)
+      inc_cut_.set(cnt, j, incidence_[i][j]);
+    ++cnt;
   }
 }
 
@@ -152,10 +173,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
 void Circuit::curs_calc()
 {
-  MX::Matrix<double> cut_inc{incidence_.rows(), incidence_.cols(),
-                             [this](int i, int j) { return this->incidence_[i][j]; }};
-
-  auto A_0 = MX::glue_side(cut_inc, MX::Matrix<double>{cut_inc.rows(), 1});
+  auto A_0 = MX::glue_side(inc_cut_, MX::Matrix<double>{inc_cut_.rows(), 1});
   fill_circ_matr();
   
   std::cerr << "A:\n" << incidence_ << "\nB:\n" << circs_ << std::endl;

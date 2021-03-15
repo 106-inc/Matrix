@@ -3,6 +3,7 @@
 
 #include "lin_alg/matrix.hh"
 #include <fstream>
+#include <algorithm>
 
 // TODO: найти где будут Edge
 
@@ -44,6 +45,7 @@ private:
   std::vector<Edge> edges_;
   MX::Matrix<double> incidence_;
   MX::Matrix<double> circs_;
+  MX::Matrix<double> inc_cut_;
 
 public:
   Circuit(const std::vector<Edge> &edges, size_t j_num);
