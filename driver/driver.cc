@@ -100,12 +100,8 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
   //! Insertion new edge to structure
 
-  /*
-  int tmp_junc = std::max(junc1, junc2);
-
-  if (tmp_junc > max_junc_)
-    max_junc_ = tmp_junc;
-  */
+  static size_t counter = 0;
+  static std::unordered_map<size_t, size_t> juncs;
 
   if (!juncs.contains(junc1))
     juncs[junc1] = counter++;
