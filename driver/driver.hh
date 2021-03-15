@@ -30,7 +30,7 @@ private:
 
   size_t loop_counter{0};
 
-  int max_junc_;
+  size_t max_junc_;
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
