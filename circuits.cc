@@ -87,11 +87,23 @@ void Circuit::fill_circ_matr()
   // go from all
   for (size_t i = 0; i < inc_rows && cycles_found < circs_.cols(); ++i)
   {
-    auto tmp_vec = dfs_start(i);
+    std::vector<int> tmp_vec = dfs_start(i);
 
-    if (!tmp_vec.empty())
+    while (!tmp_vec.empty() && cycles_found < circs_.cols())
+    {
       insert_cycle(cycles_found++, tmp_vec);
+      tmp_vec = dfs_start(i);
+    }
   }
+
+  /*if (cycles_found < circs_.cols())
+    for (size_t i = 0; i < inc_rows && cycles_found < circs_.cols(); ++i)
+    {
+      auto tmp_vec = dfs_start(i);
+
+      if (!tmp_vec.empty())
+        insert_cycle(cycles_found++, tmp_vec);
+    }*/
 }
 
 std::vector<int> Circuit::dfs_start(size_t from) const
