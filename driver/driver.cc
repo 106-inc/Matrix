@@ -81,7 +81,7 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
     juncs[junc2] = counter++;
 
   if (junc1 == junc2)
-    unique_juncs_with_loops.insert(junc1);
+    unique_juncs_with_loops.insert(juncs[junc1]);
 
   Edges_.push_back({junc1, junc2, rtor, voltage});
 
