@@ -648,13 +648,28 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
         }
     }
 
+    bool zero_col = true;
 
     if (is_zero(mat_cpy[i][i]))
+    {
+      for (int k = static_cast<int>(i); k >= 0; --k)
+        if (!is_zero(mat_cpy[k][i]))
+        {
+          zero_col = false;
+          break;
+        }
+    }
+    else
+      zero_col = false;
+    
+    if (!zero_col)
     {
       //Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
 
       return Matrix<DataT>{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
     }
+    else
+      throw rank_lack{"Oh, I'm sorry"};
 
     for (size_t k = i + 1; k < mat_cpy.rows_; ++k)
     {
