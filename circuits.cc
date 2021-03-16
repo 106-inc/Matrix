@@ -17,7 +17,6 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num,  const std::unord
       circs_(edges_.size(), edges_.size()), inc_cut_{j_num - j_loops.size(), edges_.size()}
 {
   size_t e_num = edges_.size();
-  size_t cut_cnt = 0;
 
   for (size_t i = 0; i < e_num; ++i)
   {
@@ -27,6 +26,7 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num,  const std::unord
     incidence_.set(norm2, i, -1);
   }
 
+  size_t cut_cnt = 0;
   for (size_t i = 0; i < incidence_.rows(); ++i)
   {
     if (j_loops.contains(i))
@@ -181,14 +181,14 @@ void Circuit::curs_calc()
 
   auto curs = MX::Matrix<double>::solve(system);
 
-
+/*
   std::cout << "A:" << std:: endl << incidence_ << std:: endl;
   std::cout << "A_c:" << std:: endl << inc_cut_ << std:: endl;
   std::cout << "BR:" << std:: endl << BR << std:: endl;
     std::cout << "BE:" << std:: endl << BE << std:: endl;
     std::cout << "BR_BE:" << std:: endl << BR_BE << std:: endl;
     std::cout << "SYSTEM:" << std:: endl << system << std:: endl;
-
+*/
   for (size_t i = 0, endi = curs.size(); i < endi; ++i)
     edges_[i].cur = curs[i];
 }
