@@ -20,11 +20,8 @@ int main()
   }
   catch (const MX::rank_lack &er)
   {
-    std::cerr << er.what() << std::endl;
+    std::cerr << "I CAN'T CALCULATE THIS CIRCUIT, SORRY :'(" << std::endl;
   }
-  catch (...)
-  {
-    throw;
-  }
+
   return 0;
 }
