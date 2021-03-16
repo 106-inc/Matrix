@@ -20,7 +20,11 @@ using std::initializer_list;
 
 const long double EPS = 1e-12;
 
-struct rank_lack : std::runtime_error {rank_lack(const char * msg) : std::runtime_error(msg) {}};
+struct rank_lack : public std::runtime_error 
+{
+  rank_lack(const char * msg) : std::runtime_error(msg) {}
+  
+};
 
 /**
  * @brief Compares floating point numbers with zero
@@ -226,18 +230,8 @@ public:
   {
     Matrix tmp{};
 
-    try
-    {
-      tmp = mat.diag();
-    }
-    catch(const rank_lack& rl)
-    {
-      std::cerr << rl.what() << '\n';
-    }
-    catch(...)
-    {
-      throw;
-    }
+    tmp = mat.diag();
+  
 
     std::vector<double> res;
     res.reserve(tmp.rows_);
@@ -632,26 +626,32 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 
   for (size_t i = 0, end = std::min(mat_cpy.rows_, mat_cpy.cols_); i < end; ++i)
     if (is_zero(mat_cpy[i][i]))
-      for (size_t j = 0; j < rows_; ++j)
+    {
+      size_t j = 0;
+      for (; j < rows_; ++j)
         if (!is_zero(mat_cpy[j][i]))
         {
           mat_cpy.add_line(i, j, 1);
           break;
         }
+    }
 
   for (size_t i = 0; i < mat_cpy.rows_; ++i)
   {
     if (is_zero(mat_cpy[i][i]))
+    {
       for (size_t k = i + 1; k < rows_; ++k)
         if (!is_zero(mat_cpy[k][i]))
         {
           mat_cpy.add_line(i, k, 1);
           break;
         }
+    }
+
 
     if (is_zero(mat_cpy[i][i]))
     {
-      Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
+      //Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
 
       return Matrix<DataT>{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
     }
@@ -664,6 +664,8 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
       DataT mul = mat_cpy[k][i] / mat_cpy[i][i];
       mat_cpy.add_line(k, i, -mul);
     }
+    
+    std::cerr << mat_cpy << std::endl;
   }
 
   return mat_cpy;
