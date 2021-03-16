@@ -35,8 +35,8 @@ NEW_LINE            [\n]+
 "V"                               return yy::parser::token_type::VOLT;
 ","                               return yy::parser::token_type::COMMA;
 
-{UN_OPER}?{INT}               return yy::parser::token_type::INT;
-{UN_OPER}?{DOUBLE}            return yy::parser::token_type::DOUBLE;
+{UN_OPER}?{INT}                   return yy::parser::token_type::INT;
+{UN_OPER}?{DOUBLE}                return yy::parser::token_type::DOUBLE;
 
 {NEW_LINE}                        return yy::parser::token_type::NEW_LINE;
 

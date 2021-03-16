@@ -20,10 +20,11 @@ using std::initializer_list;
 
 const long double EPS = 1e-12;
 
-struct rank_lack : public std::runtime_error 
+struct rank_lack : public std::runtime_error
 {
-  rank_lack(const char * msg) : std::runtime_error(msg) {}
-  
+  rank_lack(const char *msg) : std::runtime_error(msg)
+  {
+  }
 };
 
 /**
@@ -231,7 +232,6 @@ public:
     Matrix tmp{};
 
     tmp = mat.diag();
-  
 
     std::vector<double> res;
     res.reserve(tmp.rows_);
@@ -259,7 +259,8 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
  *
  */
 
-template <typename DataT> Matrix<DataT>::Matrix(size_t rows /* = 0 */, size_t cols /* = 0 */) : VBuf<Row<DataT>>(rows), cols_(cols)
+template <typename DataT>
+Matrix<DataT>::Matrix(size_t rows /* = 0 */, size_t cols /* = 0 */) : VBuf<Row<DataT>>(rows), cols_(cols)
 {
   Row<DataT> tmp{cols_};
   for (; used_ < size_; ++used_)
@@ -627,7 +628,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
           mat_cpy.swap_lines(down, d_idx);
           break;
         }
-      
+
       if (is_zero(mat_cpy[d_idx][d_idx]))
         throw rank_lack("Matrix rank less then number of cols");
     }

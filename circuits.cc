@@ -12,7 +12,7 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num,  const std::unordered_set<size_t> & j_loops)
+Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops)
     : edges_(edges), incidence_(j_num, edges_.size()),
       circs_(edges_.size(), edges_.size()), inc_cut_{j_num - j_loops.size(), edges_.size()}
 {
@@ -181,14 +181,6 @@ void Circuit::curs_calc()
 
   auto curs = MX::Matrix<double>::solve(system);
 
-/*
-  std::cout << "A:" << std:: endl << incidence_ << std:: endl;
-  std::cout << "A_c:" << std:: endl << inc_cut_ << std:: endl;
-  std::cout << "BR:" << std:: endl << BR << std:: endl;
-    std::cout << "BE:" << std:: endl << BE << std:: endl;
-    std::cout << "BR_BE:" << std:: endl << BR_BE << std:: endl;
-    std::cout << "SYSTEM:" << std:: endl << system << std:: endl;
-*/
   for (size_t i = 0, endi = curs.size(); i < endi; ++i)
     edges_[i].cur = curs[i];
 }

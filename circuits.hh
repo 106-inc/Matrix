@@ -2,8 +2,8 @@
 #define CIRC_CIRCUITS_HH
 
 #include "lin_alg/matrix.hh"
-#include <unordered_set>
 #include <fstream>
+#include <unordered_set>
 
 // TODO: найти где будут Edge
 
@@ -48,7 +48,7 @@ private:
   MX::Matrix<double> inc_cut_;
 
 public:
-  Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> & j_loops);
+  Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops);
 
   /*
    * What here should locate:

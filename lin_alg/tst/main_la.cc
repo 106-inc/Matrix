@@ -34,13 +34,13 @@ int main()
 
   cout << matr.GaussFWD() << endl;
 
-  //cout << matr.GaussBWD() << endl << endl;
+  // cout << matr.GaussBWD() << endl << endl;
 
   LA::Sys system{matr};
 
-  //auto solution = system.solve();
+  // auto solution = system.solve();
 
-  //for (auto &&el : solution)
+  // for (auto &&el : solution)
   //  cout << el << " ";
 
   cout << endl;

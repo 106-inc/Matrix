@@ -13,7 +13,7 @@ int main()
   CTS::Circuit crc{Edges_, driver.get_juncs(), driver.get_loops()};
   // crc.dump("large_norm.png", "norm.dot");
 
-  try 
+  try
   {
     crc.curs_calc();
     crc.curs_out();
