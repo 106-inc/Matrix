@@ -23,14 +23,17 @@ Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num,  const std::unord
   {
     size_t norm1 = edges[i].junc1.norm, norm2 = edges[i].junc2.norm;
 
-    if (!j_loops.contains(norm1) && !j_loops.contains(norm2))
-    {
-      inc_cut_.set(norm1, cut_cnt, 1);
-      inc_cut_.set(norm2, cut_cnt++, -1);
-    }
-
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
+  }
+
+  for (size_t i = 0; i < incidence_.rows(); ++i)
+  {
+    if (j_loops.contains(i))
+      continue;
+    for (size_t j = 0; j < incidence_.cols(); ++j)
+      inc_cut_.set(cut_cnt, j, incidence_[i][j]);
+    ++cut_cnt;
   }
 }
 

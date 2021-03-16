@@ -201,6 +201,8 @@ public:
    */
   Matrix &mul_line(size_t l, DataT mul);
 
+  Matrix &del_line(size_t line_num);
+
   /**
    * @brief Check if this and matr is suitable for addition
    * @return True if suitable, False otherwise
