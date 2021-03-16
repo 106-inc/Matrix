@@ -241,13 +241,6 @@ public:
 
     return res;
   }
-
-private:
-  /**
-   * @brief Backward part of Gauss method
-   * @return Self reference
-   */
-  Matrix &GaussBWD();
 };
 
 template <typename DataT> Matrix<DataT> operator+(const Matrix<DataT> &lhs, const Matrix<DataT> &rhs);
@@ -626,9 +619,6 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
 
   for (size_t d_idx = 0, end = std::min(rows_, cols_ - 1); d_idx < end; ++d_idx)
   {
-    /*std::cerr << "Itearation #" << d_idx << std::endl;
-    std::cerr << "start:" << std::endl << mat_cpy << std::endl;*/
-
     if (is_zero(mat_cpy[d_idx][d_idx]))
     {
       for (size_t down = d_idx + 1; down < rows_; ++down)
@@ -642,117 +632,21 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
         throw rank_lack("Matrix rank less then number of cols");
     }
 
-    //std::cerr << "after is_zero:" << std::endl << mat_cpy << std::endl;
-
     mat_cpy.mul_line(d_idx, 1.0 / mat_cpy[d_idx][d_idx]);
-
-    //std::cerr << "after mul_line:" << std::endl << mat_cpy << std::endl;
 
     for (size_t down = d_idx + 1; down < rows_; ++down)
       mat_cpy.add_line(down, d_idx, -mat_cpy[down][d_idx]);
 
-    //std::cerr << "after killing down:" << std::endl << mat_cpy << std::endl;
-
     for (int up = static_cast<int>(d_idx) - 1; up >= 0; --up)
       mat_cpy.add_line(up, d_idx, -mat_cpy[up][d_idx]);
-
-    //std::cerr << "after killing up:" << std::endl << mat_cpy << std::endl;
   }
-
-  /*for (size_t i = 0, end = std::min(mat_cpy.rows_, mat_cpy.cols_); i < end; ++i)
-    if (is_zero(mat_cpy[i][i]))
-    {
-      size_t j = 0;
-      for (; j < rows_; ++j)
-        if (!is_zero(mat_cpy[j][i]))
-        {
-          mat_cpy.add_line(i, j, 1);
-          break;
-        }
-    }
-
-  std::cerr << "Start:\n" << mat_cpy << std::endl;
-
-  for (size_t i = 0; i < mat_cpy.rows_; ++i)
-  {
-
-    std::cerr << "1:\n" << mat_cpy << std::endl;
-    if (is_zero(mat_cpy[i][i]))
-    {
-      for (size_t k = i + 1; k < rows_; ++k)
-        if (!is_zero(mat_cpy[k][i]))
-        {
-          mat_cpy.add_line(i, k, 1);
-          break;
-        }
-    }
-
-    std::cerr << "2:\n" << mat_cpy << std::endl;
-
-    if (is_zero(mat_cpy[i][i]))
-    {
-      bool zero_col = true;
-
-      for (size_t k = 0; k < mat_cpy.rows_; ++k)
-        if (!is_zero(mat_cpy[k][i]))
-        {
-          zero_col = false;
-          break;
-        }
-
-      if (!zero_col)
-      {
-        //Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
-
-        return Matrix<DataT>{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
-      }
-      else
-        throw rank_lack{"Oh, I'm sorry"};
-    }
-    
-    std::cerr << "3:\n" << mat_cpy << std::endl;
-
-    for (size_t k = i + 1; k < mat_cpy.rows_; ++k)
-    {
-      if (is_zero(mat_cpy[k][i]))
-        continue;
-
-      DataT mul = mat_cpy[k][i] / mat_cpy[i][i];
-      mat_cpy.add_line(k, i, -mul);
-    }
-    
-    std::cerr << mat_cpy << std::endl;
-  }*/
 
   return mat_cpy;
 }
 
 template <typename DataT> Matrix<DataT> Matrix<DataT>::diag() const
 {
-  return GaussFWD()/*.GaussBWD()*/;
-}
-
-template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
-{
-  if (!std::is_floating_point<DataT>::value)
-    throw std::bad_typeid();
-
-  for (size_t i = 0, end = std::min(rows_, cols_); i < end; ++i)
-  {
-    if (is_zero(arr_[i][i]))
-      throw rank_lack{"Your matrix rank less then number of columns"};
-
-    for (size_t k = 0; k < i; ++k)
-    {
-      if (is_zero(arr_[k][i]))
-        continue;
-
-      DataT mul = arr_[k][i] / arr_[i][i];
-      add_line(k, i, -mul);
-    }
-  }
-
-  return *this;
+  return GaussFWD();
 }
 
 template <typename DataT> bool Matrix<DataT>::sum_suitable(const Matrix<DataT> &matr) const
