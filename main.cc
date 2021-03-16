@@ -13,8 +13,18 @@ int main()
   CTS::Circuit crc{Edges_, driver.get_juncs(), driver.get_loops()};
   // crc.dump("large_norm.png", "norm.dot");
 
-  crc.curs_calc();
-  crc.curs_out();
-
+  try 
+  {
+    crc.curs_calc();
+    crc.curs_out();
+  }
+  catch (const MX::rank_lack &er)
+  {
+    std::cerr << er.what() << std::endl;
+  }
+  catch (...)
+  {
+    throw;
+  }
   return 0;
 }
