@@ -74,7 +74,6 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
   //! Insertion new edge to structure
 
   static size_t counter = 0;
-  static std::unordered_set<size_t> unique_juncs_with_loops{};
 
   if (!juncs.contains(junc1))
     juncs[junc1] = counter++;
@@ -85,7 +84,6 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
     unique_juncs_with_loops.insert(junc1);
 
   Edges_.push_back({junc1, junc2, rtor, voltage});
-  loop_counter = unique_juncs_with_loops.size();
 
   return;
 }

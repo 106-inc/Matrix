@@ -2,6 +2,8 @@
 #define MATRIX_HH
 
 #include "mem.hh"
+
+#include <exception>
 #include <iomanip>
 #include <vector>
 
@@ -17,6 +19,8 @@ namespace MX
 using std::initializer_list;
 
 const long double EPS = 1e-12;
+
+struct rank_lack : std::runtime_error {rank_lack(const char * msg) : std::runtime_error(msg) {}};
 
 /**
  * @brief Compares floating point numbers with zero
@@ -42,7 +46,7 @@ public:
   /**
    * @brief Empty matrix ctor
    */
-  Matrix(size_t rows, size_t cols);
+  Matrix(size_t rows = 0, size_t cols = 0);
 
   /**
    * @brief Matrix ctor with data
@@ -218,7 +222,20 @@ public:
 
   static std::vector<double> solve(const Matrix &mat)
   {
-    Matrix tmp{mat.diag()};
+    Matrix tmp{};
+
+    try
+    {
+      tmp = mat.diag();
+    }
+    catch(const rank_lack& rl)
+    {
+      std::cerr << rl.what() << '\n';
+    }
+    catch(...)
+    {
+      throw;
+    }
 
     std::vector<double> res;
     res.reserve(tmp.rows_);
@@ -253,7 +270,7 @@ template <typename DataT> std::ostream &operator<<(std::ostream &ost, const Matr
  *
  */
 
-template <typename DataT> Matrix<DataT>::Matrix(size_t rows, size_t cols) : VBuf<Row<DataT>>(rows), cols_(cols)
+template <typename DataT> Matrix<DataT>::Matrix(size_t rows /* = 0 */, size_t cols /* = 0 */) : VBuf<Row<DataT>>(rows), cols_(cols)
 {
   Row<DataT> tmp{cols_};
   for (; used_ < size_; ++used_)
@@ -315,9 +332,9 @@ template <typename DataT> void Matrix<DataT>::swap(Matrix<DataT> &rhs) noexcept
 template <typename DataT> const DataT &Matrix<DataT>::get(size_t row, size_t col) const
 {
   if (row >= rows_)
-    throw std::out_of_range("Row index too big.");
+    throw std::out_of_range("Getter's row index too big.");
   else if (col >= cols_)
-    throw std::out_of_range("Column index too big.");
+    throw std::out_of_range("Getter's column index too big.");
 
   return arr_[row].get(col);
 }
@@ -325,9 +342,9 @@ template <typename DataT> const DataT &Matrix<DataT>::get(size_t row, size_t col
 template <typename DataT> void Matrix<DataT>::set(size_t row, size_t col, DataT val)
 {
   if (row >= rows_)
-    throw std::out_of_range("Row index too big.");
+    throw std::out_of_range("Setter's row index too big.");
   else if (col >= cols_)
-    throw std::out_of_range("Column index too big.");
+    throw std::out_of_range("Getter's column index too big.");
 
   arr_[row].set(col, val);
 }
@@ -630,7 +647,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
           break;
         }
 
-    if (is_zero(mat_cpy[i][i])) // TODO: работает не в общем случае, но для кв. матрицы с ед. решением норм
+    if (is_zero(mat_cpy[i][i]))
     {
       Matrix<DataT> tmp{i, cols_, [&mat_cpy](size_t m, size_t n) { return mat_cpy[m][n]; }};
 
@@ -663,7 +680,7 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::GaussBWD()
   for (size_t i = 0, end = std::min(rows_, cols_); i < end; ++i)
   {
     if (is_zero(arr_[i][i]))
-      continue;
+      throw rank_lack{"Your matrix rank less then number of columns"};
 
     for (size_t k = 0; k < i; ++k)
     {

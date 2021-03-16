@@ -26,8 +26,9 @@ namespace yy
 class Driver final
 {
 private:
-  size_t loop_counter{0};
+
   std::unordered_map<size_t, size_t> juncs;
+  std::unordered_set<size_t> unique_juncs_with_loops;
 
   size_t max_junc_{};
 
@@ -56,9 +57,9 @@ public:
     return max_junc_;
   }
 
-  size_t get_loops()
+  const std::unordered_set<size_t> & get_loops()
   {
-    return loop_counter;
+    return unique_juncs_with_loops;
   }
 
   ~Driver();
