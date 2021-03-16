@@ -1,5 +1,5 @@
-#include "circuits.hh"
-#include "driver/driver.hh"
+#include "circuits/circuits.hh"
+#include "grammar/driver/driver.hh"
 
 extern std::vector<CTS::Edge> Edges_;
 

@@ -1,7 +1,7 @@
 #ifndef CIRC_CIRCUITS_HH
 #define CIRC_CIRCUITS_HH
 
-#include "lin_alg/matrix.hh"
+#include "../lin_alg/matrix.hh"
 #include <fstream>
 #include <unordered_set>
 

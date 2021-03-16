@@ -8,7 +8,7 @@
 %{
 
 #include "../FB_BLD/compiler.tab.hh"
-#include "../parser/parser.hh"
+#include "../grammar/parser/parser.hh"
 
 #define YY_USER_ACTION upd_cur_loc();
 
@@ -21,10 +21,10 @@ DIGIT1               [1-9]
 
 UN_OPER              [\+\-]
 
-INT                 {DIGIT}+
-DOUBLE              {DIGIT}+\.{DIGIT}+
+INT                  {DIGIT}+
+DOUBLE               {DIGIT}+\.{DIGIT}+
 
-NEW_LINE            [\n]+
+NEW_LINE             [\n]+
 
 %%
 

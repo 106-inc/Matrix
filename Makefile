@@ -6,9 +6,10 @@ CXX = g++ --std=c++2a -O2
 FB_BLD = FB_BLD
 BLD = BLD_DIR
 
-FNB = grammar
-DRVR = driver
-PSR = parser
+FNB = grammar/rules
+DRVR = grammar/driver
+PSR = grammar/parser
+CRC = circuits
 LA = lin_alg
 
 
@@ -40,8 +41,8 @@ driver.o: $(DRVR)/driver.cc
 parser.o: $(PSR)/parser.cc
 	$(CXX) $(WRNNG_OPTNS) -c -o $(BLD)/parser.o $(PSR)/parser.cc
 
-circuits.o: circuits.cc
-	$(CXX) $(WRNNG_OPTNS) -c -o $(BLD)/circuits.o circuits.cc
+circuits.o: circuits/circuits.cc
+	$(CXX) $(WRNNG_OPTNS) -c -o $(BLD)/circuits.o $(CRC)/circuits.cc
 
 matrix.o: $(LA)/matrix.cc
 	$(CXX) $(WRNNG_OPTNS) -c -o $(BLD)/matrix.o $(LA)/matrix.cc
