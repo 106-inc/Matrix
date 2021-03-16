@@ -50,9 +50,11 @@ yy::parser::token_type yy::Driver::yylex(yy::parser::semantic_type *yylval, pars
 
   case yy::parser::token_type::DOUBLE: {
     yylval->emplace<float>(std::stof(plex_->YYText()));
+    break;
   }
   case yy::parser::token_type::ERR: {
     std::cerr << "UNKNOWN TOKEN:" << plex_->YYText() << std::endl;
+    break;
   }
 
   default:
