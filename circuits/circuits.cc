@@ -95,7 +95,7 @@ void Circuit::fill_circ_matr()
     }
   }
 
-  std::cout << circs_ << std::endl;
+  //std::cout << circs_ << std::endl;
 }
 
 std::vector<int> Circuit::dfs_start(size_t from) const
