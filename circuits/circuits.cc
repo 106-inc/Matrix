@@ -59,14 +59,15 @@ MX::Matrix<double> Circuit::make_eds_matr() const
   return E;
 }
 
-void Circuit::insert_cycle(size_t num, const std::vector<int> &cyc)
+void Circuit::insert_cycle(const std::vector<int> &cyc)
 {
   for (size_t i = 0, endi = circs_.cols(); i < endi; ++i)
   {
-    circs_.set(num, i, cyc[i]);
+    circs_.set(cycles_amount, i, cyc[i]);
     if (cyc[i])
       edges_visited.insert(i);
   }
+  ++cycles_amount;
 }
 
 bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
@@ -77,41 +78,51 @@ bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
 
   return false;
 }
+bool Circuit::check_n_insert(const std::vector<int> &vec)
+{
+  bool is_un = is_cyc_unique(vec);
+
+  if (is_un)
+    insert_cycle(vec);
+
+  return is_un;
+}
 
 void Circuit::fill_circ_matr()
 {
   size_t inc_rows = incidence_.rows();
-  size_t cycles_found = 0;
 
   // go from all
-  for (size_t i = 0; i < inc_rows && cycles_found < circs_.cols(); ++i)
+  for (size_t i = 0; i < inc_rows && cycles_amount < circs_.cols(); ++i)
   {
-    std::vector<int> tmp_vec = dfs_start(i);
-
-    while (!tmp_vec.empty() && cycles_found < circs_.cols())
+    dfs_start(i);
+    if (edges_visited.size() == edges_.size())
+      break;
+/*
+    while (!tmp_vec.empty() && cycles_amount < circs_.cols())
     {
-      insert_cycle(cycles_found++, tmp_vec);
+      insert_cycle(tmp_vec);
       tmp_vec = dfs_start(i);
     }
+*/
   }
 
   //std::cout << circs_ << std::endl;
 }
 
-std::vector<int> Circuit::dfs_start(size_t from) const
+std::vector<int> Circuit::dfs_start(size_t from)
 {
   std::vector<int> tmp{};
   tmp.resize(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
-  if (!dfs(from, from, edges_.size(), tmp, cols))
-    tmp.clear();
+  dfs(from, from, edges_.size(), tmp, cols);
 
   return tmp;
 }
 
 bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout,
-                  std::vector<Color> &colors) const
+                  std::vector<Color> &colors)
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
@@ -130,34 +141,27 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
     size_t dest_vert = cur_edge.junc1.norm == nactual ? cur_edge.junc2.norm : cur_edge.junc1.norm;
 
     int to_cyc_rout = nactual == cur_edge.junc1.norm ? 1 : -1;
+    Color cur_col = colors[dest_vert];
     /* Check if we have already visited this vert */
-    if (colors[dest_vert] == Color::GREY)
+    if (cur_col == Color::GREY)
     {
       if (dest_vert == nstart)
       {
         cyc_rout[i] = to_cyc_rout;
-        if (is_cyc_unique(cyc_rout))
-          return true;
+        check_n_insert(cyc_rout);
         cyc_rout[i] = 0;
       }
       continue;
     }
 
-    if (colors[dest_vert] == Color::WHITE)
+    if (cur_col == Color::WHITE)
     {
       std::vector<int> rout_cpy{cyc_rout};
       std::vector<Color> col_cpy{colors};
 
       rout_cpy[i] = to_cyc_rout;
 
-      bool is_cycle = dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
-
-      if (is_cycle)
-      {
-        /* Means that we've found a cycle in previous dfs call */
-        cyc_rout = rout_cpy;
-        return true;
-      }
+      dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
     }
   }
 
