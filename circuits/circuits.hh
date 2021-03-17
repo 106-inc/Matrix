@@ -3,6 +3,7 @@
 
 #include "../lin_alg/matrix.hh"
 #include <fstream>
+#include <cstdlib>
 #include <unordered_set>
 
 // TODO: найти где будут Edge
