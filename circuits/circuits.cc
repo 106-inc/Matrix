@@ -85,7 +85,10 @@ bool Circuit::check_n_insert(const std::vector<int> &vec)
   if (is_un)
     insert_cycle(vec);
 
-  return is_un;
+  if (edges_visited.size() == edges_.size())
+    return false;
+
+  return true;
 }
 
 void Circuit::fill_circ_matr()
@@ -110,15 +113,13 @@ void Circuit::fill_circ_matr()
   //std::cout << circs_ << std::endl;
 }
 
-std::vector<int> Circuit::dfs_start(size_t from)
+void Circuit::dfs_start(size_t from)
 {
   std::vector<int> tmp{};
   tmp.resize(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, edges_.size(), tmp, cols);
-
-  return tmp;
 }
 
 bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout,
@@ -148,7 +149,8 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
       if (dest_vert == nstart)
       {
         cyc_rout[i] = to_cyc_rout;
-        check_n_insert(cyc_rout);
+        if (!check_n_insert(cyc_rout))
+          return false;
         cyc_rout[i] = 0;
       }
       continue;
@@ -161,14 +163,15 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
       rout_cpy[i] = to_cyc_rout;
 
-      dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
+      if (!dfs(nstart, dest_vert, i, rout_cpy, col_cpy))
+        return false;
     }
   }
 
   /* Mark that we go away from vert. */
   colors[nactual] = Color::BLACK;
 
-  return false;
+  return true;
 }
 
 void Circuit::curs_calc()
