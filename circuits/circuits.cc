@@ -120,22 +120,26 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
   for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
   {
-    size_t dest_vert = edges_[i].junc1.norm == nactual ? edges_[i].junc2.norm : edges_[i].junc1.norm;
-
     /* Check if we came from this vert */
     if (i == ecurr)
       continue;
 
+
+    auto &cur_edge = edges_[i];
     /* Check if we have a route between verts */
-    if (incidence_[nactual][i] == 0)
+    if (nactual != cur_edge.junc1.norm && nactual != cur_edge.junc2.norm)
       continue;
 
+    size_t dest_vert = cur_edge.junc1.norm == nactual ? cur_edge.junc2.norm : cur_edge.junc1.norm;
+
+
+    int to_cyc_rout = nactual == cur_edge.junc1.norm ? 1 : -1;
     /* Check if we have already visited this vert */
     if (colors[dest_vert] == Color::GREY)
     {
       if (dest_vert == nstart)
       {
-        cyc_rout[i] = incidence_[nactual][i];
+        cyc_rout[i] = to_cyc_rout;
         if (is_cyc_unique(cyc_rout))
           return true;
         cyc_rout[i] = 0;
@@ -148,7 +152,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
       std::vector<int> rout_cpy{cyc_rout};
       std::vector<Color> col_cpy{colors};
 
-      rout_cpy[i] = incidence_[nactual][i];
+      rout_cpy[i] = to_cyc_rout;
 
       bool is_cycle = dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
 
