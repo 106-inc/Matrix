@@ -96,7 +96,7 @@ template <typename DataT> struct Row : private VBuf<DataT>
 
   friend class Matrix<DataT>;
 
-  explicit Row(size_t size);
+  explicit Row(size_t size = 0);
 
   Row(const Row &rhs);
 
@@ -104,10 +104,14 @@ template <typename DataT> struct Row : private VBuf<DataT>
 
   Row &operator=(const Row &rhs);
 
+  Row & operator+=(const Row & rhs);
+  Row & operator-=(const Row & rhs);
+  Row & operator*=(const DataT & rhs);
+
 public:
   const DataT &get(size_t idx) const;
 
-  void set(size_t idx, DataT new_val);
+  void set(size_t idx, const DataT & new_val);
 
   const DataT &operator[](size_t idx) const;
 };
@@ -128,7 +132,7 @@ template <typename DataT> Row<DataT>::Row(size_t size) : VBuf<DataT>(size)
 template <typename DataT> Row<DataT>::Row(const Row &rhs) : VBuf<DataT>(rhs.size_)
 {
   for (; used_ < rhs.used_; ++used_)
-    copy_construct(arr_ + used_, *(rhs.arr_ + used_));
+    copy_construct(arr_ + used_, /**(rhs.arr_ + used_)*/ rhs.arr_[used_]);
 
   DataT tmp{};
   for (; used_ < size_; ++used_)
@@ -155,25 +159,62 @@ template <typename DataT> Row<DataT> &Row<DataT>::operator=(const Row &rhs)
   return *this;
 }
 
+template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row & rhs)
+{
+  Row tmp{};
+
+  for (size_t i = 0; i < used_; ++i)
+    copy_construct(tmp.arr_ + used_, arr_[i] + rhs.arr_[i]);
+
+  this->swap(tmp);
+  return *this;
+}
+
+template <typename DataT> Row<DataT> &Row<DataT>::operator-=(const Row & rhs)
+{
+  Row tmp{size_};
+
+  for (size_t i = 0; i < used_; ++i)
+    copy_construct(tmp.arr_ + used_, arr_[i] - rhs.arr_[i]);
+
+  this->swap(tmp);
+  return *this;
+}
+
+template <typename DataT> Row<DataT> &Row<DataT>::operator*=(const DataT & rhs)
+{
+  Row tmp{size_};
+
+  for (size_t i = 0; i < used_; ++i)
+    copy_construct(tmp.arr_ + used_, arr_[i] * rhs);
+
+  this->swap(tmp);
+  return *this;
+}
+
+
 template <typename DataT> const DataT &Row<DataT>::get(size_t idx) const
 {
   if (idx >= size_)
-    throw std::out_of_range("Get index too big.");
+    throw std::out_of_range("Get col index too big.");
 
   return arr_[idx];
 }
 
-template <typename DataT> void Row<DataT>::set(size_t idx, DataT new_val)
+template <typename DataT> void Row<DataT>::set(size_t idx, const DataT & new_val)
 {
   if (idx >= size_)
-    throw std::out_of_range("Set index too big.");
+    throw std::out_of_range("Set col index too big.");
 
   arr_[idx] = new_val;
 }
 
 template <typename DataT> const DataT &Row<DataT>::operator[](size_t idx) const
 {
-  return get(idx);
+  if (idx >= size_)
+    throw std::out_of_range("Get[] col index too big.");
+
+  return arr_[idx];
 }
 } // namespace MX
 

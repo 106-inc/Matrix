@@ -229,9 +229,7 @@ public:
 
   static std::vector<double> solve(const Matrix &mat)
   {
-    Matrix tmp{};
-
-    tmp = mat.diag();
+    Matrix tmp = mat.diag();
 
     std::vector<double> res;
     res.reserve(tmp.rows_);
@@ -271,13 +269,13 @@ template <typename DataT>
 template <typename Func>
 Matrix<DataT>::Matrix(size_t rows, size_t cols, Func action) : Matrix(rows, cols)
 {
-  Matrix<DataT> tmp{rows_, cols_};
+  //Matrix<DataT> tmp{rows_, cols_};
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      tmp.set(i, j, action(i, j));
+      /*tmp.*/set(i, j, action(i, j));
 
-  swap(tmp);
+  /*swap(tmp);*/
 }
 
 template <typename DataT>
@@ -291,15 +289,11 @@ Matrix<DataT>::Matrix(size_t rows, size_t cols, const initializer_list<DataT> &d
     arr_[i / cols_].set(i % cols_, *cur);
 }
 
-template <typename DataT> Matrix<DataT>::Matrix(const Matrix &orig) : Matrix(orig.rows_, orig.cols_)
+template <typename DataT> Matrix<DataT>::Matrix(const Matrix &orig) : VBuf<Row<DataT>>(orig.rows_), cols_(orig.cols_)
 {
-  Matrix<DataT> tmp{rows_, cols_};
-
-  for (size_t i = 0; i < rows_; ++i)
-    for (size_t j = 0; j < cols_; ++j)
-      tmp.set(i, j, orig[i][j]);
-
-  swap(tmp);
+  Row<DataT> tmp{cols_};
+  for (; used_ < size_; ++used_)
+    copy_construct(arr_ + used_, orig[used_]);
 }
 
 template <typename DataT>
@@ -323,8 +317,6 @@ template <typename DataT> const DataT &Matrix<DataT>::get(size_t row, size_t col
 {
   if (row >= rows_)
     throw std::out_of_range("Getter's row index too big.");
-  else if (col >= cols_)
-    throw std::out_of_range("Getter's column index too big.");
 
   return arr_[row].get(col);
 }
@@ -333,8 +325,6 @@ template <typename DataT> void Matrix<DataT>::set(size_t row, size_t col, DataT 
 {
   if (row >= rows_)
     throw std::out_of_range("Setter's row index too big.");
-  else if (col >= cols_)
-    throw std::out_of_range("Getter's column index too big.");
 
   arr_[row].set(col, val);
 }
@@ -443,9 +433,13 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator+=(const Matrix 
 
   Matrix<DataT> tmp{*this};
 
+
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      tmp.set(i, j, tmp[i][j] + matr[i][j]);
+      tmp.arr_[i].set(j, tmp.arr_[i][j] + matr.arr_[i][j]);
+
+  /*for (size_t i = 0; i < rows_; ++i)
+    tmp.arr_[i] += matr.arr_[i];*/
 
   swap(tmp);
   return *this;
@@ -460,7 +454,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator-=(const Matrix 
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      tmp.set(i, j, tmp[i][j] - matr[i][j]);
+      tmp.arr_[i].set(j, tmp.arr_[i][j] - matr.arr_[i][j]);
+      //tmp.set(i, j, tmp[i][j] - matr[i][j]);
 
   swap(tmp);
   return *this;
@@ -478,7 +473,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator*=(const Matrix 
   for (size_t i = 0; i < res.rows_; ++i)
     for (size_t j = 0; j < res.cols_; ++j)
       for (size_t k = 0; k < cols_; ++k)
-        res.set(i, j, res[i][j] + arr_[i][k] * tmp[j][k]);
+        res.arr_[i].set(j, res.arr_[i][j] + arr_[i][k] * tmp.arr_[j][k]);
+        //res.set(i, j, res[i][j] + arr_[i][k] * tmp[j][k]);
 
   swap(res);
   return *this;
@@ -490,7 +486,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator*=(DataT mul)
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      tmp.set(i, j, tmp[i][j] * mul);
+      tmp.arr_[i].set(j, tmp.arr_[i][j] * mul);
+      //tmp.set(i, j, tmp[i][j] * mul);
 
   swap(tmp);
 

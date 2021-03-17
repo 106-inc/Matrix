@@ -7,3 +7,5 @@ FB_BLD/
 BLD_DIR/
 *.o
 CMakeFiles/
+
+cachegrind*
