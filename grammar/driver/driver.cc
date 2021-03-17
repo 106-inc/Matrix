@@ -17,10 +17,8 @@ bool yy::Driver::parse()
 {
   yy::parser parser_(this);
 
-  bool res = !parser_.parse();
-
-  if (!res)
-    return res;
+  if (parser_.parse())
+    return false;
 
   for (auto &&e : Edges_)
   {
@@ -30,7 +28,7 @@ bool yy::Driver::parse()
 
   max_junc_ = juncs.size();
 
-  return res;
+  return true;
 }
 
 //! The lexical analyzer function, yylex, recognizes tokens from the input stream and returns them to the parser.
