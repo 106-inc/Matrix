@@ -116,6 +116,13 @@ public:
   const DataT &operator[](size_t idx) const;
 };
 
+template<typename DataT>
+Row<DataT> operator + (const Row<DataT> & rhs, const Row<DataT> & lhs);
+template<typename DataT>
+Row<DataT> operator - (const Row<DataT> & rhs, const Row<DataT> & lhs);
+template<typename DataT>
+Row<DataT> operator * (const Row<DataT> & rhs, const DataT & lhs);
+
 /*
  *
  * Row class method realisations
@@ -161,10 +168,10 @@ template <typename DataT> Row<DataT> &Row<DataT>::operator=(const Row &rhs)
 
 template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row & rhs)
 {
-  Row tmp{};
+  Row tmp{*this};
 
   for (size_t i = 0; i < used_; ++i)
-    copy_construct(tmp.arr_ + used_, arr_[i] + rhs.arr_[i]);
+    tmp.arr_[i] += rhs.arr_[i];
 
   this->swap(tmp);
   return *this;
@@ -172,24 +179,25 @@ template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row & rhs)
 
 template <typename DataT> Row<DataT> &Row<DataT>::operator-=(const Row & rhs)
 {
-  Row tmp{size_};
+    Row tmp1{};
+    Row tmp{*this};
 
-  for (size_t i = 0; i < used_; ++i)
-    copy_construct(tmp.arr_ + used_, arr_[i] - rhs.arr_[i]);
+    for (size_t i = 0; i < used_; ++i)
+        tmp.arr_[i] -= rhs.arr_[i];
 
-  this->swap(tmp);
-  return *this;
+    this->swap(tmp);
+    return *this;
 }
 
 template <typename DataT> Row<DataT> &Row<DataT>::operator*=(const DataT & rhs)
 {
-  Row tmp{size_};
+    Row tmp{*this};
 
-  for (size_t i = 0; i < used_; ++i)
-    copy_construct(tmp.arr_ + used_, arr_[i] * rhs);
+    for (size_t i = 0; i < used_; ++i)
+        tmp.arr_[i] *= rhs;
 
-  this->swap(tmp);
-  return *this;
+    this->swap(tmp);
+    return *this;
 }
 
 
@@ -216,6 +224,19 @@ template <typename DataT> const DataT &Row<DataT>::operator[](size_t idx) const
 
   return arr_[idx];
 }
+
+template<typename DataT>
+Row<DataT> operator + (const Row<DataT> & rhs, const Row<DataT> & lhs)
+{ return Row{rhs} += lhs; }
+
+template<typename DataT>
+Row<DataT> operator - (const Row<DataT> & rhs, const Row<DataT> & lhs)
+{ return Row{rhs} -= lhs; }
+
+template<typename DataT>
+Row<DataT> operator * (const Row<DataT> & rhs, const DataT& lhs)
+{ return Row{rhs} *= lhs; }
+
 } // namespace MX
 
 #endif // MATRIX_MEM_HH
