@@ -67,7 +67,7 @@ public:
 
 private:
   std::unordered_set<size_t> edges_visited;
-
+  size_t cycles_amount{};
   enum class Color
   {
     WHITE = 0,
@@ -80,11 +80,12 @@ private:
 
   void fill_circ_matr();
 
-  bool dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors) const;
-  std::vector<int> dfs_start(size_t from) const;
+  bool dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors);
+  std::vector<int> dfs_start(size_t from);
 
-  void insert_cycle(size_t num, const std::vector<int> &cyc);
+  void insert_cycle(const std::vector<int> &cyc);
 
+  bool check_n_insert(const std::vector<int> &vec);
   bool is_cyc_unique(const std::vector<int> &vec) const;
 };
 } // namespace CTS
