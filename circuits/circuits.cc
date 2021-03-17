@@ -62,22 +62,18 @@ MX::Matrix<double> Circuit::make_eds_matr() const
 void Circuit::insert_cycle(size_t num, const std::vector<int> &cyc)
 {
   for (size_t i = 0, endi = circs_.cols(); i < endi; ++i)
+  {
     circs_.set(num, i, cyc[i]);
+    if (cyc[i])
+      edges_visited.insert(i);
+  }
 }
 
 bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
 {
-  auto tcircs = transpose(circs_);
-
-  for (size_t i = 0, endi = tcircs.rows(); i < endi; ++i)
-  {
-    size_t j = 0;
-    for (size_t endj = tcircs.cols(); j < endj && !tcircs[i][j]; ++j)
-      ;
-
-    if (j == tcircs.cols() && vec[i])
+  for (size_t i = 0; i < vec.size(); ++i)
+    if (vec[i] && !edges_visited.contains(i))
       return true;
-  }
 
   return false;
 }
@@ -98,6 +94,8 @@ void Circuit::fill_circ_matr()
       tmp_vec = dfs_start(i);
     }
   }
+
+  std::cout << circs_ << std::endl;
 }
 
 std::vector<int> Circuit::dfs_start(size_t from) const

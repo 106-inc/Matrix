@@ -66,6 +66,8 @@ public:
   void dump(const std::string &png_file, const std::string &dot_file = "dump.dot") const;
 
 private:
+  std::unordered_set<size_t> edges_visited;
+
   enum class Color
   {
     WHITE = 0,
