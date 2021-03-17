@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 WRNNG_OPTNS = -Wall -Wextra -Wunused -Wno-old-style-cast -Waggressive-loop-optimizations -Wnon-virtual-dtor -Wuseless-cast
-CXX = g++ --std=c++2a -O2
+CXX = g++ --std=c++2a -O2 -g
 
 FB_BLD = FB_BLD
 BLD = BLD_DIR
