@@ -104,24 +104,21 @@ template <typename DataT> struct Row : private VBuf<DataT>
 
   Row &operator=(const Row &rhs);
 
-  Row & operator+=(const Row & rhs);
-  Row & operator-=(const Row & rhs);
-  Row & operator*=(const DataT & rhs);
+  Row &operator+=(const Row &rhs);
+  Row &operator-=(const Row &rhs);
+  Row &operator*=(const DataT &rhs);
 
 public:
   const DataT &get(size_t idx) const;
 
-  void set(size_t idx, const DataT & new_val);
+  void set(size_t idx, const DataT &new_val);
 
   const DataT &operator[](size_t idx) const;
 };
 
-template<typename DataT>
-Row<DataT> operator + (const Row<DataT> & rhs, const Row<DataT> & lhs);
-template<typename DataT>
-Row<DataT> operator - (const Row<DataT> & rhs, const Row<DataT> & lhs);
-template<typename DataT>
-Row<DataT> operator * (const Row<DataT> & rhs, const DataT & lhs);
+template <typename DataT> Row<DataT> operator+(const Row<DataT> &rhs, const Row<DataT> &lhs);
+template <typename DataT> Row<DataT> operator-(const Row<DataT> &rhs, const Row<DataT> &lhs);
+template <typename DataT> Row<DataT> operator*(const Row<DataT> &rhs, const DataT &lhs);
 
 /*
  *
@@ -166,7 +163,7 @@ template <typename DataT> Row<DataT> &Row<DataT>::operator=(const Row &rhs)
   return *this;
 }
 
-template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row & rhs)
+template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row &rhs)
 {
   Row tmp{*this};
 
@@ -177,29 +174,28 @@ template <typename DataT> Row<DataT> &Row<DataT>::operator+=(const Row & rhs)
   return *this;
 }
 
-template <typename DataT> Row<DataT> &Row<DataT>::operator-=(const Row & rhs)
+template <typename DataT> Row<DataT> &Row<DataT>::operator-=(const Row &rhs)
 {
-    Row tmp1{};
-    Row tmp{*this};
+  Row tmp1{};
+  Row tmp{*this};
 
-    for (size_t i = 0; i < used_; ++i)
-        tmp.arr_[i] -= rhs.arr_[i];
+  for (size_t i = 0; i < used_; ++i)
+    tmp.arr_[i] -= rhs.arr_[i];
 
-    this->swap(tmp);
-    return *this;
+  this->swap(tmp);
+  return *this;
 }
 
-template <typename DataT> Row<DataT> &Row<DataT>::operator*=(const DataT & rhs)
+template <typename DataT> Row<DataT> &Row<DataT>::operator*=(const DataT &rhs)
 {
-    Row tmp{*this};
+  Row tmp{*this};
 
-    for (size_t i = 0; i < used_; ++i)
-        tmp.arr_[i] *= rhs;
+  for (size_t i = 0; i < used_; ++i)
+    tmp.arr_[i] *= rhs;
 
-    this->swap(tmp);
-    return *this;
+  this->swap(tmp);
+  return *this;
 }
-
 
 template <typename DataT> const DataT &Row<DataT>::get(size_t idx) const
 {
@@ -209,7 +205,7 @@ template <typename DataT> const DataT &Row<DataT>::get(size_t idx) const
   return arr_[idx];
 }
 
-template <typename DataT> void Row<DataT>::set(size_t idx, const DataT & new_val)
+template <typename DataT> void Row<DataT>::set(size_t idx, const DataT &new_val)
 {
   if (idx >= size_)
     throw std::out_of_range("Set col index too big.");
@@ -225,17 +221,20 @@ template <typename DataT> const DataT &Row<DataT>::operator[](size_t idx) const
   return arr_[idx];
 }
 
-template<typename DataT>
-Row<DataT> operator + (const Row<DataT> & rhs, const Row<DataT> & lhs)
-{ return Row{rhs} += lhs; }
+template <typename DataT> Row<DataT> operator+(const Row<DataT> &rhs, const Row<DataT> &lhs)
+{
+  return Row{rhs} += lhs;
+}
 
-template<typename DataT>
-Row<DataT> operator - (const Row<DataT> & rhs, const Row<DataT> & lhs)
-{ return Row{rhs} -= lhs; }
+template <typename DataT> Row<DataT> operator-(const Row<DataT> &rhs, const Row<DataT> &lhs)
+{
+  return Row{rhs} -= lhs;
+}
 
-template<typename DataT>
-Row<DataT> operator * (const Row<DataT> & rhs, const DataT& lhs)
-{ return Row{rhs} *= lhs; }
+template <typename DataT> Row<DataT> operator*(const Row<DataT> &rhs, const DataT &lhs)
+{
+  return Row{rhs} *= lhs;
+}
 
 } // namespace MX
 

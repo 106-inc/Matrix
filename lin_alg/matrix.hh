@@ -269,11 +269,11 @@ template <typename DataT>
 template <typename Func>
 Matrix<DataT>::Matrix(size_t rows, size_t cols, Func action) : Matrix(rows, cols)
 {
-  //Matrix<DataT> tmp{rows_, cols_};
+  // Matrix<DataT> tmp{rows_, cols_};
 
   for (size_t i = 0; i < rows_; ++i)
     for (size_t j = 0; j < cols_; ++j)
-      /*tmp.*/set(i, j, action(i, j));
+      /*tmp.*/ set(i, j, action(i, j));
 
   /*swap(tmp);*/
 }
@@ -447,8 +447,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator-=(const Matrix 
 
   Matrix<DataT> tmp{*this};
 
-    for (size_t i = 0; i < rows_; ++i)
-        tmp.arr_[i] -= matr.arr_[i];
+  for (size_t i = 0; i < rows_; ++i)
+    tmp.arr_[i] -= matr.arr_[i];
 
   swap(tmp);
   return *this;
@@ -465,23 +465,20 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator*=(const Matrix 
 
   for (size_t i = 0; i < res.rows_; ++i)
     for (size_t j = 0; j < res.cols_; ++j)
+    {
+      int k = 0;
+      for (int end = static_cast<int>(cols_) - 8; k < end; k += 8)
+        res.set(i, j,
+                res.arr_[i][j] + arr_[i][k] * tmp.arr_[j][k] + arr_[i][k + 1] * tmp.arr_[j][k + 1] +
+                    arr_[i][k + 2] * tmp.arr_[j][k + 2] + arr_[i][k + 3] * tmp.arr_[j][k + 3] +
+                    arr_[i][k + 4] * tmp.arr_[j][k + 4] + arr_[i][k + 5] * tmp.arr_[j][k + 5] +
+                    arr_[i][k + 6] * tmp.arr_[j][k + 6] + arr_[i][k + 7] * tmp.arr_[j][k + 7]);
+      while (k < static_cast<int>(cols_))
       {
-        int k = 0;
-        for (int end = static_cast<int>(cols_) - 8; k < end; k += 8)
-            res.set(i, j, res.arr_[i][j] + arr_[i][k] * tmp.arr_[j][k] + 
-                                           arr_[i][k+1] * tmp.arr_[j][k+1] + 
-                                       arr_[i][k+2] * tmp.arr_[j][k+2] + 
-                                      arr_[i][k+3] * tmp.arr_[j][k+3] +
-                                      arr_[i][k+4] * tmp.arr_[j][k+4] + 
-                                      arr_[i][k+5] * tmp.arr_[j][k+5] + 
-                                      arr_[i][k+6] * tmp.arr_[j][k+6] + 
-                                      arr_[i][k+7] * tmp.arr_[j][k+7]);
-        while (k < static_cast<int>(cols_))
-        {
-            res.set(i, j, res.arr_[i][j] + arr_[i][k] * tmp.arr_[j][k]);
-            ++k;
-        }
+        res.set(i, j, res.arr_[i][j] + arr_[i][k] * tmp.arr_[j][k]);
+        ++k;
       }
+    }
 
   swap(res);
   return *this;
@@ -491,8 +488,8 @@ template <typename DataT> Matrix<DataT> &Matrix<DataT>::operator*=(DataT mul)
 {
   Matrix<DataT> tmp{*this};
 
-    for (size_t i = 0; i < rows_; ++i)
-        tmp.arr_[i] *= mul;
+  for (size_t i = 0; i < rows_; ++i)
+    tmp.arr_[i] *= mul;
 
   swap(tmp);
 

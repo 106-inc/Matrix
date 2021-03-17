@@ -124,14 +124,12 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
     if (i == ecurr)
       continue;
 
-
     auto &cur_edge = edges_[i];
     /* Check if we have a route between verts */
     if (nactual != cur_edge.junc1.norm && nactual != cur_edge.junc2.norm)
       continue;
 
     size_t dest_vert = cur_edge.junc1.norm == nactual ? cur_edge.junc2.norm : cur_edge.junc1.norm;
-
 
     int to_cyc_rout = nactual == cur_edge.junc1.norm ? 1 : -1;
     /* Check if we have already visited this vert */
