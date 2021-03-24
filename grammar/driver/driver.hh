@@ -60,17 +60,17 @@ public:
     return max_junc_;
   }
 
-  auto & get_inc()
+  const auto & get_inc()
   {
     return incidence_;
   }
 
-  auto & get_res()
+  const auto & get_res()
   {
     return resistance_;
   }
 
-  auto & get_eds()
+  const auto & get_eds()
   {
     return eds_;
   }
