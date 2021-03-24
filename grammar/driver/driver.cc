@@ -20,22 +20,16 @@ bool yy::Driver::parse()
   if (parser_.parse())
     return false;
 
-  for (auto &&e : Edges_)
-  {
-    e.junc1.norm = juncs[e.junc1.real] /*e.junc1.real*/;
-    e.junc2.norm = juncs[e.junc2.real] /*e.junc2.real*/;
-  }
-
   max_junc_ = juncs.size();
 
   size_t e_num = Edges_.size();
 
-  incidence_ = MX::Matrix<double> {max_junc_, Edges_.size()};
+  incidence_ = MX::Matrix<int>{max_junc_, Edges_.size()};
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = Edges_[i].junc1.norm, 
-           norm2 = Edges_[i].junc2.norm;
+    size_t norm1 = juncs[Edges_[i].junc1], 
+           norm2 = juncs[Edges_[i].junc2];
 
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
@@ -159,7 +153,7 @@ void yy::Driver::dump()
 {
   for (auto &&edge : Edges_)
   {
-    std::cout << edge.junc1.real << "--" << edge.junc2.real << ", " << edge.rtor << "; " << edge.eds << "V";
+    std::cout << edge.junc1 << "--" << edge.junc2 << ", " << edge.rtor << "; " << edge.eds << "V";
     std::cout << std::endl;
   }
 }
