@@ -10,7 +10,7 @@ int main()
   if (!driver.parse())
     return 1;
 
-  CTS::Circuit crc{Edges_, driver.get_juncs(), driver.get_loops()};
+  CTS::Circuit crc{driver.get_inc(), driver.get_res(), driver.get_eds()};
   // crc.dump("large_norm.png", "norm.dot");
 
   try
