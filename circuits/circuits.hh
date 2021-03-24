@@ -43,12 +43,12 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
-  MX::Matrix<double> incidence_;
+  MX::Matrix<int> incidence_;
   MX::Matrix<double> circs_;
   MX::Matrix<double> inc_cut_;
 
 public:
-  Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops);
+  Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds);
 
   /*
    * What here should locate:
@@ -56,7 +56,7 @@ public:
    * 2) calculating currents
    */
 
-  void curs_calc();
+  MX::Matrix<double> curs_calc();
   void curs_out() const
   {
     for (auto &&edge : edges_)

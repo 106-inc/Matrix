@@ -12,29 +12,20 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops)
-    : edges_(edges), incidence_(j_num, edges_.size()),
-      circs_(edges_.size(), edges_.size()), inc_cut_{j_num - j_loops.size(), edges_.size()}
+Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds)
+    : incidence_(inc)
 {
-  size_t e_num = edges_.size();
+  // fill edges vector
+
+  size_t e_num = incidence_.cols();
+
+  edges_.reserve(e_num);
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = edges[i].junc1.norm, norm2 = edges[i].junc2.norm;
-
-    incidence_.set(norm1, i, 1);
-    incidence_.set(norm2, i, -1);
+    
   }
-
-  size_t cut_cnt = 0;
-  for (size_t i = 0; i < incidence_.rows(); ++i)
-  {
-    if (j_loops.contains(i))
-      continue;
-    for (size_t j = 0; j < incidence_.cols(); ++j)
-      inc_cut_.set(cut_cnt, j, incidence_[i][j]);
-    ++cut_cnt;
-  }
+  
 }
 
 MX::Matrix<double> Circuit::make_res_matr() const
@@ -171,7 +162,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
   return false;
 }
 
-void Circuit::curs_calc()
+MX::Matrix<double> Circuit::curs_calc()
 {
   auto A_0 = MX::glue_side(inc_cut_, MX::Matrix<double>{inc_cut_.rows(), 1});
   fill_circ_matr();
@@ -185,8 +176,12 @@ void Circuit::curs_calc()
 
   auto curs = MX::Matrix<double>::solve(system);
 
+  MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};
+
   for (size_t i = 0, endi = curs.size(); i < endi; ++i)
     edges_[i].cur = curs[i];
+
+  return sol;
 }
 
 void Circuit::dump(const std::string &png_file, const std::string &dot_file) const
