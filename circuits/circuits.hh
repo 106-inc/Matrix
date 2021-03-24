@@ -9,18 +9,9 @@
 
 namespace CTS
 {
-struct Junc final
-{
-  size_t real, norm;
-
-  Junc(size_t r, size_t n = 0) : real(r), norm(n)
-  {
-  }
-};
-
 struct Edge final // rtor, junc1, junc2, voltage
 {
-  Junc junc1, junc2;
+  size_t junc1, junc2;
 
   double rtor, eds, cur;
 
@@ -77,6 +68,8 @@ private:
 
   MX::Matrix<double> make_eds_matr() const;
   MX::Matrix<double> make_res_matr() const;
+
+  void Circuit::fill_inc_cut( const std::unordered_set<size_t> &j_loops );
 
   void fill_circ_matr();
 

@@ -21,11 +21,58 @@ Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, cons
 
   edges_.reserve(e_num);
 
+  // for more locality
+  auto inc_t = MX::transpose(inc);
+  std::unordered_set<size_t> j_loops;
+
+  size_t cut_j;
   for (size_t i = 0; i < e_num; ++i)
   {
-    
+    Edge new_edge = {incidence_.rows(), incidence_.rows(), res[i][i], eds[i][0]};
+    size_t v_cnt = 0;
+
+    for (size_t j = 0; j < incidence_.rows(); ++j)
+    {
+      auto elem = inc_t[i][j];
+      if (elem != 0)
+      {
+        if (elem > 0)
+          new_edge.junc2 = j;
+        else
+          new_edge.junc1 = j;
+        ++v_cnt;
+      }
+    }
+
+    if (v_cnt == 1)
+    {
+      if (new_edge.junc1 != incidence_.rows())
+        new_edge.junc2 = new_edge.junc1;
+      else
+        new_edge.junc1 = new_edge.junc2;
+
+      j_loops.insert(new_edge.junc1);
+    }
+
+    edges_.push_back(new_edge);
   }
-  
+
+  fill_inc_cut(j_loops);
+}
+
+void Circuit::fill_inc_cut( const std::unordered_set<size_t> &j_loops )
+{
+  inc_cut_ = {incidence_.rows() - j_loops.size(), incidence_.cols()};
+
+  size_t cut_cnt = 0;
+  for (size_t i = 0, endi = incidence_.rows(); i < endi; ++i)
+  {
+    if (j_loops.contains(i))
+      continue;
+    for (size_t j = 0, endj = incidence_.cols(); j < endj; ++j)
+      inc_cut_.set(cut_cnt, j, incidence_[i][j]);
+    ++cut_cnt;
+  }
 }
 
 MX::Matrix<double> Circuit::make_res_matr() const
