@@ -13,7 +13,7 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 }
 
 Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds)
-    : incidence_(inc)
+    : incidence_(inc), circs_(incidence_.cols(), incidence_.cols())
 {
   // fill edges vector
 
@@ -210,6 +210,7 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 MX::Matrix<double> Circuit::curs_calc()
 {
   auto A_0 = MX::glue_side(inc_cut_, MX::Matrix<double>{inc_cut_.rows(), 1});
+
   fill_circ_matr();
 
   auto BR = circs_ * make_res_matr();
