@@ -28,6 +28,29 @@ bool yy::Driver::parse()
 
   max_junc_ = juncs.size();
 
+  size_t e_num = Edges_.size();
+
+  incidence_ = MX::Matrix<double> {max_junc_, Edges_.size()};
+
+  for (size_t i = 0; i < e_num; ++i)
+  {
+    size_t norm1 = Edges_[i].junc1.norm, 
+           norm2 = Edges_[i].junc2.norm;
+
+    incidence_.set(norm1, i, 1);
+    incidence_.set(norm2, i, -1);
+  }
+
+  resistance_ = MX::Matrix<double> {e_num, e_num};
+
+  for (size_t i = 0; i < e_num; ++i)
+    resistance_.set(i, i, Edges_[i].rtor);
+
+  eds_ = MX::Matrix<double> {e_num, 1};
+
+  for (size_t i = 0; i < e_num; ++i)
+    eds_.set(i, 0, Edges_[i].eds);
+
   return true;
 }
 

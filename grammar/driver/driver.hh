@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "../parser/parser.hh"
+#include "../../lin_alg/matrix.hh"
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
@@ -33,6 +34,10 @@ private:
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
 
+  MX::Matrix<double> incidence_;
+  MX::Matrix<double> resistance_;
+  MX::Matrix<double> eds_;
+
 public:
   Driver();
 
@@ -53,6 +58,21 @@ public:
   size_t get_juncs()
   {
     return max_junc_;
+  }
+
+  auto & get_inc()
+  {
+    return incidence_;
+  }
+
+  auto & get_res()
+  {
+    return resistance_;
+  }
+
+  auto & get_eds()
+  {
+    return eds_;
   }
 
   const std::unordered_set<size_t> &get_loops()
