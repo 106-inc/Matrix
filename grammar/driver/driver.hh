@@ -8,8 +8,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "../parser/parser.hh"
 #include "../../lin_alg/matrix.hh"
+#include "../parser/parser.hh"
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
@@ -60,17 +60,17 @@ public:
     return max_junc_;
   }
 
-  const auto & get_inc()
+  const auto &get_inc()
   {
     return incidence_;
   }
 
-  const auto & get_res()
+  const auto &get_res()
   {
     return resistance_;
   }
 
-  const auto & get_eds()
+  const auto &get_eds()
   {
     return eds_;
   }

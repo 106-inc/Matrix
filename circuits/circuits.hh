@@ -69,7 +69,7 @@ private:
   MX::Matrix<double> make_eds_matr() const;
   MX::Matrix<double> make_res_matr() const;
 
-  void fill_inc_cut( const std::unordered_set<size_t> &j_loops );
+  void fill_inc_cut(const std::unordered_set<size_t> &j_loops);
 
   void fill_circ_matr();
 

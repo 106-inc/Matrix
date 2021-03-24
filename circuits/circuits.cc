@@ -59,7 +59,7 @@ Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, cons
   fill_inc_cut(j_loops);
 }
 
-void Circuit::fill_inc_cut( const std::unordered_set<size_t> &j_loops )
+void Circuit::fill_inc_cut(const std::unordered_set<size_t> &j_loops)
 {
   inc_cut_ = {incidence_.rows() - j_loops.size(), incidence_.cols()};
 
@@ -135,16 +135,16 @@ void Circuit::fill_circ_matr()
     dfs_start(i);
     if (edges_visited.size() == edges_.size())
       break;
-/*
-    while (!tmp_vec.empty() && cycles_amount < circs_.cols())
-    {
-      insert_cycle(tmp_vec);
-      tmp_vec = dfs_start(i);
-    }
-*/
+    /*
+        while (!tmp_vec.empty() && cycles_amount < circs_.cols())
+        {
+          insert_cycle(tmp_vec);
+          tmp_vec = dfs_start(i);
+        }
+    */
   }
 
-  //std::cout << circs_ << std::endl;
+  // std::cout << circs_ << std::endl;
 }
 
 std::vector<int> Circuit::dfs_start(size_t from)
@@ -158,8 +158,7 @@ std::vector<int> Circuit::dfs_start(size_t from)
   return tmp;
 }
 
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout,
-                  std::vector<Color> &colors)
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors)
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;

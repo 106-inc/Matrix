@@ -28,19 +28,18 @@ bool yy::Driver::parse()
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = juncs[Edges_[i].junc1], 
-           norm2 = juncs[Edges_[i].junc2];
+    size_t norm1 = juncs[Edges_[i].junc1], norm2 = juncs[Edges_[i].junc2];
 
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
   }
 
-  resistance_ = MX::Matrix<double> {e_num, e_num};
+  resistance_ = MX::Matrix<double>{e_num, e_num};
 
   for (size_t i = 0; i < e_num; ++i)
     resistance_.set(i, i, Edges_[i].rtor);
 
-  eds_ = MX::Matrix<double> {e_num, 1};
+  eds_ = MX::Matrix<double>{e_num, 1};
 
   for (size_t i = 0; i < e_num; ++i)
     eds_.set(i, 0, Edges_[i].eds);
