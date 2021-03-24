@@ -7,7 +7,7 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 {
   double real_cur = MX::is_zero(edge.cur) ? 0.0 : edge.cur;
 
-  ost << edge.junc1.real << " -- " << edge.junc2.real << ": " << real_cur << " A" << std::endl;
+  ost << edge.junc1 << " -- " << edge.junc2 << ": " << real_cur << " A" << std::endl;
 
   return ost;
 }
@@ -25,7 +25,6 @@ Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, cons
   auto inc_t = MX::transpose(inc);
   std::unordered_set<size_t> j_loops;
 
-  size_t cut_j;
   for (size_t i = 0; i < e_num; ++i)
   {
     Edge new_edge = {incidence_.rows(), incidence_.rows(), res[i][i], eds[i][0]};
@@ -173,12 +172,12 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
     auto &cur_edge = edges_[i];
     /* Check if we have a route between verts */
-    if (nactual != cur_edge.junc1.norm && nactual != cur_edge.junc2.norm)
+    if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
       continue;
 
-    size_t dest_vert = cur_edge.junc1.norm == nactual ? cur_edge.junc2.norm : cur_edge.junc1.norm;
+    size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
 
-    int to_cyc_rout = nactual == cur_edge.junc1.norm ? 1 : -1;
+    int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
     Color cur_col = colors[dest_vert];
     /* Check if we have already visited this vert */
     if (cur_col == Color::GREY)
@@ -268,7 +267,7 @@ void Circuit::dump(const std::string &png_file, const std::string &dot_file) con
             "shape = box, color = black]"
          << std::endl;
 
-    fout << e.junc1.norm << " -> " << name_of_edge << " -> " << e.junc2.norm << std::endl;
+    fout << e.junc1 << " -> " << name_of_edge << " -> " << e.junc2 << std::endl;
 
     fout << std::endl;
 
