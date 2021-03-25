@@ -22,21 +22,25 @@ bool yy::Driver::parse()
 
   size_t e_num = Edges_.size();
 
+  /* filling incidence matrix */
   incidence_ = MX::Matrix<int>{max_junc_, Edges_.size()};
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = juncs[Edges_[i].junc1], norm2 = juncs[Edges_[i].junc2];
+    size_t norm1 = juncs[Edges_[i].junc1],
+           norm2 = juncs[Edges_[i].junc2];
 
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
   }
 
+  /* filling resistance matrix */
   resistance_ = MX::Matrix<double>{e_num, e_num};
 
   for (size_t i = 0; i < e_num; ++i)
     resistance_.set(i, i, Edges_[i].rtor);
 
+  /* filling eds matrix */
   eds_ = MX::Matrix<double>{e_num, 1};
 
   for (size_t i = 0; i < e_num; ++i)

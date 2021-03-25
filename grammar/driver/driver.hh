@@ -75,6 +75,11 @@ public:
     return eds_;
   }
 
+  const auto &get_juncs_set()
+  {
+    return juncs;
+  }
+
   const std::unordered_set<size_t> &get_loops()
   {
     return unique_juncs_with_loops;
