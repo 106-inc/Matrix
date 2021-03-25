@@ -55,35 +55,12 @@ public:
 
   void dump();
 
-  size_t get_juncs()
-  {
-    return max_junc_;
-  }
-
-  const auto &get_inc()
-  {
-    return incidence_;
-  }
-
-  const auto &get_res()
-  {
-    return resistance_;
-  }
-
-  const auto &get_eds()
-  {
-    return eds_;
-  }
-
-  const auto &get_juncs_set()
-  {
-    return juncs;
-  }
-
   const std::unordered_set<size_t> &get_loops()
   {
     return unique_juncs_with_loops;
   }
+
+  void print_curs(const MX::Matrix<double> & curs);
 
   ~Driver();
 };
