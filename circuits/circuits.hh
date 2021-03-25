@@ -10,18 +10,9 @@
 
 namespace CTS
 {
-struct Junc final
-{
-  size_t real, norm;
-
-  Junc(size_t r, size_t n = 0) : real(r), norm(n)
-  {
-  }
-};
-
 struct Edge final // rtor, junc1, junc2, voltage
 {
-  Junc junc1, junc2;
+  size_t junc1, junc2;
 
   double rtor, eds, cur;
 
@@ -44,12 +35,12 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
-  MX::Matrix<double> incidence_;
+  MX::Matrix<int> incidence_;
   MX::Matrix<double> circs_;
   MX::Matrix<double> inc_cut_;
 
 public:
-  Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops);
+  Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds);
 
   /*
    * What here should locate:
@@ -57,7 +48,7 @@ public:
    * 2) calculating currents
    */
 
-  void curs_calc();
+  MX::Matrix<double> curs_calc();
   void curs_out() const
   {
     for (auto &&edge : edges_)
@@ -78,6 +69,8 @@ private:
 
   MX::Matrix<double> make_eds_matr() const;
   MX::Matrix<double> make_res_matr() const;
+
+  void fill_inc_cut(const std::unordered_set<size_t> &j_loops);
 
   void fill_circ_matr();
 

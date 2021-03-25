@@ -7,31 +7,68 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 {
   double real_cur = MX::is_zero(edge.cur) ? 0.0 : edge.cur;
 
-  ost << edge.junc1.real << " -- " << edge.junc2.real << ": " << real_cur << " A" << std::endl;
+  ost << edge.junc1 << " -- " << edge.junc2 << ": " << real_cur << " A" << std::endl;
 
   return ost;
 }
 
-Circuit::Circuit(const std::vector<Edge> &edges, size_t j_num, const std::unordered_set<size_t> &j_loops)
-    : edges_(edges), incidence_(j_num, edges_.size()),
-      circs_(edges_.size(), edges_.size()), inc_cut_{j_num - j_loops.size(), edges_.size()}
+Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds)
+    : incidence_(inc), circs_(incidence_.cols(), incidence_.cols())
 {
-  size_t e_num = edges_.size();
+  // fill edges vector
+
+  size_t e_num = incidence_.cols();
+
+  edges_.reserve(e_num);
+
+  // for more locality
+  auto inc_t = MX::transpose(inc);
+  std::unordered_set<size_t> j_loops;
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = edges[i].junc1.norm, norm2 = edges[i].junc2.norm;
+    Edge new_edge = {incidence_.rows(), incidence_.rows(), res[i][i], eds[i][0]};
+    size_t v_cnt = 0;
 
-    incidence_.set(norm1, i, 1);
-    incidence_.set(norm2, i, -1);
+    for (size_t j = 0; j < incidence_.rows(); ++j)
+    {
+      auto elem = inc_t[i][j];
+      if (elem != 0)
+      {
+        if (elem > 0)
+          new_edge.junc2 = j;
+        else
+          new_edge.junc1 = j;
+        ++v_cnt;
+      }
+    }
+
+    if (v_cnt == 1)
+    {
+      if (new_edge.junc1 != incidence_.rows())
+        new_edge.junc2 = new_edge.junc1;
+      else
+        new_edge.junc1 = new_edge.junc2;
+
+      j_loops.insert(new_edge.junc1);
+    }
+
+    edges_.push_back(new_edge);
   }
 
+  fill_inc_cut(j_loops);
+}
+
+void Circuit::fill_inc_cut(const std::unordered_set<size_t> &j_loops)
+{
+  inc_cut_ = {incidence_.rows() - j_loops.size(), incidence_.cols()};
+
   size_t cut_cnt = 0;
-  for (size_t i = 0; i < incidence_.rows(); ++i)
+  for (size_t i = 0, endi = incidence_.rows(); i < endi; ++i)
   {
     if (j_loops.contains(i))
       continue;
-    for (size_t j = 0; j < incidence_.cols(); ++j)
+    for (size_t j = 0, endj = incidence_.cols(); j < endj; ++j)
       inc_cut_.set(cut_cnt, j, incidence_[i][j]);
     ++cut_cnt;
   }
@@ -101,16 +138,16 @@ void Circuit::fill_circ_matr()
     dfs_start(i);
     if (edges_visited.size() == edges_.size())
       break;
-/*
-    while (!tmp_vec.empty() && cycles_amount < circs_.cols())
-    {
-      insert_cycle(tmp_vec);
-      tmp_vec = dfs_start(i);
-    }
-*/
+    /*
+        while (!tmp_vec.empty() && cycles_amount < circs_.cols())
+        {
+          insert_cycle(tmp_vec);
+          tmp_vec = dfs_start(i);
+        }
+    */
   }
 
-  //std::cout << circs_ << std::endl;
+  // std::cout << circs_ << std::endl;
 }
 
 void Circuit::dfs_start(size_t from)
@@ -122,8 +159,7 @@ void Circuit::dfs_start(size_t from)
   dfs(from, from, edges_.size(), tmp, cols);
 }
 
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout,
-                  std::vector<Color> &colors)
+bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors)
 {
   /* Mark that now we are at this vert */
   colors[nactual] = Color::GREY;
@@ -136,12 +172,12 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
     auto &cur_edge = edges_[i];
     /* Check if we have a route between verts */
-    if (nactual != cur_edge.junc1.norm && nactual != cur_edge.junc2.norm)
+    if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
       continue;
 
-    size_t dest_vert = cur_edge.junc1.norm == nactual ? cur_edge.junc2.norm : cur_edge.junc1.norm;
+    size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
 
-    int to_cyc_rout = nactual == cur_edge.junc1.norm ? 1 : -1;
+    int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
     Color cur_col = colors[dest_vert];
     /* Check if we have already visited this vert */
     if (cur_col == Color::GREY)
@@ -174,9 +210,10 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
   return true;
 }
 
-void Circuit::curs_calc()
+MX::Matrix<double> Circuit::curs_calc()
 {
   auto A_0 = MX::glue_side(inc_cut_, MX::Matrix<double>{inc_cut_.rows(), 1});
+
   fill_circ_matr();
 
   auto BR = circs_ * make_res_matr();
@@ -189,8 +226,12 @@ void Circuit::curs_calc()
   dump("hello.png");
   auto curs = MX::Matrix<double>::solve(system);
 
+  MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};
+
   for (size_t i = 0, endi = curs.size(); i < endi; ++i)
     edges_[i].cur = curs[i];
+
+  return sol;
 }
 
 void Circuit::dump(const std::string &png_file, const std::string &dot_file) const
@@ -230,9 +271,9 @@ void Circuit::dump(const std::string &png_file, const std::string &dot_file) con
 
             "shape = box, color = black]"
          << std::endl;
-    fout << e.junc1.norm << " -> " << name_of_edge << " -> " << e.junc2.norm;
+    fout << e.junc1 << " -> " << name_of_edge << " -> " << e.junc2 << std::endl;
 
-    fout << ";" << std::endl;
+    fout << std::endl;
 
     ++num_of_edge;
   }
