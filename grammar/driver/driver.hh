@@ -60,7 +60,7 @@ public:
     return unique_juncs_with_loops;
   }
 
-  void print_curs(const MX::Matrix<double> & curs);
+  void print_curs(const MX::Matrix<double> &curs);
 
   ~Driver();
 };

@@ -27,8 +27,7 @@ bool yy::Driver::parse()
 
   for (size_t i = 0; i < e_num; ++i)
   {
-    size_t norm1 = juncs[Edges_[i].junc1],
-           norm2 = juncs[Edges_[i].junc2];
+    size_t norm1 = juncs[Edges_[i].junc1], norm2 = juncs[Edges_[i].junc2];
 
     incidence_.set(norm1, i, 1);
     incidence_.set(norm2, i, -1);
@@ -46,7 +45,6 @@ bool yy::Driver::parse()
   for (size_t i = 0; i < e_num; ++i)
     eds_.set(i, 0, Edges_[i].eds);
 
-
   CTS::Circuit crc{incidence_, resistance_, eds_};
 
   try
@@ -61,12 +59,12 @@ bool yy::Driver::parse()
   return true;
 }
 
-void yy::Driver::print_curs(const MX::Matrix<double> & curs)
+void yy::Driver::print_curs(const MX::Matrix<double> &curs)
 {
   for (size_t i = 0, end = curs.rows(); i < end; ++i)
     Edges_[i].cur = curs[i][0];
 
-  for (auto && edge : Edges_)
+  for (auto &&edge : Edges_)
     std::cout << edge;
 }
 
