@@ -7,8 +7,6 @@ std::vector<CTS::Edge> Edges_{};
 yy::Driver::Driver() : plex_(new OurFlexLexer)
 {
   plex_->switch_streams(std::cin, std::cout);
-
-  Edges_.reserve(1);
 }
 
 //! Functuion for calling bison yy::parser:parse()
