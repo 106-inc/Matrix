@@ -122,7 +122,10 @@ bool Circuit::check_n_insert(const std::vector<int> &vec)
   if (is_un)
     insert_cycle(vec);
 
-  return is_un;
+  if (edges_visited.size() == edges_.size())
+    return false;
+
+  return true;
 }
 
 void Circuit::fill_circ_matr()
@@ -147,15 +150,13 @@ void Circuit::fill_circ_matr()
   // std::cout << circs_ << std::endl;
 }
 
-std::vector<int> Circuit::dfs_start(size_t from)
+void Circuit::dfs_start(size_t from)
 {
   std::vector<int> tmp{};
   tmp.resize(edges_.size());
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, edges_.size(), tmp, cols);
-
-  return tmp;
 }
 
 bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors)
@@ -184,7 +185,8 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
       if (dest_vert == nstart)
       {
         cyc_rout[i] = to_cyc_rout;
-        check_n_insert(cyc_rout);
+        if (!check_n_insert(cyc_rout))
+          return false;
         cyc_rout[i] = 0;
       }
       continue;
@@ -197,14 +199,15 @@ bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> 
 
       rout_cpy[i] = to_cyc_rout;
 
-      dfs(nstart, dest_vert, i, rout_cpy, col_cpy);
+      if (!dfs(nstart, dest_vert, i, rout_cpy, col_cpy))
+        return false;
     }
   }
 
   /* Mark that we go away from vert. */
   colors[nactual] = Color::BLACK;
 
-  return false;
+  return true;
 }
 
 MX::Matrix<double> Circuit::curs_calc()
@@ -220,6 +223,7 @@ MX::Matrix<double> Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
+  dump("hello.png");
   auto curs = MX::Matrix<double>::solve(system);
 
   MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};
@@ -232,7 +236,6 @@ MX::Matrix<double> Circuit::curs_calc()
 
 void Circuit::dump(const std::string &png_file, const std::string &dot_file) const
 {
-  char name_of_edge = 'A';
   size_t num_of_edge = 0;
   std::ofstream fout;
 
@@ -249,6 +252,8 @@ void Circuit::dump(const std::string &png_file, const std::string &dot_file) con
 
   for (auto &&e : edges_)
   {
+    std::string name_of_edge = "E" + std::to_string(num_of_edge);
+
     fout << name_of_edge
          << " [label=\n\" "
             "Edge # "
@@ -266,12 +271,10 @@ void Circuit::dump(const std::string &png_file, const std::string &dot_file) con
 
             "shape = box, color = black]"
          << std::endl;
-
     fout << e.junc1 << " -> " << name_of_edge << " -> " << e.junc2 << std::endl;
 
     fout << std::endl;
 
-    ++name_of_edge;
     ++num_of_edge;
   }
 
