@@ -216,7 +216,7 @@ MX::Matrix<double> Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  dump("hello.png");
+  //dump("hello.png");
   auto curs = MX::Matrix<double>::solve(system);
 
   MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};
