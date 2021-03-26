@@ -136,34 +136,34 @@ void Circuit::fill_circ_matr()
       break;
   }
 
-  //std::cout << circs_ << std::endl;
+  // std::cout << circs_ << std::endl;
 }
 
 void Circuit::dfs_start(size_t from)
 {
   std::vector<int> rout{};
   rout.resize(edges_.size());
-  std::vector<Color> colors(edges_.size(), Color::WHITE);
+  std::vector<bool> visited(edges_.size(), false);
 
   struct stk_frame final
   {
     size_t nactual, ecurr;
     std::vector<int> cyc_rout;
-    std::vector<Color> cols;
+    std::vector<bool> visited;
   };
   std::stack<stk_frame> stack;
 
-  stack.push({from, edges_.size(), rout, colors});
+  stack.push({from, edges_.size(), rout, visited});
 
   while (!stack.empty())
   {
     size_t nactual = stack.top().nactual, ecurr = stack.top().ecurr;
     auto cyc_rout = stack.top().cyc_rout;
-    auto cols = stack.top().cols;
+    auto vted = stack.top().visited;
 
     stack.pop();
     /* Mark that now we are at this vert */
-    colors[nactual] = Color::GREY;
+    vted[nactual] = true;
 
     for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
     {
@@ -179,9 +179,9 @@ void Circuit::dfs_start(size_t from)
       size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
 
       int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
-      Color cur_col = colors[dest_vert];
+      bool cur_state = vted[dest_vert];
       /* Check if we have already visited this vert */
-      if (cur_col == Color::GREY)
+      if (cur_state)
       {
         if (dest_vert == from)
         {
@@ -193,20 +193,14 @@ void Circuit::dfs_start(size_t from)
         continue;
       }
 
-      if (cur_col == Color::WHITE)
-      {
-        std::vector<int> rout_cpy{cyc_rout};
-        std::vector<Color> col_cpy{colors};
+      std::vector<int> rout_cpy{cyc_rout};
+      std::vector<bool> vted_cpy{vted};
 
-        rout_cpy[i] = to_cyc_rout;
+      rout_cpy[i] = to_cyc_rout;
 
-        stk_frame frame = {dest_vert, i, rout_cpy, col_cpy};
-        stack.push(frame);
-      }
+      stk_frame frame = {dest_vert, i, rout_cpy, vted_cpy};
+      stack.push(frame);
     }
-
-    /* Mark that we go away from vert. */
-    // colors[nactual] = Color::BLACK;
   }
 }
 
