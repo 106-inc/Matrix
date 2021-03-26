@@ -66,12 +66,6 @@ public:
 private:
   std::unordered_set<size_t> edges_visited;
   size_t cycles_amount{};
-  enum class Color
-  {
-    WHITE = 0,
-    GREY,
-    BLACK
-  };
 
   void fill_inc_cut(const std::unordered_set<size_t> &j_loops);
 
