@@ -13,7 +13,7 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 }
 
 Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds)
-    : incidence_(inc), circs_(incidence_.cols(), incidence_.cols())
+    : incidence_(inc), resistance_(res), eds_(eds), circs_(incidence_.cols(), incidence_.cols())
 {
   // fill edges vector
 
@@ -74,28 +74,6 @@ void Circuit::fill_inc_cut(const std::unordered_set<size_t> &j_loops)
   }
 }
 
-MX::Matrix<double> Circuit::make_res_matr() const
-{
-  size_t e_num = edges_.size();
-  MX::Matrix<double> R{e_num, e_num};
-
-  for (size_t i = 0; i < e_num; ++i)
-    R.set(i, i, edges_[i].rtor);
-
-  return R;
-}
-
-MX::Matrix<double> Circuit::make_eds_matr() const
-{
-  size_t e_num = edges_.size();
-  MX::Matrix<double> E{e_num, 1};
-
-  for (size_t i = 0; i < e_num; ++i)
-    E.set(i, 0, edges_[i].eds);
-
-  return E;
-}
-
 void Circuit::insert_cycle(const std::vector<int> &cyc)
 {
   for (size_t i = 0, endi = circs_.cols(); i < endi; ++i)
@@ -117,9 +95,7 @@ bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
 }
 bool Circuit::check_n_insert(const std::vector<int> &vec)
 {
-  bool is_un = is_cyc_unique(vec);
-
-  if (is_un)
+  if (is_cyc_unique(vec))
     insert_cycle(vec);
 
   if (edges_visited.size() == edges_.size())
@@ -130,21 +106,12 @@ bool Circuit::check_n_insert(const std::vector<int> &vec)
 
 void Circuit::fill_circ_matr()
 {
-  size_t inc_rows = incidence_.rows();
-
   // go from all
-  for (size_t i = 0; i < inc_rows && cycles_amount < circs_.cols(); ++i)
+  for (size_t i = 0; i < incidence_.rows() && cycles_amount < circs_.cols(); ++i)
   {
     dfs_start(i);
     if (edges_visited.size() == edges_.size())
       break;
-    /*
-        while (!tmp_vec.empty() && cycles_amount < circs_.cols())
-        {
-          insert_cycle(tmp_vec);
-          tmp_vec = dfs_start(i);
-        }
-    */
   }
 
   // std::cout << circs_ << std::endl;
@@ -152,62 +119,67 @@ void Circuit::fill_circ_matr()
 
 void Circuit::dfs_start(size_t from)
 {
-  std::vector<int> tmp{};
-  tmp.resize(edges_.size());
-  std::vector<Color> cols(edges_.size(), Color::WHITE);
+  std::vector<int> rout{};
+  rout.resize(edges_.size());
+  std::vector<bool> visited(edges_.size(), false);
 
-  dfs(from, from, edges_.size(), tmp, cols);
-}
-
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors)
-{
-  /* Mark that now we are at this vert */
-  colors[nactual] = Color::GREY;
-
-  for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
+  struct stk_frame final
   {
-    /* Check if we came from this vert */
-    if (i == ecurr)
-      continue;
+    size_t nactual, ecurr;
+    std::vector<int> cyc_rout;
+    std::vector<bool> visited;
+  };
+  std::stack<stk_frame> stack;
 
-    auto &cur_edge = edges_[i];
-    /* Check if we have a route between verts */
-    if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
-      continue;
+  stack.push({from, edges_.size(), rout, visited});
 
-    size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
+  while (!stack.empty())
+  {
+    size_t nactual = stack.top().nactual, ecurr = stack.top().ecurr;
+    auto cyc_rout = stack.top().cyc_rout;
+    auto vted = stack.top().visited;
 
-    int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
-    Color cur_col = colors[dest_vert];
-    /* Check if we have already visited this vert */
-    if (cur_col == Color::GREY)
+    stack.pop();
+    /* Mark that now we are at this vert */
+    vted[nactual] = true;
+
+    for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
     {
-      if (dest_vert == nstart)
+      /* Check if we came from this vert */
+      if (i == ecurr)
+        continue;
+
+      auto &cur_edge = edges_[i];
+      /* Check if we have a route between verts */
+      if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
+        continue;
+
+      size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
+
+      int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
+      bool cur_state = vted[dest_vert];
+      /* Check if we have already visited this vert */
+      if (cur_state)
       {
-        cyc_rout[i] = to_cyc_rout;
-        if (!check_n_insert(cyc_rout))
-          return false;
-        cyc_rout[i] = 0;
+        if (dest_vert == from)
+        {
+          cyc_rout[i] = to_cyc_rout;
+          if (!check_n_insert(cyc_rout))
+            return;
+          cyc_rout[i] = 0;
+        }
+        continue;
       }
-      continue;
-    }
 
-    if (cur_col == Color::WHITE)
-    {
       std::vector<int> rout_cpy{cyc_rout};
-      std::vector<Color> col_cpy{colors};
+      std::vector<bool> vted_cpy{vted};
 
       rout_cpy[i] = to_cyc_rout;
 
-      if (!dfs(nstart, dest_vert, i, rout_cpy, col_cpy))
-        return false;
+      stk_frame frame = {dest_vert, i, rout_cpy, vted_cpy};
+      stack.push(frame);
     }
   }
-
-  /* Mark that we go away from vert. */
-  colors[nactual] = Color::BLACK;
-
-  return true;
 }
 
 MX::Matrix<double> Circuit::curs_calc()
@@ -216,14 +188,14 @@ MX::Matrix<double> Circuit::curs_calc()
 
   fill_circ_matr();
 
-  auto BR = circs_ * make_res_matr();
-  auto BE = circs_ * make_eds_matr();
+  auto BR = circs_ * resistance_;
+  auto BE = circs_ * eds_;
 
   auto BR_BE = MX::glue_side(BR, BE);
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  dump("hello.png");
+  // dump("hello.png");
   auto curs = MX::Matrix<double>::solve(system);
 
   MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};

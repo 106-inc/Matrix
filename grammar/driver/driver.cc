@@ -45,6 +45,11 @@ bool yy::Driver::parse()
   for (size_t i = 0; i < e_num; ++i)
     eds_.set(i, 0, Edges_[i].eds);
 
+  return true;
+}
+
+void yy::Driver::solve()
+{
   CTS::Circuit crc{incidence_, resistance_, eds_};
 
   try
@@ -55,8 +60,6 @@ bool yy::Driver::parse()
   {
     std::cerr << "I CAN'T CALCULATE THIS CIRCUIT, SORRY :'(" << std::endl;
   }
-
-  return true;
 }
 
 void yy::Driver::print_curs(const MX::Matrix<double> &curs)

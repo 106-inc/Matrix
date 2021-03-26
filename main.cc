@@ -10,5 +10,7 @@ int main()
   if (!driver.parse())
     return 1;
 
+  driver.solve();
+
   return 0;
 }

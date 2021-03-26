@@ -47,6 +47,8 @@ public:
 
   bool parse();
 
+  void solve();
+
   void insert(size_t junc1, size_t junc2, float rtor, float voltage);
 
   parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc);
@@ -54,11 +56,6 @@ public:
   void report_syntax_error(const parser::context &ctx);
 
   void dump();
-
-  const std::unordered_set<size_t> &get_loops()
-  {
-    return unique_juncs_with_loops;
-  }
 
   void print_curs(const MX::Matrix<double> &curs);
 

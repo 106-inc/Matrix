@@ -2,8 +2,9 @@
 #define CIRC_CIRCUITS_HH
 
 #include "../lin_alg/matrix.hh"
-#include <fstream>
 #include <cstdlib>
+#include <fstream>
+#include <stack>
 #include <unordered_set>
 
 // TODO: найти где будут Edge
@@ -35,7 +36,12 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
+
   MX::Matrix<int> incidence_;
+
+  MX::Matrix<double> resistance_;
+  MX::Matrix<double> eds_;
+
   MX::Matrix<double> circs_;
   MX::Matrix<double> inc_cut_;
 
@@ -60,21 +66,11 @@ public:
 private:
   std::unordered_set<size_t> edges_visited;
   size_t cycles_amount{};
-  enum class Color
-  {
-    WHITE = 0,
-    GREY,
-    BLACK
-  };
-
-  MX::Matrix<double> make_eds_matr() const;
-  MX::Matrix<double> make_res_matr() const;
 
   void fill_inc_cut(const std::unordered_set<size_t> &j_loops);
 
   void fill_circ_matr();
 
-  bool dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors);
   void dfs_start(size_t from);
 
   void insert_cycle(const std::vector<int> &cyc);
