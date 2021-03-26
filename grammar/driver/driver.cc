@@ -22,6 +22,7 @@ bool yy::Driver::parse()
 
   size_t e_num = Edges_.size();
 
+  /* filling incidence matrix */
   incidence_ = MX::Matrix<int>{max_junc_, Edges_.size()};
 
   for (size_t i = 0; i < e_num; ++i)
@@ -32,17 +33,39 @@ bool yy::Driver::parse()
     incidence_.set(norm2, i, -1);
   }
 
+  /* filling resistance matrix */
   resistance_ = MX::Matrix<double>{e_num, e_num};
 
   for (size_t i = 0; i < e_num; ++i)
     resistance_.set(i, i, Edges_[i].rtor);
 
+  /* filling eds matrix */
   eds_ = MX::Matrix<double>{e_num, 1};
 
   for (size_t i = 0; i < e_num; ++i)
     eds_.set(i, 0, Edges_[i].eds);
 
+  CTS::Circuit crc{incidence_, resistance_, eds_};
+
+  try
+  {
+    print_curs(crc.curs_calc());
+  }
+  catch (const MX::rank_lack &er)
+  {
+    std::cerr << "I CAN'T CALCULATE THIS CIRCUIT, SORRY :'(" << std::endl;
+  }
+
   return true;
+}
+
+void yy::Driver::print_curs(const MX::Matrix<double> &curs)
+{
+  for (size_t i = 0, end = curs.rows(); i < end; ++i)
+    Edges_[i].cur = curs[i][0];
+
+  for (auto &&edge : Edges_)
+    std::cout << edge;
 }
 
 //! The lexical analyzer function, yylex, recognizes tokens from the input stream and returns them to the parser.
