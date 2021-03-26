@@ -57,11 +57,6 @@ public:
 
   void dump();
 
-  const std::unordered_set<size_t> &get_loops()
-  {
-    return unique_juncs_with_loops;
-  }
-
   void print_curs(const MX::Matrix<double> &curs);
 
   ~Driver();
