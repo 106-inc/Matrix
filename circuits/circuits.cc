@@ -117,9 +117,7 @@ bool Circuit::is_cyc_unique(const std::vector<int> &vec) const
 }
 bool Circuit::check_n_insert(const std::vector<int> &vec)
 {
-  bool is_un = is_cyc_unique(vec);
-
-  if (is_un)
+  if (is_cyc_unique(vec))
     insert_cycle(vec);
 
   if (edges_visited.size() == edges_.size())
@@ -130,77 +128,86 @@ bool Circuit::check_n_insert(const std::vector<int> &vec)
 
 void Circuit::fill_circ_matr()
 {
-  size_t inc_rows = incidence_.rows();
-
   // go from all
-  for (size_t i = 0; i < inc_rows && cycles_amount < circs_.cols(); ++i)
+  for (size_t i = 0; i < incidence_.rows() && cycles_amount < circs_.cols(); ++i)
   {
     dfs_start(i);
     if (edges_visited.size() == edges_.size())
       break;
   }
 
-  // std::cout << circs_ << std::endl;
+  //std::cout << circs_ << std::endl;
 }
 
 void Circuit::dfs_start(size_t from)
 {
-  std::vector<int> tmp{};
-  tmp.resize(edges_.size());
-  std::vector<Color> cols(edges_.size(), Color::WHITE);
+  std::vector<int> rout{};
+  rout.resize(edges_.size());
+  std::vector<Color> colors(edges_.size(), Color::WHITE);
 
-  dfs(from, from, edges_.size(), tmp, cols);
-}
-
-bool Circuit::dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors)
-{
-  /* Mark that now we are at this vert */
-  colors[nactual] = Color::GREY;
-
-  for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
+  struct stk_frame final
   {
-    /* Check if we came from this vert */
-    if (i == ecurr)
-      continue;
+    size_t nactual, ecurr;
+    std::vector<int> cyc_rout;
+    std::vector<Color> cols;
+  };
+  std::stack<stk_frame> stack;
 
-    auto &cur_edge = edges_[i];
-    /* Check if we have a route between verts */
-    if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
-      continue;
+  stack.push({from, edges_.size(), rout, colors});
 
-    size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
+  while (!stack.empty())
+  {
+    size_t nactual = stack.top().nactual, ecurr = stack.top().ecurr;
+    auto cyc_rout = stack.top().cyc_rout;
+    auto cols = stack.top().cols;
 
-    int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
-    Color cur_col = colors[dest_vert];
-    /* Check if we have already visited this vert */
-    if (cur_col == Color::GREY)
+    stack.pop();
+    /* Mark that now we are at this vert */
+    colors[nactual] = Color::GREY;
+
+    for (size_t i = 0, edg_size = edges_.size(); i < edg_size; ++i)
     {
-      if (dest_vert == nstart)
+      /* Check if we came from this vert */
+      if (i == ecurr)
+        continue;
+
+      auto &cur_edge = edges_[i];
+      /* Check if we have a route between verts */
+      if (nactual != cur_edge.junc1 && nactual != cur_edge.junc2)
+        continue;
+
+      size_t dest_vert = cur_edge.junc1 == nactual ? cur_edge.junc2 : cur_edge.junc1;
+
+      int to_cyc_rout = nactual == cur_edge.junc1 ? 1 : -1;
+      Color cur_col = colors[dest_vert];
+      /* Check if we have already visited this vert */
+      if (cur_col == Color::GREY)
       {
-        cyc_rout[i] = to_cyc_rout;
-        if (!check_n_insert(cyc_rout))
-          return false;
-        cyc_rout[i] = 0;
+        if (dest_vert == from)
+        {
+          cyc_rout[i] = to_cyc_rout;
+          if (!check_n_insert(cyc_rout))
+            return;
+          cyc_rout[i] = 0;
+        }
+        continue;
       }
-      continue;
+
+      if (cur_col == Color::WHITE)
+      {
+        std::vector<int> rout_cpy{cyc_rout};
+        std::vector<Color> col_cpy{colors};
+
+        rout_cpy[i] = to_cyc_rout;
+
+        stk_frame frame = {dest_vert, i, rout_cpy, col_cpy};
+        stack.push(frame);
+      }
     }
 
-    if (cur_col == Color::WHITE)
-    {
-      std::vector<int> rout_cpy{cyc_rout};
-      std::vector<Color> col_cpy{colors};
-
-      rout_cpy[i] = to_cyc_rout;
-
-      if (!dfs(nstart, dest_vert, i, rout_cpy, col_cpy))
-        return false;
-    }
+    /* Mark that we go away from vert. */
+    // colors[nactual] = Color::BLACK;
   }
-
-  /* Mark that we go away from vert. */
-  colors[nactual] = Color::BLACK;
-
-  return true;
 }
 
 MX::Matrix<double> Circuit::curs_calc()
@@ -216,7 +223,7 @@ MX::Matrix<double> Circuit::curs_calc()
 
   auto system = MX::glue_bott(A_0, BR_BE);
 
-  //dump("hello.png");
+  // dump("hello.png");
   auto curs = MX::Matrix<double>::solve(system);
 
   MX::Matrix<double> sol = {curs.size(), 1, curs.begin(), curs.end()};

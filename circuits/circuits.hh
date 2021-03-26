@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <unordered_set>
+#include <stack>
 
 // TODO: найти где будут Edge
 
@@ -74,7 +75,6 @@ private:
 
   void fill_circ_matr();
 
-  bool dfs(size_t nstart, size_t nactual, size_t ecurr, std::vector<int> &cyc_rout, std::vector<Color> &colors);
   void dfs_start(size_t from);
 
   void insert_cycle(const std::vector<int> &cyc);
