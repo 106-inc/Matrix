@@ -135,13 +135,6 @@ void Circuit::fill_circ_matr()
     dfs_start(i);
     if (edges_visited.size() == edges_.size())
       break;
-    /*
-        while (!tmp_vec.empty() && cycles_amount < circs_.cols())
-        {
-          insert_cycle(tmp_vec);
-          tmp_vec = dfs_start(i);
-        }
-    */
   }
 
   // std::cout << circs_ << std::endl;
@@ -154,6 +147,8 @@ std::vector<int> Circuit::dfs_start(size_t from)
   std::vector<Color> cols(edges_.size(), Color::WHITE);
 
   dfs(from, from, edges_.size(), tmp, cols);
+
+  
 
   return tmp;
 }
