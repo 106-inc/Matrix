@@ -13,7 +13,7 @@ std::ostream &operator<<(std::ostream &ost, const Edge &edge)
 }
 
 Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, const MX::Matrix<double> &eds)
-    : incidence_(inc), circs_(incidence_.cols(), incidence_.cols())
+    : incidence_(inc), resistance_(res), eds_(eds), circs_(incidence_.cols(), incidence_.cols())
 {
   // fill edges vector
 
@@ -72,28 +72,6 @@ void Circuit::fill_inc_cut(const std::unordered_set<size_t> &j_loops)
       inc_cut_.set(cut_cnt, j, incidence_[i][j]);
     ++cut_cnt;
   }
-}
-
-MX::Matrix<double> Circuit::make_res_matr() const
-{
-  size_t e_num = edges_.size();
-  MX::Matrix<double> R{e_num, e_num};
-
-  for (size_t i = 0; i < e_num; ++i)
-    R.set(i, i, edges_[i].rtor);
-
-  return R;
-}
-
-MX::Matrix<double> Circuit::make_eds_matr() const
-{
-  size_t e_num = edges_.size();
-  MX::Matrix<double> E{e_num, 1};
-
-  for (size_t i = 0; i < e_num; ++i)
-    E.set(i, 0, edges_[i].eds);
-
-  return E;
 }
 
 void Circuit::insert_cycle(const std::vector<int> &cyc)
@@ -210,8 +188,8 @@ MX::Matrix<double> Circuit::curs_calc()
 
   fill_circ_matr();
 
-  auto BR = circs_ * make_res_matr();
-  auto BE = circs_ * make_eds_matr();
+  auto BR = circs_ * resistance_;
+  auto BE = circs_ * eds_;
 
   auto BR_BE = MX::glue_side(BR, BE);
 

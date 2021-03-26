@@ -36,7 +36,12 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
+ 
   MX::Matrix<int> incidence_;
+
+  MX::Matrix<double> resistance_;
+  MX::Matrix<double> eds_;
+
   MX::Matrix<double> circs_;
   MX::Matrix<double> inc_cut_;
 
@@ -67,9 +72,6 @@ private:
     GREY,
     BLACK
   };
-
-  MX::Matrix<double> make_eds_matr() const;
-  MX::Matrix<double> make_res_matr() const;
 
   void fill_inc_cut(const std::unordered_set<size_t> &j_loops);
 
