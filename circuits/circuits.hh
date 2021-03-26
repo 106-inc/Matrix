@@ -2,10 +2,10 @@
 #define CIRC_CIRCUITS_HH
 
 #include "../lin_alg/matrix.hh"
-#include <fstream>
 #include <cstdlib>
-#include <unordered_set>
+#include <fstream>
 #include <stack>
+#include <unordered_set>
 
 // TODO: найти где будут Edge
 
@@ -36,7 +36,7 @@ class Circuit final
 {
 private:
   std::vector<Edge> edges_;
- 
+
   MX::Matrix<int> incidence_;
 
   MX::Matrix<double> resistance_;
