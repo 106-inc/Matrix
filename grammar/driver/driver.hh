@@ -47,6 +47,8 @@ public:
 
   bool parse();
 
+  void solve();
+
   void insert(size_t junc1, size_t junc2, float rtor, float voltage);
 
   parser::token_type yylex(parser::semantic_type *yylval, parser::location_type *yylloc);
