@@ -29,7 +29,7 @@ private:
   std::unordered_map<size_t, size_t> juncs;
   std::unordered_set<size_t> unique_juncs_with_loops;
 
-  size_t max_junc_{};
+  size_t max_junc_{0};
 
   OurFlexLexer *plex_; // maybe this is good name
   std::vector<std::string> lines_of_prog;
@@ -55,7 +55,7 @@ public:
 
   void report_syntax_error(const parser::context &ctx);
 
-  void dump();
+  void dump() const;
 
   void print_curs(const MX::Matrix<double> &curs);
 

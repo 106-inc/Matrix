@@ -121,9 +121,7 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
   if (junc1 == junc2)
     unique_juncs_with_loops.insert(juncs[junc1]);
 
-  Edges_.push_back({junc1, junc2, rtor, voltage});
-
-  return;
+  Edges_.emplace_back(junc1, junc2, rtor, voltage);
 }
 
 //!  Function for processing syntax error during parsing
@@ -172,7 +170,7 @@ void yy::Driver::report_syntax_error(const parser::context &ctx)
   std::cerr << std::endl;
 }
 
-void yy::Driver::dump()
+void yy::Driver::dump() const
 {
   for (auto &&edge : Edges_)
   {

@@ -350,7 +350,7 @@ template <typename DataT> size_t Matrix<DataT>::rows() const noexcept
 template <typename DataT> DataT Matrix<DataT>::det() const
 {
   if (!std::is_floating_point<DataT>::value)
-    throw std::bad_typeid();
+    throw std::runtime_error("det() method only for floating point types");
 
   if ((cols_ != rows_))
     throw std::range_error("Matrix should be square.");
@@ -613,7 +613,7 @@ template <typename DataT> Matrix<DataT> Matrix<DataT>::GaussFWD() const
   Matrix<DataT> mat_cpy{*this};
 
   if (!std::is_floating_point<DataT>::value)
-    throw std::bad_typeid();
+    throw std::runtime_error("GaussFWD method only for floating point types");
 
   for (size_t d_idx = 0, end = std::min(rows_, cols_ - 1); d_idx < end; ++d_idx)
   {
