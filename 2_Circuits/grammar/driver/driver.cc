@@ -111,12 +111,10 @@ void yy::Driver::insert(size_t junc1, size_t junc2, float rtor, float voltage)
 {
   //! Insertion new edge to structure
 
-  static size_t counter = 0;
-
   if (!juncs.contains(junc1))
-    juncs[junc1] = counter++;
+    juncs[junc1] = juncs.size();
   if (!juncs.contains(junc2))
-    juncs[junc2] = counter++;
+    juncs[junc2] = juncs.size();
 
   if (junc1 == junc2)
     unique_juncs_with_loops.insert(juncs[junc1]);
