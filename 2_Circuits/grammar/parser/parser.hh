@@ -2,6 +2,7 @@
 #define CIRC_PARSER_HH
 
 #include <iostream>
+#include <cctype>
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
