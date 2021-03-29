@@ -11,7 +11,7 @@
 
 %code requires
 {
-namespace yy { class Driver; };
+namespace yy { class Driver; }
 
 #include <string>
 #include "../circuits/circuits.hh"
