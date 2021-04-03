@@ -17,7 +17,7 @@ set(WARN_OPTIONS
   -Wuseless-cast
   -Wunreachable-code)
 
-add_executable(${EX_NAME} main.cc chain.cc matrix/matrix.cc)
+add_executable(${EX_NAME} main.cc matrix/matrix.cc)
 
 target_include_directories(${EX_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${EX_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
