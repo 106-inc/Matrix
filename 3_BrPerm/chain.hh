@@ -51,21 +51,23 @@ namespace chain
     MX::Matrix<size_t> braces{num_of_mat, num_of_mat};
 
     for (size_t l = 1; l < num_of_mat; ++l)
-      for (size_t i = 0; i < num_of_mat - 1; ++i)
+      for (size_t i = 0; i < num_of_mat - l; ++i)
       {
-        size_t j = i + 1;
+        size_t j = i + l;
         calcs.set(i, j, std::numeric_limits<size_t>::max());
         for (size_t k = i; k < j; ++k)
         {
-          size_t to_set = calcs[i][k] + calcs[k + 1][j] + sizes_[i - 1] * sizes_[k] * sizes_[j];
+          size_t to_set = calcs[i][k] + calcs[k + 1][j] + sizes_[i] * sizes_[k + 1] * sizes_[j + 1];
           size_t min_set = std::min(calcs[i][j], to_set); 
           if (min_set == to_set)
-            braces.set(i, j, k);
-
-          calcs.set(i, j, min_set);
+          {
+            braces.set(i, j, k + 1);
+            calcs.set(i, j, to_set);
+          }
         }
       }
     std::cout << braces;
+    std::cout << calcs[0][num_of_mat - 1] << std::endl;
   }
 }
 
