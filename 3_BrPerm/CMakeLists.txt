@@ -14,6 +14,7 @@ set(PR_RELEASE_OPTIONS -O2)
 set(WARN_OPTIONS 
   -Wall -Wextra -Wunused -Wpedantic # classic
   -Wno-old-style-cast -Waggressive-loop-optimizations 
+  -Weffc++
   -Wuseless-cast
   -Wunreachable-code)
 
