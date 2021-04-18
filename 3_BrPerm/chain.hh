@@ -26,10 +26,7 @@ namespace chain
     bool operator< (const SubChain & rhs) const
     {
       if (cut_ == rhs.cut_)
-      {
         return to_ < rhs.to_;
-        std::cerr << "SubChain::operator< (cut == rhs.cut_)\n";
-      }
       return cut_ < rhs.cut_;
     }
     /* TODO: check is it okay */
