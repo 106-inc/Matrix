@@ -1,10 +1,11 @@
 #ifndef __CHAIN_H__
 #define __CHAIN_H__
 
+#include "matrix.hh"
 #include <limits>
+#include <memory>
 #include <set>
 #include <stack>
-#include "matrix.hh"
 
 namespace chain
 {
@@ -12,23 +13,61 @@ using ldbl = long double;
 
 namespace detail
 {
-struct SubChain final
+struct SubChain;
+using pSChain = std::unique_ptr<SubChain>;
+
+struct Interval final 
 {
-  size_t from_, to_, cut_;
+  size_t from_{}, to_{}, cut_{};
 
-  SubChain(size_t from, size_t to, size_t cut = 0) : from_(from), to_(to), cut_(cut){};
-
-  SubChain() = default;
-
-  bool operator<(const SubChain &rhs) const
+  bool operator <( const Interval &rhs ) const
   {
     if (cut_ == rhs.cut_)
       return to_ < rhs.to_;
     return cut_ < rhs.cut_;
   }
+};
+
+struct SubChain final
+{
+  Interval interv{};
+  pSChain left{}, right{};
+
+  SubChain(Interval inter, pSChain l = {}, pSChain r = {})
+      : interv(inter), left(std::move(l)), right(std::move(r)){};
+
+  void insert( const Interval &to_insert )
+  {
+    auto cur_node = this;
+  
+    while (1)
+    {
+      if (to_insert < cur_node->interv)
+      {
+        if (!cur_node->left)
+        {
+          cur_node->left = std::make_unique<SubChain>(to_insert);
+          return;
+        }
+        cur_node = cur_node->left.get();
+      }
+      else
+      {
+        if (!cur_node->right)
+        {
+          cur_node->right = std::make_unique<SubChain>(to_insert);
+          return;
+        }
+        cur_node = cur_node->right.get();
+      }
+    }
+  }
+
+  SubChain() = default;
+
   /* TODO: check is it okay */
 };
-}
+} // namespace detail
 
 class MatrixChain final
 {
@@ -72,7 +111,7 @@ public:
 private:
   void order_recalc();
 
-  std::set<detail::SubChain> fill_mul_tree();
+  detail::pSChain fill_mul_tree();
 };
 
 void MatrixChain::order_recalc()
@@ -104,36 +143,55 @@ void MatrixChain::order_recalc()
 
 MX::Matrix<ldbl> MatrixChain::multiply()
 {
-  auto mul_tree = fill_mul_tree();
+  auto root = fill_mul_tree();
   order_.clear();
   order_.reserve(braces_mat_.cols() - 1);
-  // here we perform multiplication
-  auto cur_matr_it = mul_tree.begin(), matr_end_it = mul_tree.end();
+  
+  // here we walk through the tree and perform multiplication & fill order vec
+  std::stack<detail::SubChain *> to_visit;
 
-  auto res_matr = chain_[cur_matr_it->from_];
-  order_.emplace_back(cur_matr_it->from_);
-  ++cur_matr_it;
+  auto cur_node = root.get();
 
-  while (cur_matr_it != matr_end_it)
+  MX::Matrix<ldbl> res{};
+
+  while (1)
   {
-    if (cur_matr_it->from_ == cur_matr_it->to_)
+    if (!cur_node->left)
     {
-      res_matr *= chain_[cur_matr_it->from_];
-      order_.emplace_back(cur_matr_it->from_);
-    }
+      auto new_mat_ind = cur_node->interv.from_;
+      if (!res.cols())
+        // means that it is the first matrix in multiplication chain
+        res = chain_[new_mat_ind];
+      else
+        res *= chain_[new_mat_ind];
 
-    ++cur_matr_it;
+      order_.emplace_back(new_mat_ind);
+
+      if (to_visit.empty())
+        break;
+      cur_node = to_visit.top();
+      to_visit.pop();
+      continue;
+    }
+    
+    // here we push to visiting list (actually stack) right
+    // node, but go to left
+    to_visit.emplace(cur_node->right.get());
+
+    cur_node = cur_node->left.get();
   }
 
   for (auto elem : order_)
     std::cout << elem << " ";
   std::cout << std::endl;
-  return res_matr;
+  return res;
 }
 
-std::set<detail::SubChain> MatrixChain::fill_mul_tree()
+detail::pSChain MatrixChain::fill_mul_tree()
 {
-  std::set<detail::SubChain> mul_tree{};
+  size_t num_of_mat = chain_.size();
+  detail::Interval init_int = {0, num_of_mat - 1, braces_mat_[0][num_of_mat - 1] - 1};
+  detail::pSChain root = std::make_unique<detail::SubChain>(init_int);
 
   if (braces_mat_.cols() != sizes_.size() + 1)
   {
@@ -141,10 +199,9 @@ std::set<detail::SubChain> MatrixChain::fill_mul_tree()
     order_.clear();
   }
 
-  size_t num_of_mat = chain_.size();
-
   std::stack<std::pair<size_t, size_t>> idx_stack{};
-  idx_stack.emplace(0, num_of_mat - 1);
+  idx_stack.emplace(0, root->interv.cut_);
+  idx_stack.emplace(root->interv.cut_ + 1, num_of_mat - 1);
 
   size_t start = 0, end = 0;
 
@@ -158,19 +215,20 @@ std::set<detail::SubChain> MatrixChain::fill_mul_tree()
 
     if (start == end)
     {
-      mul_tree.emplace(start, end, end);
+      //mul_tree.emplace(start, end, end);
+      root->insert({start, end, end});
       continue;
     }
 
     size_t cut = braces_mat_[start][end];
 
-    mul_tree.emplace(start, end, cut - 1);
+    root->insert({start, end, cut - 1});
 
     idx_stack.emplace(start, cut - 1);
     idx_stack.emplace(cut, end);
   }
 
-  return mul_tree;
+  return root;
 }
 
 } // namespace chain
