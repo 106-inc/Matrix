@@ -27,7 +27,8 @@ namespace chain
     {
       if (cut_ == rhs.cut_)
       {
-        std::cerr << "SubChain::operator< (cut == rhs.cut_)";
+        return to_ < rhs.to_;
+        std::cerr << "SubChain::operator< (cut == rhs.cut_)\n";
       }
       return cut_ < rhs.cut_;
     }
@@ -132,7 +133,7 @@ namespace chain
 
       size_t cut = braces[start][end];
 
-      mul_tree.emplace(start, end, cut);
+      mul_tree.emplace(start, end, cut - 1);
 
       idx_stack.emplace(start, cut - 1);
       idx_stack.emplace(cut, end);
