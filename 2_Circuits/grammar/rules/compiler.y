@@ -14,12 +14,12 @@
 namespace yy { class Driver; }
 
 #include <string>
-#include "../circuits/circuits.hh"
+#include "circuits.hh"
 }
 
 %code
 {
-#include "../grammar/driver/driver.hh"
+#include "driver.hh"
 
 namespace yy
 {

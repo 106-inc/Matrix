@@ -7,8 +7,8 @@
 
 %{
 
-#include "../FB_BLD/compiler.tab.hh"
-#include "../grammar/parser/parser.hh"
+#include "compiler.tab.hh"
+#include "parser.hh"
 
 #define YY_USER_ACTION upd_cur_loc();
 

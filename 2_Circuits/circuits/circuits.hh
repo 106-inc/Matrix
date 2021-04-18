@@ -1,7 +1,7 @@
 #ifndef CIRC_CIRCUITS_HH
 #define CIRC_CIRCUITS_HH
 
-#include "../lin_alg/matrix.hh"
+#include "matrix.hh"
 #include <cstdlib>
 #include <fstream>
 #include <stack>
