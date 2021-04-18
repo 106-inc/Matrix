@@ -1,6 +1,8 @@
 #ifndef __CHAIN_H__
 #define __CHAIN_H__
 
+#include <set>
+#include <stack>
 #include <limits>
 #include "matrix.hh"
 
@@ -38,12 +40,15 @@ namespace chain
     }
 
     ~MatrixChain() = default;
+
+    MX::Matrix<ldbl> multiply ( );
+
   private:
-    void order_recalc();
+    MX::Matrix<size_t> order_recalc();
   };
 
 
-  void MatrixChain::order_recalc()
+  MX::Matrix<size_t> MatrixChain::order_recalc()
   {
     size_t num_of_mat = chain_.size();
 
@@ -68,7 +73,44 @@ namespace chain
       }
     std::cout << braces;
     std::cout << calcs[0][num_of_mat - 1] << std::endl;
+
+    return braces;
   }
+
+  MX::Matrix<ldbl> MatrixChain::multiply ( )
+  {
+    std::set<SubChain> mul_tree{};
+
+    auto braces = order_recalc();
+
+    size_t num_of_mat = chain_.size();
+    size_t last_idx = num_of_mat - 1;
+
+    std::stack<std::pair<size_t, size_t>> idx_st{};
+    idx_st.emplace(0, last_idx);
+
+    while (!idx_st.empty())
+    {
+      /* write main cycle */
+    }
+
+  }
+
+  struct SubChain final
+  {
+  public:
+
+    size_t from_, to_, cut_;
+
+  public:
+
+    SubChain ( size_t from, size_t to, size_t cut = 0 ) : from_(from), to_(to), cut_(cut)
+    {};
+
+    SubChain ( ) = default;
+
+    /* TODO: redefine spaceship operator or all cmp operators */
+  };
 }
 
 #endif // __CHAIN_H__
