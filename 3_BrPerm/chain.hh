@@ -86,13 +86,31 @@ namespace chain
     size_t num_of_mat = chain_.size();
     size_t last_idx = num_of_mat - 1;
 
-    std::stack<std::pair<size_t, size_t>> idx_st{};
-    idx_st.emplace(0, last_idx);
+    std::stack<std::pair<size_t, size_t>> idx_stack{};
+    idx_stack.emplace(0, last_idx);
 
-    while (!idx_st.empty())
+    size_t start, end;
+
+    while (!idx_stack.empty())
     {
-      /* write main cycle */
+      auto cur_p = idx_stack.top();
+      idx_stack.pop();
+
+      start = cur_p.first;
+      end = cur_p.second;
+
+      if (start == end)
+        continue;
+
+      size_t cut = braces[start][end];
+
+      mul_tree.emplace(start, end, cut);
+
+      idx_stack.emplace(start, cut);
+      idx_stack.emplace(cut + 1, end);
     }
+
+    /* Make multiplication itself */
 
   }
 
