@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "../parser/parser.hh"
+#include "parser.hh"
 #include "matrix.hh"
 
 #ifndef yyFlexLexer
