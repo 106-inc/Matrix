@@ -56,6 +56,8 @@ public:
       throw std::runtime_error{"Incompatible matrix size"};
     else
       sizes_.push_back(mat.cols());
+
+    order_recalc();
   }
 
   const std::vector<size_t> &get_order() const
@@ -69,6 +71,8 @@ public:
 
 private:
   void order_recalc();
+
+  std::set<detail::SubChain> fill_mul_tree();
 };
 
 void MatrixChain::order_recalc()
@@ -94,23 +98,55 @@ void MatrixChain::order_recalc()
         }
       }
     }
-  std::cout << braces_mat_;
-  std::cout << calcs[0][num_of_mat - 1] << std::endl;
+  /*std::cout << braces_mat_;
+  std::cout << calcs[0][num_of_mat - 1] << std::endl;*/
 }
 
 MX::Matrix<ldbl> MatrixChain::multiply()
 {
+  auto mul_tree = fill_mul_tree();
+  order_.clear();
+  order_.reserve(braces_mat_.cols() - 1);
+  // here we perform multiplication
+  auto cur_matr_it = mul_tree.begin(), matr_end_it = mul_tree.end();
+
+  auto res_matr = chain_[cur_matr_it->from_];
+  order_.emplace_back(cur_matr_it->from_);
+  ++cur_matr_it;
+
+  while (cur_matr_it != matr_end_it)
+  {
+    if (cur_matr_it->from_ == cur_matr_it->to_)
+    {
+      res_matr *= chain_[cur_matr_it->from_];
+      order_.emplace_back(cur_matr_it->from_);
+    }
+
+    ++cur_matr_it;
+  }
+
+  for (auto elem : order_)
+    std::cout << elem << " ";
+  std::cout << std::endl;
+  return res_matr;
+}
+
+std::set<detail::SubChain> MatrixChain::fill_mul_tree()
+{
   std::set<detail::SubChain> mul_tree{};
 
   if (braces_mat_.cols() != sizes_.size() + 1)
+  {
     order_recalc();
+    order_.clear();
+  }
 
   size_t num_of_mat = chain_.size();
 
   std::stack<std::pair<size_t, size_t>> idx_stack{};
   idx_stack.emplace(0, num_of_mat - 1);
 
-  size_t start, end;
+  size_t start = 0, end = 0;
 
   while (!idx_stack.empty())
   {
@@ -134,20 +170,9 @@ MX::Matrix<ldbl> MatrixChain::multiply()
     idx_stack.emplace(cut, end);
   }
 
-  auto cur_matr_it = mul_tree.begin(), matr_end_it = mul_tree.end();
-
-  auto res_matr = chain_[cur_matr_it->from_];
-
-  while (cur_matr_it != matr_end_it)
-  {
-    if (cur_matr_it->from_ == cur_matr_it->to_)
-      res_matr *= chain_[cur_matr_it->from_];
-
-    ++cur_matr_it;
-  }
-
-  return res_matr;
+  return mul_tree;
 }
+
 } // namespace chain
 
 #endif // __CHAIN_H__
