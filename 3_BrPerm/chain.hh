@@ -1,21 +1,21 @@
 #ifndef __CHAIN_H__
 #define __CHAIN_H__
 
-#include "matrix.hh"
 #include <limits>
 #include <set>
 #include <stack>
+#include "matrix.hh"
 
 namespace chain
 {
 using ldbl = long double;
 
+namespace detail
+{
 struct SubChain final
 {
-public:
   size_t from_, to_, cut_;
 
-public:
   SubChain(size_t from, size_t to, size_t cut = 0) : from_(from), to_(to), cut_(cut){};
 
   SubChain() = default;
@@ -28,6 +28,7 @@ public:
   }
   /* TODO: check is it okay */
 };
+}
 
 class MatrixChain final
 {
@@ -36,6 +37,8 @@ private:
   std::vector<size_t> order_{};
 
   std::vector<size_t> sizes_{};
+
+  MX::Matrix<size_t> braces_mat_{};
 
 public:
   MatrixChain() = default;
@@ -47,15 +50,17 @@ public:
   void push(const MX::Matrix<ldbl> &mat)
   {
     chain_.emplace_back(mat);
-    order_.push_back(order_.size());
     if (sizes_.size() == 0)
       sizes_.push_back(mat.rows()), sizes_.push_back(mat.cols());
     else if (sizes_.back() != mat.rows())
       throw std::runtime_error{"Incompatible matrix size"};
     else
       sizes_.push_back(mat.cols());
+  }
 
-    order_recalc();
+  const std::vector<size_t> &get_order() const
+  {
+    return order_;
   }
 
   ~MatrixChain() = default;
@@ -63,15 +68,15 @@ public:
   MX::Matrix<ldbl> multiply();
 
 private:
-  MX::Matrix<size_t> order_recalc();
+  void order_recalc();
 };
 
-MX::Matrix<size_t> MatrixChain::order_recalc()
+void MatrixChain::order_recalc()
 {
   size_t num_of_mat = chain_.size();
 
   MX::Matrix<size_t> calcs{num_of_mat, num_of_mat};
-  MX::Matrix<size_t> braces{num_of_mat, num_of_mat};
+  braces_mat_ = MX::Matrix<size_t>{num_of_mat, num_of_mat};
 
   for (size_t l = 1; l < num_of_mat; ++l)
     for (size_t i = 0; i < num_of_mat - l; ++i)
@@ -84,28 +89,26 @@ MX::Matrix<size_t> MatrixChain::order_recalc()
         size_t min_set = std::min(calcs[i][j], to_set);
         if (min_set == to_set)
         {
-          braces.set(i, j, k + 1);
+          braces_mat_.set(i, j, k + 1);
           calcs.set(i, j, to_set);
         }
       }
     }
-  std::cout << braces;
+  std::cout << braces_mat_;
   std::cout << calcs[0][num_of_mat - 1] << std::endl;
-
-  return braces;
 }
 
 MX::Matrix<ldbl> MatrixChain::multiply()
 {
-  std::set<SubChain> mul_tree{};
+  std::set<detail::SubChain> mul_tree{};
 
-  auto braces = order_recalc();
+  if (braces_mat_.cols() != sizes_.size() + 1)
+    order_recalc();
 
   size_t num_of_mat = chain_.size();
-  size_t last_idx = num_of_mat - 1;
 
   std::stack<std::pair<size_t, size_t>> idx_stack{};
-  idx_stack.emplace(0, last_idx);
+  idx_stack.emplace(0, num_of_mat - 1);
 
   size_t start, end;
 
@@ -123,7 +126,7 @@ MX::Matrix<ldbl> MatrixChain::multiply()
       continue;
     }
 
-    size_t cut = braces[start][end];
+    size_t cut = braces_mat_[start][end];
 
     mul_tree.emplace(start, end, cut - 1);
 
