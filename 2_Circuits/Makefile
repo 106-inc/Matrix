@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 WRNNG_OPTNS = -Wall -Wextra -Wpedantic -Wunused -Wno-old-style-cast -Waggressive-loop-optimizations -Wnon-virtual-dtor -Wuseless-cast
-CXX = g++ --std=c++2a -O2 -g
+CXX = g++ --std=c++2a -O2 -g -I ../matrix
 
 FB_BLD = FB_BLD
 BLD = BLD_DIR
@@ -10,7 +10,7 @@ FNB = grammar/rules
 DRVR = grammar/driver
 PSR = grammar/parser
 CRC = circuits
-LA = lin_alg
+LA = ../matrix
 
 
 all: start

@@ -1,8 +1,8 @@
 #ifndef CIRC_PARSER_HH
 #define CIRC_PARSER_HH
 
-#include <iostream>
 #include <cctype>
+#include <iostream>
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
