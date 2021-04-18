@@ -126,6 +126,7 @@ namespace chain
 
       if (start == end)
       {
+        mul_tree.emplace(start, end, end);
         continue;
       }
 
