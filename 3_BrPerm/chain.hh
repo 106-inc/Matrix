@@ -10,6 +10,30 @@ namespace chain
 {
   using ldbl = long double;
 
+  struct SubChain final
+  {
+  public:
+
+    size_t from_, to_, cut_;
+
+  public:
+
+    SubChain ( size_t from, size_t to, size_t cut = 0 ) : from_(from), to_(to), cut_(cut)
+    {};
+
+    SubChain ( ) = default;
+
+    bool operator< (const SubChain & rhs) const
+    {
+      if (cut_ == rhs.cut_)
+      {
+        std::cerr << "SubChain::operator< (cut == rhs.cut_)";
+      }
+      return cut_ < rhs.cut_;
+    }
+    /* TODO: check is it okay */
+  };
+
   class MatrixChain final
   {
   private:
@@ -44,6 +68,7 @@ namespace chain
     MX::Matrix<ldbl> multiply ( );
 
   private:
+
     MX::Matrix<size_t> order_recalc();
   };
 
@@ -100,35 +125,33 @@ namespace chain
       end = cur_p.second;
 
       if (start == end)
+      {
         continue;
+      }
 
       size_t cut = braces[start][end];
 
       mul_tree.emplace(start, end, cut);
 
-      idx_stack.emplace(start, cut);
-      idx_stack.emplace(cut + 1, end);
+      idx_stack.emplace(start, cut - 1);
+      idx_stack.emplace(cut, end);
     }
 
-    /* Make multiplication itself */
+    auto cur_matr_it = mul_tree.begin(),
+         matr_end_it = mul_tree.end();
 
+    auto res_matr = chain_[cur_matr_it->from_];
+
+    while (cur_matr_it != matr_end_it)
+    {
+      if(cur_matr_it->from_ == cur_matr_it->to_)
+        res_matr *= chain_[cur_matr_it->from_];
+      
+      ++cur_matr_it;
+    }
+
+    return res_matr;
   }
-
-  struct SubChain final
-  {
-  public:
-
-    size_t from_, to_, cut_;
-
-  public:
-
-    SubChain ( size_t from, size_t to, size_t cut = 0 ) : from_(from), to_(to), cut_(cut)
-    {};
-
-    SubChain ( ) = default;
-
-    /* TODO: redefine spaceship operator or all cmp operators */
-  };
 }
 
 #endif // __CHAIN_H__
