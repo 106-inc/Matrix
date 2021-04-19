@@ -1,43 +1,60 @@
 #include "chain.hh"
 
-int main(void)
+void naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>>& mtr_vec)
 {
-#if 0
-  chain::MatrixChain ch;
-  size_t amount{};
-  std::cin >> amount;
+  MX::Matrix<chain::ldbl> res = mtr_vec[0];
 
+  for (size_t i = 1; i < amount; ++i)
+    res *= mtr_vec[i];
+  
+  std::cout << "Naive mul:" << std::endl;
+  std::cout << res << std::endl;
+}
+
+void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>>& mtr_vec)
+{
   int tmp_elem = 0;
+  std::vector<double> matr_buf{};
 
   for (size_t i = 0; i < amount; ++i)
   {
-    std::vector<double> matr_buf;
     size_t rw = 0, cl = 0;
     std::cin >> rw >> cl;
-    matr_buf.resize(rw * cl);
 
     for (size_t i = 0; i < rw * cl; ++i)
     {
       std::cin >> tmp_elem;
-      matr_buf[i] = tmp_elem;
+      matr_buf.push_back(tmp_elem);
     }
 
-    ch.push(MX::Matrix<chain::ldbl>{rw, cl, matr_buf.begin(), matr_buf.end()});
-  
-    for (size_t i = 0; i < rw * cl; ++i)
-      std::cout << matr_buf[i] << " ";
-    
-    std::cout << std::endl;
-
+    mtr_vec.push_back(MX::Matrix<chain::ldbl>{rw, cl, matr_buf.begin(), matr_buf.end()});
     matr_buf.clear();
   }
+}
+
+int main(void)
+{
+
+  chain::MatrixChain ch;
+  size_t amount{};
+  std::cin >> amount;
+  std::vector<MX::Matrix<chain::ldbl>> mtr_vec;
+
+  matr_init(amount, mtr_vec);
+
+  naive_mul(amount, mtr_vec);
+
+  for (size_t i = 0; i < amount; ++i)
+    ch.push(mtr_vec[i]);
 
   auto res = ch.multiply();
 
-  std::cout << res;
+  std::cout << "Optimal mul:" << std::endl;
+  std::cout << res << std::endl;
 
   return 0;
-#endif
+
+#if 0
 
   chain::MatrixChain ch;
 
@@ -54,4 +71,5 @@ int main(void)
   std::cout << res << std::endl;
 
   return 0;
+#endif
 }
