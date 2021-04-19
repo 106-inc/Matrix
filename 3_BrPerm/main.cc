@@ -61,11 +61,9 @@ int main()
 
 #if (TIME == 1)
   Time::Timer optim_time;
-#endif
 
-  auto res = ch.multiply();
+  auto res = ch.multiplied();
 
-#if (TIME == 1)
   auto measured_opt = optim_time.elapsed();
   std::cout << "optimal multiplication time: " << measured_opt << " microsecs\n";
 
