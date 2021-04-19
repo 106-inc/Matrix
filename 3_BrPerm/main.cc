@@ -32,7 +32,7 @@ void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
   }
 }
 
-int main(void)
+int main()
 {
 
   chain::MatrixChain ch;
