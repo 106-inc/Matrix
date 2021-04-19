@@ -54,7 +54,8 @@ void MatrixChain::push(const MX::Matrix<ldbl> &mat)
   else
     sizes_.push_back(mat.cols());
 
-  order_recalc();
+  set_braces();
+  fill_order();
 }
 
 const std::vector<size_t> &MatrixChain::get_order() const
@@ -62,7 +63,7 @@ const std::vector<size_t> &MatrixChain::get_order() const
   return order_;
 }
 
-void MatrixChain::order_recalc()
+void MatrixChain::set_braces()
 {
   size_t num_of_mat = chain_.size();
 
@@ -85,15 +86,16 @@ void MatrixChain::order_recalc()
         }
       }
     }
+
 }
 
-MX::Matrix<ldbl> MatrixChain::multiply()
+void MatrixChain::fill_order()
 {
-  auto root = fill_mul_tree();
+  auto root = fill_mul_tree(); // here we build a matrix chain tree
   order_.clear();
   order_.reserve(braces_mat_.cols() - 1);
 
-  // here we walk through the tree and perform multiplication & fill order vec
+  // here we just fill an order vector
 
   auto cur_node = root.get();
 
@@ -140,8 +142,13 @@ MX::Matrix<ldbl> MatrixChain::multiply()
       to_visit.emplace(cur_node->right.get(), false);
     }
   }
+}
 
-  // actually perform multiplication
+MX::Matrix<ldbl> MatrixChain::multiply() const
+{
+  if (chain_.size() == 0)
+    throw std::runtime_error{"You can't multiply empty chain"};
+
   auto res = chain_[order_.front()];
 
   for (size_t i = 1, endi = order_.size(); i < endi; ++i)
@@ -161,12 +168,8 @@ detail::pSChain MatrixChain::fill_mul_tree()
   size_t num_of_mat = chain_.size();
   detail::Interval init_int = {0, num_of_mat - 1, braces_mat_[0][num_of_mat - 1] - 1};
   detail::pSChain root = std::make_unique<detail::SubChain>(init_int);
-
-  if (braces_mat_.cols() != sizes_.size() + 1)
-  {
-    order_recalc();
-    order_.clear();
-  }
+  if (num_of_mat == 1)
+    return root;
 
   std::stack<std::pair<size_t, size_t>> idx_stack{};
   idx_stack.emplace(0, root->interv.cut_);
