@@ -1,3 +1,4 @@
+#include <fstream>
 #include "chain.hh"
 #include "timer.hh"
 
@@ -31,6 +32,14 @@ void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 
 int main()
 {
+#if (REDIRECT == 1)
+  std::ifstream ifs("../test/5.dat");
+  if (!ifs)
+    return -1;
+
+  std::cin.rdbuf(ifs.rdbuf());
+
+#endif // REDIRECT
 
   chain::MatrixChain ch;
   size_t amount{};
@@ -45,8 +54,6 @@ int main()
     ch.push(mtr_vec[i]);
 
   auto res = ch.multiply();
-
-
 
   if (res == naive_res)
     std::cout << "Test passed" << std::endl;
@@ -69,5 +76,8 @@ int main()
   
 #endif
 
+#if (REDIRECT == 1)
+  ifs.close();
+#endif
   return 0;
 }
