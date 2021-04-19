@@ -16,11 +16,11 @@ namespace detail
 struct SubChain;
 using pSChain = std::unique_ptr<SubChain>;
 
-struct Interval final 
+struct Interval final
 {
   size_t from_{}, to_{}, cut_{};
 
-  bool operator <( const Interval &rhs ) const
+  bool operator<(const Interval &rhs) const
   {
     if (cut_ == rhs.cut_)
       return to_ < rhs.to_;
@@ -33,13 +33,12 @@ struct SubChain final
   Interval interv{};
   pSChain left{}, right{};
 
-  SubChain(Interval inter, pSChain l = {}, pSChain r = {})
-      : interv(inter), left(std::move(l)), right(std::move(r)){};
+  SubChain(Interval inter, pSChain l = {}, pSChain r = {}) : interv(inter), left(std::move(l)), right(std::move(r)){};
 
-  void insert( const Interval &to_insert )
+  void insert(const Interval &to_insert)
   {
     auto cur_node = this;
-  
+
     while (1)
     {
       if (to_insert < cur_node->interv)
@@ -63,7 +62,7 @@ struct SubChain final
     }
   }
 
-  bool is_leaf( )
+  bool is_leaf()
   {
     return !left && !right;
   }
@@ -151,13 +150,12 @@ MX::Matrix<ldbl> MatrixChain::multiply()
   auto root = fill_mul_tree();
   order_.clear();
   order_.reserve(braces_mat_.cols() - 1);
-  
+
   // here we walk through the tree and perform multiplication & fill order vec
 
   auto cur_node = root.get();
 
   MX::Matrix<ldbl> res{};
-
 
   using vis_el = std::pair<detail::SubChain *, bool>;
   using mat_el = std::pair<MX::Matrix<ldbl>, int>;
@@ -171,7 +169,7 @@ MX::Matrix<ldbl> MatrixChain::multiply()
 
   while (!to_visit.empty())
   {
-    auto & cur_top = to_visit.top();
+    auto &cur_top = to_visit.top();
     cur_node = cur_top.first;
 
     if (cur_node->is_leaf())
@@ -181,7 +179,7 @@ MX::Matrix<ldbl> MatrixChain::multiply()
       to_visit.pop();
       continue;
     }
-    
+
     if (cur_top.second)
     {
       auto ms_el1 = mx_stack.top();
@@ -189,8 +187,7 @@ MX::Matrix<ldbl> MatrixChain::multiply()
       auto ms_el2 = mx_stack.top();
       mx_stack.pop();
 
-      auto & m1 = ms_el1.first,
-           & m2 = ms_el2.first;
+      auto &m1 = ms_el1.first, &m2 = ms_el2.first;
 
       if (ms_el1.second != MULTED)
         order_.push_back(ms_el1.second);
@@ -239,7 +236,6 @@ detail::pSChain MatrixChain::fill_mul_tree()
 
     if (start == end)
     {
-      //mul_tree.emplace(start, end, end);
       root->insert({start, end, end});
       continue;
     }

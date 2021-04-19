@@ -1,17 +1,17 @@
 #include "chain.hh"
 
-void naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>>& mtr_vec)
+void naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   MX::Matrix<chain::ldbl> res = mtr_vec[0];
 
   for (size_t i = 1; i < amount; ++i)
     res *= mtr_vec[i];
-  
+
   std::cout << "Naive mul:" << std::endl;
   std::cout << res << std::endl;
 }
 
-void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>>& mtr_vec)
+void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   int tmp_elem = 0;
   std::vector<double> matr_buf{};
