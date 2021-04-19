@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 def matrix_product(p):
     """Return m and s.
 
@@ -73,13 +75,13 @@ def print_parenthesization(s, start, end):
     print(')', end='')
 
 
-n = int(input('Enter number of matrices: '))
+n = int(input())
 p = []
+temp_lst = None
 for i in range(n):
-    temp = int(input('Enter number of rows in matrix {}: '.format(i + 1)))
-    p.append(temp)
-temp = int(input('Enter number of columns in matrix {}: '.format(n)))
-p.append(temp)
+    temp_lst = input().split()
+    p.append(int(temp_lst[0]))
+p.append(int(temp_lst[1]))
 
 m, s = matrix_product(p)
 print('The number of scalar multiplications needed:', m[1][n])
