@@ -97,13 +97,11 @@ MX::Matrix<ldbl> MatrixChain::multiply()
 
   auto cur_node = root.get();
 
-  MX::Matrix<ldbl> res{};
-
   using vis_el = std::pair<detail::SubChain *, bool>;
-  using mat_el = std::pair<MX::Matrix<ldbl>, int>;
+  // using mat_el = std::pair<MX::Matrix<ldbl>, int>;
 
   std::stack<vis_el> to_visit;
-  std::stack<mat_el> mx_stack{};
+  std::stack<int> mx_stack{};
 
   to_visit.emplace(root.get(), false);
 
@@ -117,7 +115,7 @@ MX::Matrix<ldbl> MatrixChain::multiply()
     if (cur_node->is_leaf())
     {
       auto idx = cur_node->interv.from_;
-      mx_stack.emplace(chain_[idx], idx);
+      mx_stack.emplace(idx);
       to_visit.pop();
     }
     else if (cur_top.second)
@@ -127,14 +125,12 @@ MX::Matrix<ldbl> MatrixChain::multiply()
       auto ms_el2 = mx_stack.top();
       mx_stack.pop();
 
-      auto &m1 = ms_el1.first, &m2 = ms_el2.first;
+      if (ms_el1 != MULTED)
+        order_.push_back(ms_el1);
+      if (ms_el2 != MULTED)
+        order_.push_back(ms_el2);
 
-      if (ms_el1.second != MULTED)
-        order_.push_back(ms_el1.second);
-      if (ms_el2.second != MULTED)
-        order_.push_back(ms_el2.second);
-
-      mx_stack.emplace(m1 * m2, MULTED);
+      mx_stack.emplace(MULTED);
       to_visit.pop();
     }
     else
@@ -145,7 +141,19 @@ MX::Matrix<ldbl> MatrixChain::multiply()
     }
   }
 
-  return mx_stack.top().first;
+  // actually perform multiplication
+  auto res = chain_[order_.front()];
+
+  for (size_t i = 1, endi = order_.size(); i < endi; ++i)
+  {
+    auto &to_mult = chain_[order_[i]];
+    if (res.cols() == to_mult.rows())
+      res *= to_mult;
+    else
+      res = to_mult * res;
+  }
+
+  return res;
 }
 
 detail::pSChain MatrixChain::fill_mul_tree()
