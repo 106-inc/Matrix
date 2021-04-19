@@ -6,6 +6,7 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include "timer.hh"
 
 namespace chain
 {
@@ -50,6 +51,10 @@ private:
 
   MX::Matrix<size_t> braces_mat_{};
 
+  MX::Matrix<ldbl> result_{};
+
+  ldbl elapsed_ms_{};
+
 public:
   MatrixChain() = default;
 
@@ -62,8 +67,9 @@ public:
   // get multiplication order
   const std::vector<size_t> &get_order() const;
 
-  // get result of multiplication
-  MX::Matrix<ldbl> multiply() const;
+  const MX::Matrix<ldbl> &multiplied() const;
+
+  ldbl get_mult_time() const { return elapsed_ms_; }
 
   ~MatrixChain() = default;
 
@@ -71,6 +77,8 @@ private:
   void set_braces();
 
   void fill_order();
+
+  void order_n_mult();
 
   detail::pSChain fill_mul_tree();
 };

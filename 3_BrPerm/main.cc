@@ -1,5 +1,4 @@
 #include "chain.hh"
-#include "timer.hh"
 #include <fstream>
 
 #if (TIME == 1)
@@ -16,7 +15,7 @@ static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<c
 
 void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
-  int matr_lim = 5;
+  int matr_lim = 1;
   std::vector<double> matr_buf{};
 
   for (size_t i = 0; i < amount; ++i)
@@ -64,7 +63,7 @@ int main()
 
   auto res = ch.multiplied();
 
-  auto measured_opt = optim_time.elapsed();
+  auto measured_opt = ch.get_mult_time();
   std::cout << "optimal multiplication time: " << measured_opt << " microsecs\n";
 
   auto gain = static_cast<long double>(measured_naive) / measured_opt;
