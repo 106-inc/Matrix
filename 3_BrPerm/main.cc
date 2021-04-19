@@ -74,7 +74,7 @@ int main()
   if (res == naive_res)
     std::cout << "TEST PASSED" << std::endl;
   else 
-    std::cout << "TEST DIDN'T PASS" << std::endl;
+    std::cout << "TEST FAILED" << std::endl;
 #endif 
 
   std::vector<size_t> optimal_order = ch.get_order();
