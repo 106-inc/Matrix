@@ -51,7 +51,7 @@ public:
   /**
    * @brief Empty matrix ctor
    */
-  Matrix(size_t rows = 0, size_t cols = 0);
+  explicit Matrix(size_t rows = 0, size_t cols = 0);
 
   /**
    * @brief Matrix ctor with data
@@ -76,6 +76,16 @@ public:
    * @param action Filling function/functor/lamda
    */
   template <typename Func> Matrix(size_t rows, size_t cols, Func action);
+  
+  static Matrix Identity(size_t rows, size_t cols)
+  {
+    return {rows, cols, [](size_t i, size_t j){ return static_cast<DataT>(i == j); }};
+  }
+
+  static Matrix Random(size_t rows, size_t cols, int limit)
+  {
+    return {rows, cols, [limit](size_t, size_t){ return rand() % limit; }};
+  }
 
   /**
    * @brief Swap this matrix with rhs
