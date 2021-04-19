@@ -1,6 +1,6 @@
-#include <fstream>
 #include "chain.hh"
 #include "timer.hh"
+#include <fstream>
 
 #if (TIME == 1)
 static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
@@ -10,7 +10,7 @@ static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<c
   for (size_t i = 1; i < amount; ++i)
     res *= mtr_vec[i];
 
-  return res; 
+  return res;
 }
 #endif
 
@@ -59,7 +59,6 @@ int main()
   for (size_t i = 0; i < amount; ++i)
     ch.push(mtr_vec[i]);
 
-
 #if (TIME == 1)
   Time::Timer optim_time;
 #endif
@@ -74,22 +73,21 @@ int main()
   std::cout << "Gain in " << gain << " times" << std::endl;
 #endif
 
-
 #if (TIME == 1)
   if (res == naive_res)
     std::cout << "TEST PASSED" << std::endl;
-  else 
+  else
     std::cout << "TEST FAILED" << std::endl;
-#endif 
+#endif
 
   std::vector<size_t> optimal_order = ch.get_order();
 
 #if (ORDER == 1)
-  for (auto matr: optimal_order)
+  for (auto matr : optimal_order)
     std::cout << matr << " ";
 
   std::cout << std::endl;
-  
+
 #endif
 
 #if (REDIRECT == 1)

@@ -86,7 +86,6 @@ void MatrixChain::set_braces()
         }
       }
     }
-
 }
 
 void MatrixChain::fill_order()

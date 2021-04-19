@@ -57,7 +57,7 @@ public:
   MatrixChain &operator=(const MatrixChain &) = delete;
 
   // add matrix to chain
-  void push(const MX::Matrix<ldbl> &mat); 
+  void push(const MX::Matrix<ldbl> &mat);
 
   // get multiplication order
   const std::vector<size_t> &get_order() const;
@@ -66,6 +66,7 @@ public:
   MX::Matrix<ldbl> multiply() const;
 
   ~MatrixChain() = default;
+
 private:
   void set_braces();
 
