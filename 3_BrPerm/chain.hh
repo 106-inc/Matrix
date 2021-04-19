@@ -2,11 +2,11 @@
 #define __CHAIN_H__
 
 #include "matrix.hh"
+#include "timer.hh"
 #include <limits>
 #include <memory>
 #include <set>
 #include <stack>
-#include "timer.hh"
 
 namespace chain
 {
@@ -69,7 +69,10 @@ public:
 
   const MX::Matrix<ldbl> &multiplied() const;
 
-  ldbl get_mult_time() const { return elapsed_ms_; }
+  ldbl get_mult_time() const
+  {
+    return elapsed_ms_;
+  }
 
   ~MatrixChain() = default;
 

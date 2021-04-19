@@ -8,8 +8,8 @@
 #include <FlexLexer.h>
 #endif /* yyFlexLexer */
 
-#include "compiler.tab.hh"
 #include "circuits.hh"
+#include "compiler.tab.hh"
 
 enum RES_OF_PARSE
 {

@@ -76,15 +76,15 @@ public:
    * @param action Filling function/functor/lamda
    */
   template <typename Func> Matrix(size_t rows, size_t cols, Func action);
-  
+
   static Matrix Identity(size_t rows, size_t cols)
   {
-    return {rows, cols, [](size_t i, size_t j){ return static_cast<DataT>(i == j); }};
+    return {rows, cols, [](size_t i, size_t j) { return static_cast<DataT>(i == j); }};
   }
 
   static Matrix Random(size_t rows, size_t cols, int limit)
   {
-    return {rows, cols, [limit](size_t, size_t){ return rand() % limit; }};
+    return {rows, cols, [limit](size_t, size_t) { return rand() % limit; }};
   }
 
   /**

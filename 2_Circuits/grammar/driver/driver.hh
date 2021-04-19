@@ -8,8 +8,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "parser.hh"
 #include "matrix.hh"
+#include "parser.hh"
 
 #ifndef yyFlexLexer
 #include <FlexLexer.h>
