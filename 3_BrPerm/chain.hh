@@ -208,10 +208,6 @@ MX::Matrix<ldbl> MatrixChain::multiply()
     }
   }
 
-  for (auto elem : order_)
-    std::cout << elem << " ";
-  std::cout << std::endl;
-
   return mx_stack.top().first;
 }
 
