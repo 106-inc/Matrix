@@ -82,6 +82,11 @@ public:
     return {rows, cols, [](size_t i, size_t j){ return static_cast<DataT>(i == j); }};
   }
 
+  static Matrix Random(size_t rows, size_t cols, int limit)
+  {
+    return {rows, cols, [limit](size_t, size_t){ return rand() % limit; }};
+  }
+
   /**
    * @brief Swap this matrix with rhs
    * @param rhs Other matrix
