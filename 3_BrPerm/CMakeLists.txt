@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(braces_perm)
+project(perm)
 
-set(EX_NAME ${PROJECT_NAME}.o)
+set(MUL_ORDER ${PROJECT_NAME}_order.o) # just print order
+set(MULTIPLY ${PROJECT_NAME}_multiply.o) # perform nultiply & and print measured time
 
 # option for debug (debug info)
 set(PR_DEBUG_OPTIONS -g)
@@ -18,18 +19,27 @@ set(WARN_OPTIONS
   -Wuseless-cast
   -Wunreachable-code)
 
-add_executable(${EX_NAME} main.cc chain.cc ../matrix/matrix.cc)
+add_executable(${MUL_ORDER} main.cc chain.cc ../matrix/matrix.cc)
+add_executable(${MULTIPLY} main.cc chain.cc ../matrix/matrix.cc)
+  
+set(TARGETS ${MUL_ORDER} ${MULTIPLY})
 
-target_include_directories(${EX_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(${EX_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(${EX_NAME} PRIVATE ../matrix)
+foreach(TAR ${TARGETS})
+  target_include_directories(${TAR} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(${TAR} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_include_directories(${TAR} PRIVATE ../matrix)
 
-# Specify standard
-target_compile_features(${EX_NAME} PRIVATE cxx_std_20)
+  # Specify standard
+  target_compile_features(${TAR} PRIVATE cxx_std_20)
 
-# Specify warning options
-target_compile_options(${EX_NAME} PRIVATE ${WARN_OPTIONS})
+  # Specify warning options
+  target_compile_options(${TAR} PRIVATE ${WARN_OPTIONS})
 
-# Specify compiler options for debug and release
-target_compile_options(${EX_NAME} PRIVATE "$<$<CONFIG:DEBUG>:${PR_DEBUG_OPTIONS}>")
-target_compile_options(${EX_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${PR_RELEASE_OPTIONS}>")
+  # Specify compiler options for debug and release
+  target_compile_options(${TAR} PRIVATE "$<$<CONFIG:DEBUG>:${PR_DEBUG_OPTIONS}>")
+  target_compile_options(${TAR} PRIVATE "$<$<CONFIG:RELEASE>:${PR_RELEASE_OPTIONS}>")
+endforeach()
+
+target_compile_definitions(${MUL_ORDER} PRIVATE ORDER=1)
+target_compile_definitions(${MULTIPLY} PRIVATE ORDER=0)
+
