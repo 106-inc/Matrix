@@ -15,7 +15,7 @@ static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<c
 
 void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
-  int matr_lim = 1;
+  int matr_lim = 2;
   std::vector<double> matr_buf{};
 
   for (size_t i = 0; i < amount; ++i)
@@ -68,9 +68,7 @@ int main()
 
   auto gain = static_cast<long double>(measured_naive) / measured_opt;
   std::cout << "Gain in " << gain << " times" << std::endl;
-#endif
 
-#if (TIME == 1)
   if (res == naive_res)
     std::cout << "TEST PASSED" << std::endl;
   else

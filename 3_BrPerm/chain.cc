@@ -156,7 +156,6 @@ void MatrixChain::order_n_mult()
 
   elapsed_ms_ = static_cast<ldbl>(timer.elapsed());
   result_ = mx_stack.top().first;
-  std::cout << result_;
 }
 
 detail::pSChain MatrixChain::fill_mul_tree()
