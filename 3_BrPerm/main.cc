@@ -2,6 +2,7 @@
 #include "chain.hh"
 #include "timer.hh"
 
+#if (TIME == 1)
 static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   MX::Matrix<chain::ldbl> res = mtr_vec[0];
@@ -9,11 +10,9 @@ static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<c
   for (size_t i = 1; i < amount; ++i)
     res *= mtr_vec[i];
 
-  std::cout << "Naive mul:" << std::endl;
-  std::cout << res << std::endl;
-
   return res; 
 }
+#endif
 
 void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
@@ -48,23 +47,35 @@ int main()
 
   matr_init(amount, mtr_vec);
 
+#if (TIME == 1)
+  Time::Timer naive_time;
+
   MX::Matrix<chain::ldbl> naive_res = naive_mul(amount, mtr_vec);
+
+  std::cout << "naive multiplication time: " << naive_time.elapsed() << " microsecs\n";
+#endif
 
   for (size_t i = 0; i < amount; ++i)
     ch.push(mtr_vec[i]);
 
+
+#if (TIME == 1)
+  Time::Timer optim_time;
+#endif
+
   auto res = ch.multiply();
 
+#if (TIME == 1)
+  std::cout << "optimal multiplication time: " << optim_time.elapsed() << " microsecs\n";
+#endif
+
+
+#if (TIME == 1)
   if (res == naive_res)
-    std::cout << "Test passed" << std::endl;
+    std::cout << "TEST PASSED" << std::endl;
   else 
-    std::cout << "Test didn't pass" << std::endl;
-
-
-
-  std::cout << "Optimal mul:" << std::endl;
-  std::cout << res << std::endl;
-
+    std::cout << "TEST DIDN'T PASS" << std::endl;
+#endif 
 
   std::vector<size_t> optimal_order = ch.get_order();
 

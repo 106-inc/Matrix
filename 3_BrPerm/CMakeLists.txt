@@ -41,5 +41,5 @@ foreach(TAR ${TARGETS})
 endforeach()
 
 target_compile_definitions(${MUL_ORDER} PRIVATE ORDER=1)
-target_compile_definitions(${MULTIPLY} PRIVATE ORDER=0)
+target_compile_definitions(${MULTIPLY} PRIVATE TIME=1)
 
