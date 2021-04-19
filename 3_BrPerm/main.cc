@@ -52,7 +52,8 @@ int main()
 
   MX::Matrix<chain::ldbl> naive_res = naive_mul(amount, mtr_vec);
 
-  std::cout << "naive multiplication time: " << naive_time.elapsed() << " microsecs\n";
+  auto measured_naive = naive_time.elapsed();
+  std::cout << "naive multiplication time: " << measured_naive << " microsecs\n";
 #endif
 
   for (size_t i = 0; i < amount; ++i)
@@ -66,7 +67,11 @@ int main()
   auto res = ch.multiply();
 
 #if (TIME == 1)
-  std::cout << "optimal multiplication time: " << optim_time.elapsed() << " microsecs\n";
+  auto measured_opt = optim_time.elapsed();
+  std::cout << "optimal multiplication time: " << measured_opt << " microsecs\n";
+
+  auto gain = static_cast<long double>(measured_naive) / measured_opt;
+  std::cout << "Gain in " << gain << " times" << std::endl;
 #endif
 
 
