@@ -13,7 +13,7 @@ void naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 
 void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
-  int tmp_elem = 0;
+  int matr_lim = 5;
   std::vector<double> matr_buf{};
 
   for (size_t i = 0; i < amount; ++i)
@@ -21,13 +21,7 @@ void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
     size_t rw = 0, cl = 0;
     std::cin >> rw >> cl;
 
-    for (size_t i = 0; i < rw * cl; ++i)
-    {
-      std::cin >> tmp_elem;
-      matr_buf.push_back(tmp_elem);
-    }
-
-    mtr_vec.push_back(MX::Matrix<chain::ldbl>{rw, cl, matr_buf.begin(), matr_buf.end()});
+    mtr_vec.push_back(MX::Matrix<chain::ldbl>::Random(rw, cl, matr_lim));
     matr_buf.clear();
   }
 }
@@ -51,6 +45,13 @@ int main()
 
   std::cout << "Optimal mul:" << std::endl;
   std::cout << res << std::endl;
+
+  std::vector<size_t> optimal_order = ch.get_order();
+
+  for (auto matr: optimal_order)
+    std::cout << matr << " ";
+
+  std::cout << std::endl;
 
   return 0;
 }
