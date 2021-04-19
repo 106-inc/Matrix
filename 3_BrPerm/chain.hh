@@ -63,6 +63,11 @@ struct SubChain final
     }
   }
 
+  bool is_leaf( )
+  {
+    return !left && !right;
+  }
+
   SubChain() = default;
 
   /* TODO: check is it okay */
@@ -148,43 +153,66 @@ MX::Matrix<ldbl> MatrixChain::multiply()
   order_.reserve(braces_mat_.cols() - 1);
   
   // here we walk through the tree and perform multiplication & fill order vec
-  std::stack<detail::SubChain *> to_visit;
 
   auto cur_node = root.get();
 
   MX::Matrix<ldbl> res{};
 
-  while (1)
+
+  using vis_el = std::pair<detail::SubChain *, bool>;
+  using mat_el = std::pair<MX::Matrix<ldbl>, int>;
+
+  std::stack<vis_el> to_visit;
+  std::stack<mat_el> mx_stack{};
+
+  to_visit.emplace(root.get(), false);
+
+  constexpr int MULTED = -1;
+
+  while (!to_visit.empty())
   {
-    if (!cur_node->left)
+    auto & cur_top = to_visit.top();
+    cur_node = cur_top.first;
+
+    if (cur_node->is_leaf())
     {
-      auto new_mat_ind = cur_node->interv.from_;
-      if (!res.cols())
-        // means that it is the first matrix in multiplication chain
-        res = chain_[new_mat_ind];
-      else
-        res *= chain_[new_mat_ind];
-
-      order_.emplace_back(new_mat_ind);
-
-      if (to_visit.empty())
-        break;
-      cur_node = to_visit.top();
+      auto idx = cur_node->interv.from_;
+      mx_stack.emplace(chain_[idx], idx);
       to_visit.pop();
       continue;
     }
     
-    // here we push to visiting list (actually stack) right
-    // node, but go to left
-    to_visit.emplace(cur_node->right.get());
+    if (cur_top.second)
+    {
+      auto ms_el1 = mx_stack.top();
+      mx_stack.pop();
+      auto ms_el2 = mx_stack.top();
+      mx_stack.pop();
 
-    cur_node = cur_node->left.get();
+      auto & m1 = ms_el1.first,
+           & m2 = ms_el2.first;
+
+      if (ms_el1.second != MULTED)
+        order_.push_back(ms_el1.second);
+      if (ms_el2.second != MULTED)
+        order_.push_back(ms_el2.second);
+
+      mx_stack.emplace(m1 * m2, MULTED);
+      to_visit.pop();
+    }
+    else
+    {
+      cur_top.second = true;
+      to_visit.emplace(cur_node->left.get(), false);
+      to_visit.emplace(cur_node->right.get(), false);
+    }
   }
 
   for (auto elem : order_)
     std::cout << elem << " ";
   std::cout << std::endl;
-  return res;
+
+  return mx_stack.top().first;
 }
 
 detail::pSChain MatrixChain::fill_mul_tree()
