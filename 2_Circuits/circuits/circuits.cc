@@ -61,7 +61,7 @@ Circuit::Circuit(const MX::Matrix<int> &inc, const MX::Matrix<double> &res, cons
 
 void Circuit::fill_inc_cut(const std::unordered_set<size_t> &j_loops)
 {
-  inc_cut_ = {incidence_.rows() - j_loops.size(), incidence_.cols()};
+  inc_cut_ = MX::Matrix<double>{incidence_.rows() - j_loops.size(), incidence_.cols()};
 
   size_t cut_cnt = 0;
   for (size_t i = 0, endi = incidence_.rows(); i < endi; ++i)
