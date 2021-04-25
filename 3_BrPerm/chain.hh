@@ -7,6 +7,8 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include <iterator>
+#include <algorithm>
 
 namespace chain
 {

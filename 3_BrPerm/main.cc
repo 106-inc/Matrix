@@ -18,7 +18,6 @@ void matr_init(std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   int matr_lim = 2;
   size_t rw = 0, cl = 0;
-  std::ifstream in_{"../test/0.dat"};
   auto& in = std::cin;
 
   while(in)
@@ -49,6 +48,9 @@ int main()
   chain::MatrixChain ch;
   std::vector<MX::Matrix<chain::ldbl>> mtr_vec;
 
+  /* TODO: think about output iterator like std::back_inserter for removing mtr_vec */
+  //auto ch_it = std::back_insert_iterator{ch};
+  
   try
   {
     matr_init(mtr_vec);
