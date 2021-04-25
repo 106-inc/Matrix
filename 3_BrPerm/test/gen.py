@@ -18,8 +18,6 @@ def main():
         print('Incorrect size: ' + str(args.size) + '\nTry again')
         return
 
-    print(2 * args.num_of_mul)
-
     tmp_cols = args.cols2
     cur_rows = args.rows1
     cur_cols = args.cols1

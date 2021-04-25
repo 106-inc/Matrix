@@ -2,9 +2,10 @@
 #include <fstream>
 
 #if (TIME == 1)
-static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
+static MX::Matrix<chain::ldbl> naive_mul(std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   MX::Matrix<chain::ldbl> res = mtr_vec[0];
+  size_t amount = mtr_vec.size();
 
   for (size_t i = 1; i < amount; ++i)
     res *= mtr_vec[i];
@@ -13,18 +14,24 @@ static MX::Matrix<chain::ldbl> naive_mul(size_t amount, std::vector<MX::Matrix<c
 }
 #endif
 
-void matr_init(size_t amount, std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
+void matr_init(std::vector<MX::Matrix<chain::ldbl>> &mtr_vec)
 {
   int matr_lim = 2;
-  std::vector<double> matr_buf{};
+  size_t rw = 0, cl = 0;
+  std::ifstream in_{"../test/0.dat"};
+  auto& in = std::cin;
 
-  for (size_t i = 0; i < amount; ++i)
+  while(in)
   {
-    size_t rw = 0, cl = 0;
-    std::cin >> rw >> cl;
+    in >> rw >> cl;
+
+    if (!in)
+      break;
+    
+    if (!in.good())
+      throw std::runtime_error{"Invalid character at stdin"};
 
     mtr_vec.push_back(MX::Matrix<chain::ldbl>::Random(rw, cl, matr_lim));
-    matr_buf.clear();
   }
 }
 
@@ -40,23 +47,30 @@ int main()
 #endif // REDIRECT
 
   chain::MatrixChain ch;
-  size_t amount{};
-  std::cin >> amount;
   std::vector<MX::Matrix<chain::ldbl>> mtr_vec;
 
-  matr_init(amount, mtr_vec);
+  try
+  {
+    matr_init(mtr_vec);
+  }
+
+  catch (std::exception& err)
+  {
+    std::cerr << "Error occured in " << err.what() << std::endl;
+    return -1;
+  }
 
 #if (TIME == 1)
   Time::Timer naive_time;
 
-  MX::Matrix<chain::ldbl> naive_res = naive_mul(amount, mtr_vec);
+  MX::Matrix<chain::ldbl> naive_res = naive_mul(mtr_vec);
 
   auto measured_naive = naive_time.elapsed();
   std::cout << "naive multiplication time: " << measured_naive << " microsecs\n";
 #endif
 
-  for (size_t i = 0; i < amount; ++i)
-    ch.push(mtr_vec[i]);
+  for (auto&& mtr_vec_elm : mtr_vec)
+    ch.push(mtr_vec_elm);
 
 #if (TIME == 1)
   Time::Timer optim_time;
