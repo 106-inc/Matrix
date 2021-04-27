@@ -46,6 +46,8 @@ bool SubChain::is_leaf() const
 } // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
+
+/*
 void MatrixChain::push(const MX::Matrix<ldbl> &mat)
 {
   chain_.emplace_back(mat);
@@ -59,10 +61,37 @@ void MatrixChain::push(const MX::Matrix<ldbl> &mat)
   set_braces();
   order_n_mult();
 }
+*/
+
+
+void MatrixChain::emplace(const back_it& mat, size_t rows, size_t cols)
+{
+  back_it ins_it = back_inserter();
+  ins_it = mat;
+
+  if (sizes_.size() == 0)
+    sizes_.push_back(rows), sizes_.push_back(cols);
+
+  else if (sizes_.back() != rows)
+    throw std::runtime_error{"Incompatible matrix size"};
+    
+  else
+    sizes_.push_back(cols);
+
+  set_braces();
+  order_n_mult();
+}
+
+
 
 const std::vector<size_t> &MatrixChain::get_order() const
 {
   return order_;
+}
+
+const std::vector<MX::Matrix<ldbl>>& MatrixChain::get_chain() const
+{
+  return chain_;
 }
 
 const MX::Matrix<ldbl> &MatrixChain::multiplied() const

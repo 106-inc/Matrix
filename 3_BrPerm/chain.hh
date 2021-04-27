@@ -10,6 +10,7 @@
 #include <iterator>
 #include <algorithm>
 
+
 namespace chain
 {
 using ldbl = long double;
@@ -60,6 +61,8 @@ private:
 
   ldbl elapsed_ms_{};
 
+public:
+
   using back_it = std::back_insert_iterator<std::vector<MX::Matrix<ldbl>>>;
 
 public:
@@ -69,10 +72,13 @@ public:
   MatrixChain &operator=(const MatrixChain &) = delete;
 
   // add matrix to chain
-  void push(const MX::Matrix<ldbl> &mat);
+  void emplace(const back_it& mat, size_t rows, size_t cols);
 
   // get multiplication order
   const std::vector<size_t> &get_order() const;
+
+  // get current matrix chain
+  const std::vector<MX::Matrix<ldbl>>& get_chain() const;
 
   const MX::Matrix<ldbl> &multiplied() const;
 
@@ -81,9 +87,9 @@ public:
     return elapsed_ms_;
   }
 
-  back_it back_insert(MatrixChain& ch)
+  back_it back_inserter()
   {
-    return back_it(ch.chain_);
+    return back_it(chain_);
   }
 
   ~MatrixChain() = default;
