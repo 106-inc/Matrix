@@ -39,6 +39,9 @@ struct SubChain final
 
   SubChain() = default;
 
+  SubChain(const SubChain&) = delete;
+  SubChain& operator=(const SubChain&) = delete; 
+
   /* TODO: check is it okay */
 };
 } // namespace detail
@@ -57,6 +60,8 @@ private:
 
   ldbl elapsed_ms_{};
 
+  using back_it = std::back_insert_iterator<std::vector<MX::Matrix<ldbl>>>;
+
 public:
   MatrixChain() = default;
 
@@ -74,6 +79,11 @@ public:
   ldbl get_mult_time() const
   {
     return elapsed_ms_;
+  }
+
+  back_it back_insert(MatrixChain& ch)
+  {
+    return back_it(ch.chain_);
   }
 
   ~MatrixChain() = default;

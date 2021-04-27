@@ -49,7 +49,6 @@ int main()
   std::vector<MX::Matrix<chain::ldbl>> mtr_vec;
 
   /* TODO: think about output iterator like std::back_inserter for removing mtr_vec */
-  //auto ch_it = std::back_insert_iterator{ch};
   
   try
   {
