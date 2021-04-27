@@ -93,7 +93,30 @@ const std::vector<size_t> &MatrixChain::get_order() const
   return order_;
 }
 
-const std::vector<MX::Matrix<ldbl>>& MatrixChain::get_chain() const
+const std::vector <size_t> MatrixChain::get_op_order() const
+{
+  std::vector<size_t> op_order;
+  size_t ord_size = order_.size();
+  size_t tmp = 0;
+
+  for (size_t i = 0; i < ord_size - 1; ++i)
+  {
+    if (order_[i + 1] == 0)
+      tmp = 0;
+
+    else if (std::fabs(order_[i + 1] - order_[i]) == 1)
+      tmp = order_[i];
+
+    else (std::fabs(order_[i + 1] - order_[i]) > 1)
+      tmp = order_[i + 1] - 1;
+    
+    op_order.push_back(tmp);
+  }
+
+  return op_order;
+}
+
+const std::vector<MX::Matrix<ldbl>> &MatrixChain::get_chain() const
 {
   return chain_;
 }

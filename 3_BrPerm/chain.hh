@@ -83,6 +83,8 @@ public:
   // get multiplication order
   const std::vector<size_t> &get_order() const;
 
+  const std::vector <size_t> get_op_order() const;
+
   // get current matrix chain
   const std::vector<MX::Matrix<ldbl>>& get_chain() const;
 

@@ -25,7 +25,7 @@ void ch_init(chain::MatrixChain& chain)
   size_t rw = 0, cl = 0;
   auto& in = std::cin;
 
-  chain::MatrixChain::back_it ch_back = chain.back_inserter();
+  chain::MatrixChain::back_it chain_back = chain.back_inserter();
 
   while(in)
   {
@@ -38,9 +38,9 @@ void ch_init(chain::MatrixChain& chain)
       throw std::runtime_error{"Invalid character at stdin"};
 
     
-    ch_back = MX::Matrix<chain::ldbl>::Random(rw, cl, matr_lim);
+    chain_back = MX::Matrix<chain::ldbl>::Random(rw, cl, matr_lim);
 
-    chain.emplace(ch_back, rw, cl);
+    chain.emplace(chain_back, rw, cl);
 
   }
 }
@@ -76,11 +76,7 @@ int main()
 
   auto measured_naive = naive_time.elapsed();
   std::cout << "naive multiplication time: " << measured_naive << " microsecs\n";
-#endif
 
-
-
-#if (TIME == 1)
   Time::Timer optim_time;
 
   auto res = ch.multiplied();
@@ -97,11 +93,18 @@ int main()
     std::cout << "TEST FAILED" << std::endl;
 #endif
 
-  std::vector<size_t> optimal_order = ch.get_order();
-
 #if (ORDER == 1)
+
+  std::vector<size_t> optimal_order = ch.get_order();
   for (auto matr : optimal_order)
     std::cout << matr << " ";
+
+  std::cout << std::endl;
+
+  std::vector<size_t> optimal_op_order = ch.get_op_order();
+
+  for (auto op : optimal_op_order)
+    std::cout << op << " ";
 
   std::cout << std::endl;
 
