@@ -93,6 +93,7 @@ const std::vector<size_t> &MatrixChain::get_order() const
   return order_;
 }
 
+// TODO: мы выставляем порядок матриц а не операций: придумать алгос для операций
 const std::vector <size_t> MatrixChain::get_op_order() const
 {
   std::vector<size_t> op_order;
@@ -106,10 +107,9 @@ const std::vector <size_t> MatrixChain::get_op_order() const
 
     else if (std::fabs(order_[i + 1] - order_[i]) == 1)
       tmp = order_[i];
-
-    else (std::fabs(order_[i + 1] - order_[i]) > 1)
-      tmp = order_[i + 1] - 1;
     
+    else tmp = order_[i + 1] - 1;
+
     op_order.push_back(tmp);
   }
 
