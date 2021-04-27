@@ -27,6 +27,7 @@ struct Interval final
   bool operator<(const Interval &rhs) const;
 };
 
+
 struct SubChain final
 {
   Interval interv{};
@@ -35,6 +36,7 @@ struct SubChain final
   SubChain(Interval inter, pSChain l = {}, pSChain r = {}) : interv(inter), left(std::move(l)), right(std::move(r)){};
 
   void insert(const Interval &to_insert);
+  pSChain::pointer find(const Interval &to_find);
 
   bool is_leaf() const;
 
@@ -45,6 +47,7 @@ struct SubChain final
 
   /* TODO: check is it okay */
 };
+
 } // namespace detail
 
 class MatrixChain final
@@ -73,6 +76,9 @@ public:
 
   // add matrix to chain
   void emplace(const back_it& mat, size_t rows, size_t cols);
+
+  void push(const MX::Matrix<ldbl> &mat);
+  void push(const back_it& mat);
 
   // get multiplication order
   const std::vector<size_t> &get_order() const;

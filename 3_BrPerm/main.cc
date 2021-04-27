@@ -58,12 +58,8 @@ int main()
 
   chain::MatrixChain ch;
 
-
-  /* TODO: think about output iterator like std::back_inserter for removing mtr_vec */
-  
   try
   {
-    //matr_init(mtr_vec);
     ch_init(ch);
   }
 

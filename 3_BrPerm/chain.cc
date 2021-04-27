@@ -14,16 +14,22 @@ bool Interval::operator<(const Interval &rhs) const
 
 void SubChain::insert(const Interval &to_insert)
 {
+  auto found_node = find(to_insert);
+  found_node->interv = to_insert;
+}
+
+pSChain::pointer SubChain::find(const Interval &to_find)
+{
   auto cur_node = this;
 
   while (true)
   {
-    if (to_insert < cur_node->interv)
+    if (to_find < cur_node->interv)
     {
       if (!cur_node->left)
       {
-        cur_node->left = std::make_unique<SubChain>(to_insert);
-        return;
+        cur_node->left = std::make_unique<SubChain>();
+        return cur_node->left.get();
       }
       cur_node = cur_node->left.get();
     }
@@ -31,12 +37,12 @@ void SubChain::insert(const Interval &to_insert)
     {
       if (!cur_node->right)
       {
-        cur_node->right = std::make_unique<SubChain>(to_insert);
-        return;
+        cur_node->right = std::make_unique<SubChain>();
+        return cur_node->right.get();
       }
       cur_node = cur_node->right.get();
     }
-  }
+  } 
 }
 
 bool SubChain::is_leaf() const
@@ -47,7 +53,7 @@ bool SubChain::is_leaf() const
 
 //////////////////////////////////////////////////////////////////////////
 
-/*
+
 void MatrixChain::push(const MX::Matrix<ldbl> &mat)
 {
   chain_.emplace_back(mat);
@@ -61,7 +67,6 @@ void MatrixChain::push(const MX::Matrix<ldbl> &mat)
   set_braces();
   order_n_mult();
 }
-*/
 
 
 void MatrixChain::emplace(const back_it& mat, size_t rows, size_t cols)
@@ -81,7 +86,6 @@ void MatrixChain::emplace(const back_it& mat, size_t rows, size_t cols)
   set_braces();
   order_n_mult();
 }
-
 
 
 const std::vector<size_t> &MatrixChain::get_order() const
@@ -191,7 +195,8 @@ detail::pSChain MatrixChain::fill_mul_tree()
 {
   size_t num_of_mat = chain_.size();
   detail::Interval init_int = {0, num_of_mat - 1, braces_mat_[0][num_of_mat - 1] - 1};
-  detail::pSChain root = std::make_unique<detail::SubChain>(init_int);
+  auto root = std::make_unique<detail::SubChain>(init_int);
+
   if (num_of_mat == 1)
     return root;
 
